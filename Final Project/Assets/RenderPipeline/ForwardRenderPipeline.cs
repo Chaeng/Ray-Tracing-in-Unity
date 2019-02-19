@@ -47,13 +47,14 @@ public class ForwardRenderPipeline : RenderPipeline
 
         #region Clear Flag - Clear the previous frame
 
-        var buffer = new CommandBuffer { name = camera.name };  // We batch the commands into a buffer to reduce the amount of sending commands to GPU
+        var buffer = new CommandBuffer { name = "Forward Renderer" };  // We batch the commands into a buffer to reduce the amount of sending commands to GPU
 
         CameraClearFlags clearFlags = camera.clearFlags;        // Each camera can config its clear flag to determine what should be shown if nothing can be seen by the camera
         buffer.ClearRenderTarget(
             ((clearFlags & CameraClearFlags.Depth) != 0), 
             ((clearFlags & CameraClearFlags.Color) != 0), 
-            camera.backgroundColor);     
+            camera.backgroundColor);
+         
 
         renderContext.ExecuteCommandBuffer(buffer);     // We copied all the commands to an internal memory that is ready to send to GPU
         buffer.Release();                               // Release the memory allocated by the buffer as all the commands already copied to internal memory
