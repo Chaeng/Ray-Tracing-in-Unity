@@ -21,7 +21,7 @@ using UnityEngine.Experimental.Rendering;   // Since SRP is an experimental feat
 public class RayTracingRenderPipelineAsset : RenderPipelineAsset
 {
     public ComputeShader computeShader;
-
+    public Texture skybox;
 
     /// <summary>
     /// This return a render pipeline to Unity. It is used by Unity.
@@ -29,6 +29,6 @@ public class RayTracingRenderPipelineAsset : RenderPipelineAsset
     /// <returns>The create pipeline.</returns>
     protected override IRenderPipeline InternalCreatePipeline()
     {
-        return new RayTracingRenderPipeline(computeShader);
+        return new RayTracingRenderPipeline(computeShader, skybox);
     }
 }

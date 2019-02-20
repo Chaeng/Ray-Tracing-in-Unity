@@ -9,11 +9,13 @@ public class RayTracingRenderPipeline : RenderPipeline
     private ComputeShader m_computeShader;
 
     private RenderTexture m_target;
+    private Texture m_skyboxTex;
 
 
-    public RayTracingRenderPipeline(ComputeShader computeShader)
+    public RayTracingRenderPipeline(ComputeShader computeShader, Texture skybox)
     {
         m_computeShader = computeShader;
+        m_skyboxTex = skybox;
     }
 
 
@@ -59,6 +61,7 @@ public class RayTracingRenderPipeline : RenderPipeline
 
         m_computeShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
         m_computeShader.SetMatrix("_CameraInverseProjection", camera.projectionMatrix.inverse);
+        m_computeShader.SetTexture(0, "_SkyboxTexture", m_skyboxTex);
         m_computeShader.SetTexture(0, "Result", m_target);
         int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);
         int threadGroupsY = Mathf.CeilToInt(Screen.height / 8.0f);
