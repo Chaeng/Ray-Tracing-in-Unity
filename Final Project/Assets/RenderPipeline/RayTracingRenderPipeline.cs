@@ -6,10 +6,10 @@ using UnityEngine.Experimental.Rendering;   // Since SRP is an experimental feat
 
 public class RayTracingRenderPipeline : RenderPipeline
 {
-    private ComputeShader m_computeShader;
+    private ComputeShader m_computeShader;  // The compute shader we are going to write our ray tracing program on
 
-    private RenderTexture m_target;
-    private Texture m_skyboxTex;
+    private RenderTexture m_target;         // The texture to hold the ray tracing result from the compute shader
+    private Texture m_skyboxTex;            // The skybox we used as the background
 
 
     public RayTracingRenderPipeline(ComputeShader computeShader, Texture skybox)
@@ -29,7 +29,7 @@ public class RayTracingRenderPipeline : RenderPipeline
     {
         base.Render(renderContext, cameras);
 
-        foreach(var camera in cameras)
+        foreach (var camera in cameras)
         {
             RenderPerCamera(renderContext, camera);
         }
@@ -65,9 +65,10 @@ public class RayTracingRenderPipeline : RenderPipeline
         m_computeShader.SetTexture(0, "Result", m_target);
         int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);
         int threadGroupsY = Mathf.CeilToInt(Screen.height / 8.0f);
-        m_computeShader.Dispatch(0, threadGroupsX, threadGroupsY, 1);
-
-
+        if (threadGroupsX > 0 && threadGroupsY > 0)                 // Prevent dispatching 0 threads to GPU (when the editor is starting or there is no screen to render) 
+        {
+            m_computeShader.Dispatch(0, threadGroupsX, threadGroupsY, 1);
+        }
 
         buffer.Blit(m_target, camera.activeTexture);
 
@@ -91,10 +92,10 @@ public class RayTracingRenderPipeline : RenderPipeline
     /// </summary>
     private void InitRenderTexture()
     {
-        if(m_target == null || m_target.width != Screen.width || m_target.height != Screen.height)
+        if (m_target == null || m_target.width != Screen.width || m_target.height != Screen.height)
         {
             // Release render texture if we already have one
-            if(m_target != null)
+            if (m_target != null)
                 m_target.Release();
 
             // Get a render target for Ray Tracing
