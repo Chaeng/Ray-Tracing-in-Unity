@@ -16,6 +16,8 @@
 
 # Rider IDE configuration
 .idea/
+Final Project/Assets/Plugins/Editor/JetBrains.meta
+Final Project/Assets/Plugins/Editor/JetBrains/
 
 # Gradle cache directory
 .gradle/
