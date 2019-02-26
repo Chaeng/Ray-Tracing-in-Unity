@@ -1,4 +1,7 @@
-﻿// Each #kernel tells which function to compile; you can have many kernels
+﻿#include "Ray.compute"
+#include "RayHit.compute"
+
+// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
 
 // Create a RenderTexture with enableRandomWrite flag and set it
@@ -17,35 +20,6 @@ float4x4 _CameraInverseProjection;
 // sphere
 int _NumOfSpheres;
 StructuredBuffer<float> _Spheres;
-
-
-struct Ray
-{
-    float3 origin;
-    float3 direction;
-};
-Ray CreateRay(float3 origin, float3 direction)
-{
-    Ray ray;
-    ray.origin = origin;
-    ray.direction = direction;
-    return ray;
-}
-
-struct RayHit
-{
-    float3 position;
-    float distance;
-    float3 normal;
-};
-RayHit CreateRayHit()
-{
-    RayHit hit;
-    hit.position = float3(0.0f, 0.0f, 0.0f);
-    hit.distance = 1.#INF;
-    hit.normal = float3(0.0f, 0.0f, 0.0f);
-    return hit;
-}
 
 Ray CreateCameraRay(float2 uv)
 {
