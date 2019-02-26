@@ -1,0 +1,14 @@
+﻿struct RayHit
+{
+    float3 position;
+    float distance;
+    float3 normal;
+};
+RayHit CreateRayHit()
+{
+    RayHit hit;
+    hit.position = float3(0.0f, 0.0f, 0.0f);
+    hit.distance = 1.#INF;
+    hit.normal = float3(0.0f, 0.0f, 0.0f);
+    return hit;
+}
