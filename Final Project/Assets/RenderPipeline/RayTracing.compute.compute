@@ -17,6 +17,10 @@ float4x4 _CameraToWorld;
 float4x4 _CameraInverseProjection;
 
 
+// sphere
+int _NumOfSpheres;
+StructuredBuffer<float> _Spheres;
+
 Ray CreateCameraRay(float2 uv)
 {
     // Transform the camera origin to world space
@@ -100,8 +104,12 @@ void IntersectSphere(Ray ray, inout RayHit bestHit, float4 sphere)
 RayHit Trace(Ray ray)
 {
     RayHit bestHit = CreateRayHit();
-    // Add a floating unit sphere
-       IntersectSphere(ray, bestHit, float4(0, 3.0f, 0, 1.0f));
+
+    if(_NumOfSpheres > 0)
+    {
+        IntersectSphere(ray, bestHit, float4(_Spheres[0], _Spheres[1], _Spheres[2], _Spheres[3]));
+    }
+
     return bestHit;
 }
 

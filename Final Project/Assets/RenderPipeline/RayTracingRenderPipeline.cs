@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;                // Import Unity stuff related to rendering that is shared by all rendering pipelines
-using UnityEngine.Experimental.Rendering;   // Since SRP is an experimental feature, we have to import it using this namespace
+using UnityEngine.Experimental.Rendering;
+using UnityEngine.SceneManagement;
+
+// Since SRP is an experimental feature, we have to import it using this namespace
 
 public class RayTracingRenderPipeline : RenderPipeline
 {
@@ -10,6 +13,8 @@ public class RayTracingRenderPipeline : RenderPipeline
 
     private RenderTexture m_target;         // The texture to hold the ray tracing result from the compute shader
     private Texture m_skyboxTex;            // The skybox we used as the background
+    
+    private List<float[]> m_sphereGeom = new List<float[]>();
 
 
     public RayTracingRenderPipeline(ComputeShader computeShader, Texture skybox)
@@ -29,11 +34,33 @@ public class RayTracingRenderPipeline : RenderPipeline
     {
         base.Render(renderContext, cameras);
 
+        ParseScene(SceneManager.GetActiveScene());
+
         foreach (var camera in cameras)
         {
             RenderPerCamera(renderContext, camera);
         }
     }
+
+
+
+    private void ParseScene(Scene scene)
+    {
+        m_sphereGeom.Clear();
+        
+        GameObject[] roots = scene.GetRootGameObjects();
+
+        foreach (var root in roots)
+        {
+            RTSphereRenderer[] sphereRenderers = root.GetComponentsInChildren<RTSphereRenderer>();
+
+            foreach (var renderer in sphereRenderers)
+            {
+                m_sphereGeom.Add(renderer.GetGeometry());
+            }
+        }
+    }
+    
 
 
     /// <summary>
@@ -57,17 +84,38 @@ public class RayTracingRenderPipeline : RenderPipeline
             ((clearFlags & CameraClearFlags.Depth) != 0),
             ((clearFlags & CameraClearFlags.Color) != 0),
             camera.backgroundColor);
-
+        
+        #endregion
+        
+        
+        #region Ray Tracing
 
         m_computeShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
         m_computeShader.SetMatrix("_CameraInverseProjection", camera.projectionMatrix.inverse);
         m_computeShader.SetTexture(0, "_SkyboxTexture", m_skyboxTex);
+        m_computeShader.SetInt("_NumOfSpheres", m_sphereGeom.Count);
+        ComputeBuffer sphereBuffer = null;
+        if (m_sphereGeom.Count > 0)
+        {
+            sphereBuffer = new ComputeBuffer(4, 16);
+            sphereBuffer.SetData(m_sphereGeom[0]);
+        }
+        else
+        {
+            sphereBuffer = new ComputeBuffer(1, 4);     // need to be at least 4 bytes long
+        }
+        m_computeShader.SetBuffer(0, "_Spheres", sphereBuffer);
         m_computeShader.SetTexture(0, "Result", m_target);
         int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);
         int threadGroupsY = Mathf.CeilToInt(Screen.height / 8.0f);
         if (threadGroupsX > 0 && threadGroupsY > 0)                 // Prevent dispatching 0 threads to GPU (when the editor is starting or there is no screen to render) 
         {
             m_computeShader.Dispatch(0, threadGroupsX, threadGroupsY, 1);
+        }
+
+        if (sphereBuffer != null)
+        {
+            sphereBuffer.Release();
         }
 
         buffer.Blit(m_target, camera.activeTexture);
