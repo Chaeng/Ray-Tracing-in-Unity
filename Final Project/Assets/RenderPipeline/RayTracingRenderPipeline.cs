@@ -106,6 +106,11 @@ public class RayTracingRenderPipeline : RenderPipeline
             sphereBuffer.SetData(m_sphereGeom);
             m_computeShader.SetBuffer(0, "_Spheres", sphereBuffer);
         }
+        else
+        {
+            sphereBuffer = new ComputeBuffer(1, 4);     // need to be at least 4 bytes long
+        }
+        m_computeShader.SetBuffer(0, "_Spheres", sphereBuffer);
         m_computeShader.SetTexture(0, "Result", m_target);
         int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);
         int threadGroupsY = Mathf.CeilToInt(Screen.height / 8.0f);
