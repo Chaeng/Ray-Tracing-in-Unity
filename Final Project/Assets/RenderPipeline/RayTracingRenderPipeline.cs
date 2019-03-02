@@ -14,8 +14,8 @@ public class RayTracingRenderPipeline : RenderPipeline
 
     private RenderTexture m_target;         // The texture to hold the ray tracing result from the compute shader
     private Texture m_skyboxTex;            // The skybox we used as the background
-    
-    private List<float[]> m_sphereGeom = new List<float[]>();
+
+    private List<float> m_sphereGeom;
 
     // We batch the commands into a buffer to reduce the amount of sending commands to GPU
     // Reusing the command buffer object avoids continuous memory allocation
@@ -62,9 +62,14 @@ public class RayTracingRenderPipeline : RenderPipeline
 
     private void ParseScene(Scene scene)
     {
-        m_sphereGeom.Clear();
-        
         GameObject[] roots = scene.GetRootGameObjects();
+
+        // TODO: Optimize dynamic array generation
+        if(m_sphereGeom == null)
+        {
+            m_sphereGeom = new List<float>();
+        }
+        m_sphereGeom.Clear();
 
         foreach (var root in roots)
         {
@@ -72,11 +77,11 @@ public class RayTracingRenderPipeline : RenderPipeline
 
             foreach (var renderer in sphereRenderers)
             {
-                m_sphereGeom.Add(renderer.GetGeometry());
+                m_sphereGeom.AddRange(renderer.GetGeometry());
             }
         }
     }
-    
+
 
 
     /// <summary>
@@ -107,12 +112,13 @@ public class RayTracingRenderPipeline : RenderPipeline
         m_computeShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
         m_computeShader.SetMatrix("_CameraInverseProjection", camera.projectionMatrix.inverse);
         m_computeShader.SetTexture(0, "_SkyboxTexture", m_skyboxTex);
-        m_computeShader.SetInt("_NumOfSpheres", m_sphereGeom.Count);
+        m_computeShader.SetInt("_NumOfSpheres", m_sphereGeom.Count / 4);
         ComputeBuffer sphereBuffer = null;
-        if (m_sphereGeom.Count > 0)
+        if (m_sphereGeom.Count / 4 > 0)
         {
-            sphereBuffer = new ComputeBuffer(4, 16);
-            sphereBuffer.SetData(m_sphereGeom[0]);
+            sphereBuffer = new ComputeBuffer(m_sphereGeom.Count, sizeof(float));
+            sphereBuffer.SetData(m_sphereGeom);
+            m_computeShader.SetBuffer(0, "_Spheres", sphereBuffer);
         }
         else
         {

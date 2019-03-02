@@ -105,9 +105,9 @@ RayHit Trace(Ray ray)
 {
     RayHit bestHit = CreateRayHit();
 
-    if(_NumOfSpheres > 0)
+    for(int i = 0; i < _NumOfSpheres; i++)
     {
-        IntersectSphere(ray, bestHit, float4(_Spheres[0], _Spheres[1], _Spheres[2], _Spheres[3]));
+        IntersectSphere(ray, bestHit, float4(_Spheres[4*i], _Spheres[4*i+1], _Spheres[4*i+2], _Spheres[4*i+3]));
     }
 
     return bestHit;
