@@ -25,11 +25,15 @@ public class RTSphereRenderer : RTRenderer
     }
 
 
-    public float[] GetGeometry()
+    public RTSphere_t GetGeometry()
     {
         if (mySphere == null)
         {
-            return new float[4]{0, 0, 0, 0};
+            return new RTSphere_t()
+            {
+                center = Vector3.zero,
+                radius = 0
+            };
         }
 
         return mySphere.GetGeometry();

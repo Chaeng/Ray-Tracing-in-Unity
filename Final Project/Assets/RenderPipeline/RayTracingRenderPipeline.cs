@@ -14,7 +14,7 @@ public class RayTracingRenderPipeline : RenderPipeline
     private RenderTexture m_target;         // The texture to hold the ray tracing result from the compute shader
     private Texture m_skyboxTex;            // The skybox we used as the background
 
-    private List<float> m_sphereGeom;
+    private List<RTSphere_t> m_sphereGeom;
 
 
     public RayTracingRenderPipeline(ComputeShader computeShader, Texture skybox)
@@ -51,7 +51,7 @@ public class RayTracingRenderPipeline : RenderPipeline
         // TODO: Optimize dynamic array generation
         if(m_sphereGeom == null)
         {
-            m_sphereGeom = new List<float>();
+            m_sphereGeom = new List<RTSphere_t>();
         }
         m_sphereGeom.Clear();
 
@@ -61,7 +61,7 @@ public class RayTracingRenderPipeline : RenderPipeline
 
             foreach (var renderer in sphereRenderers)
             {
-                m_sphereGeom.AddRange(renderer.GetGeometry());
+                m_sphereGeom.Add(renderer.GetGeometry());
             }
         }
     }
@@ -98,17 +98,17 @@ public class RayTracingRenderPipeline : RenderPipeline
         m_computeShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
         m_computeShader.SetMatrix("_CameraInverseProjection", camera.projectionMatrix.inverse);
         m_computeShader.SetTexture(0, "_SkyboxTexture", m_skyboxTex);
-        m_computeShader.SetInt("_NumOfSpheres", m_sphereGeom.Count / 4);
+        m_computeShader.SetInt("_NumOfSpheres", m_sphereGeom.Count);
         ComputeBuffer sphereBuffer = null;
-        if (m_sphereGeom.Count / 4 > 0)
+        if (m_sphereGeom.Count> 0)
         {
-            sphereBuffer = new ComputeBuffer(m_sphereGeom.Count, sizeof(float));
+            sphereBuffer = new ComputeBuffer(m_sphereGeom.Count, 4*sizeof(float));
             sphereBuffer.SetData(m_sphereGeom);
             m_computeShader.SetBuffer(0, "_Spheres", sphereBuffer);
         }
         else
         {
-            sphereBuffer = new ComputeBuffer(1, 4);     // need to be at least 4 bytes long
+            sphereBuffer = new ComputeBuffer(1, 16);     // need to be at least 16 bytes long for RTSphere_t
         }
         m_computeShader.SetBuffer(0, "_Spheres", sphereBuffer);
         m_computeShader.SetTexture(0, "Result", m_target);

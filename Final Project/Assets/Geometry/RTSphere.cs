@@ -13,16 +13,15 @@ public class RTSphere : RTGeometry
     }
 
 
-    public float[] GetGeometry()
+    public RTSphere_t GetGeometry()
     {
-        var center = transform.position;
+        var _center = transform.position;
         
-        return new float[4]
+        
+        return new RTSphere_t 
         {
-            center.x,
-            center.y,
-            center.z,
-            m_radius
+            center = _center,
+            radius = m_radius
         };
     }
 }
