@@ -17,7 +17,7 @@ using UnityEngine;
 using UnityEngine.Experimental.Rendering;   // Since SRP is an experimental feature, we have to import it using this namespace
 
 
-[CreateAssetMenu(menuName = "Rendering/RayTracingPipeline")]
+[CreateAssetMenu(menuName = "Rendering/RayTracingRenderPipeline")]
 public class RayTracingRenderPipelineAsset : RenderPipelineAsset
 {
     public ComputeShader computeShader;
