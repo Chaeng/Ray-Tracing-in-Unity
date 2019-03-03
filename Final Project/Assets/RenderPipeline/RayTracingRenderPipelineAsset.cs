@@ -20,7 +20,7 @@ using UnityEngine.SceneManagement;
 // Since SRP is an experimental feature, we have to import it using this namespace
 
 
-[CreateAssetMenu(menuName = "Rendering/RayTracingPipeline")]
+[CreateAssetMenu(menuName = "Rendering/RayTracingRenderPipeline")]
 public class RayTracingRenderPipelineAsset : RenderPipelineAsset
 {
     public RenderPipelineConfigObject m_defaultConfig;
