@@ -5,7 +5,7 @@ float3 PhongDiffuseShading(float3 lightDir, float3 lightColor, float3 hitNormal)
     float nDotL = dot(hitNormal, lightDir);
     if(nDotL > 0)
     {
-        return lightColor * dot(hitNormal, lightDir);
+        return lightColor * nDotL;
     }
     return float3(0, 0, 0);
 }
