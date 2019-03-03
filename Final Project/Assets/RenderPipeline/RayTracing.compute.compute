@@ -10,9 +10,15 @@
 // with cs.SetTexture
 RWTexture2D<float4> Result;
 
+// Global Settings
+
 //Skybox
 Texture2D<float4> _SkyboxTexture;
 SamplerState sampler_SkyboxTexture;
+
+
+// Ambient
+float3 _AmbientGlobal;
 
 
 float4x4 _CameraToWorld;
