@@ -6,6 +6,8 @@ float3 Shade(
     float3 ambientColor,
     int numOfDirLight,
     StructuredBuffer<RTDirectionalLight> dirLights,
+    int numOfPointLight,
+    StructuredBuffer<RTPointLight> pointLights,
     Texture2D<float4> skybox, 
     SamplerState skyboxSampler)
 {
