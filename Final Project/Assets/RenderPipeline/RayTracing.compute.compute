@@ -74,7 +74,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     
     // Trace and shade
     RayHit hit = Trace(ray);
-    float3 result = Shade(ray, hit, _SkyboxTexture, sampler_SkyboxTexture);
+    float3 result = Shade(ray, hit, _AmbientGlobal, _SkyboxTexture, sampler_SkyboxTexture);
     Result[id.xy] = float4(result, 1);
 }
 

@@ -1,11 +1,10 @@
 ﻿static const float PI = 3.14159265f;
 
-float3 Shade(inout Ray ray, RayHit hit, Texture2D<float4> skybox, SamplerState skyboxSampler)
+float3 Shade(inout Ray ray, RayHit hit, float3 ambientColor, Texture2D<float4> skybox, SamplerState skyboxSampler)
 {
     if (hit.distance < 1.#INF)
     {
-        // Return the normal
-        return hit.normal * 0.5f + 0.5f;
+        return ambientColor;
     }
     else
     {
