@@ -1,5 +1,6 @@
 ﻿#include "Ray.compute"
 #include "RayHit.compute"
+#include "Light/RTDirectionalLight.compute"
 #include "RTSphere.compute"
 #include "Shading/Phong.compute"
 
@@ -20,10 +21,13 @@ SamplerState sampler_SkyboxTexture;
 // Ambient
 float3 _AmbientGlobal;
 
-
+// Camera
 float4x4 _CameraToWorld;
 float4x4 _CameraInverseProjection;
 
+// Light
+int _NumOfDirectionalLights;
+StructuredBuffer<RTDirectionalLight> _DirectionalLights;
 
 // sphere
 int _NumOfSpheres;
@@ -74,7 +78,14 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     
     // Trace and shade
     RayHit hit = Trace(ray);
-    float3 result = Shade(ray, hit, _AmbientGlobal, _SkyboxTexture, sampler_SkyboxTexture);
+    float3 result = Shade(
+        ray, 
+        hit, 
+        _AmbientGlobal,
+        _NumOfDirectionalLights,
+         _DirectionalLights,
+        _SkyboxTexture, 
+        sampler_SkyboxTexture);
     Result[id.xy] = float4(result, 1);
 }
 

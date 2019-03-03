@@ -1,10 +1,26 @@
 ﻿static const float PI = 3.14159265f;
 
-float3 Shade(inout Ray ray, RayHit hit, float3 ambientColor, Texture2D<float4> skybox, SamplerState skyboxSampler)
+float3 Shade(
+    inout Ray ray, 
+    RayHit hit, 
+    float3 ambientColor,
+    int numOfDirLight,
+    StructuredBuffer<RTDirectionalLight> dirLights,
+    Texture2D<float4> skybox, 
+    SamplerState skyboxSampler)
 {
     if (hit.distance < 1.#INF)
     {
-        return ambientColor;
+        float3 color = ambientColor;
+        
+        for(int i = 0; i < numOfDirLight; i++)
+        {
+            float3 R = reflect(-1 * dirLights[i].direction, hit.normal);
+            float vDotR = dot(-1 * ray.direction, R);
+            color = color + dirLights[i].color * dot(hit.normal, dirLights[i].direction) + dirLights[i].color * pow(vDotR, 5);
+        }
+        
+        return color;
     }
     else
     {

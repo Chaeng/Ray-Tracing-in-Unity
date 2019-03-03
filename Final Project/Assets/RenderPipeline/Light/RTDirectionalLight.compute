@@ -1,0 +1,8 @@
+﻿// Represent a directional light in HLSL Shader
+// Corresponding to RTLightStructureDirectional.cs
+
+struct RTDirectionalLight
+{
+    float3 color;
+    float3 direction;
+};
