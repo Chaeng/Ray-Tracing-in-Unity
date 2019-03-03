@@ -14,14 +14,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;   // Since SRP is an experimental feature, we have to import it using this namespace
+using UnityEngine.Experimental.Rendering;
+using UnityEngine.SceneManagement;
+
+// Since SRP is an experimental feature, we have to import it using this namespace
 
 
-[CreateAssetMenu(menuName = "Rendering/RayTracingPipeline")]
+[CreateAssetMenu(menuName = "Rendering/RayTracingRenderPipeline")]
 public class RayTracingRenderPipelineAsset : RenderPipelineAsset
 {
+    public RenderPipelineConfigObject m_defaultConfig;
+    public List<RenderPipelineConfigObject> m_config;
+
     public ComputeShader computeShader;
-    public Texture skybox;
 
     /// <summary>
     /// This return a render pipeline to Unity. It is used by Unity.
@@ -29,6 +34,6 @@ public class RayTracingRenderPipelineAsset : RenderPipelineAsset
     /// <returns>The create pipeline.</returns>
     protected override IRenderPipeline InternalCreatePipeline()
     {
-        return new RayTracingRenderPipeline(computeShader, skybox);
+        return new RayTracingRenderPipeline(computeShader, m_config);
     }
 }

@@ -12,5 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b030931155ed4422ab303b66ead784f1, type: 3}
   m_Name: RayTracingRenderPipeline
   m_EditorClassIdentifier: 
+  m_defaultConfig: {fileID: 11400000, guid: d8e3fc0408e7c48b2a407df760bd6741, type: 2}
+  m_config:
+  - {fileID: 11400000, guid: d8e3fc0408e7c48b2a407df760bd6741, type: 2}
+  - {fileID: 11400000, guid: ce4669f394e6c443ba6192f9aad21414, type: 2}
   computeShader: {fileID: 7200000, guid: 7981801b75d814ddc9940706eeaeda14, type: 3}
   skybox: {fileID: 2800000, guid: 1153dc89e66880c4eb7adc16ba588855, type: 3}
