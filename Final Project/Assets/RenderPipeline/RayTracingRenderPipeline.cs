@@ -142,6 +142,11 @@ public class RayTracingRenderPipeline : RenderPipeline
 
             foreach (var light in lights)
             {
+                if (!light.gameObject.activeSelf)
+                {
+                    continue;
+                }
+                
                 switch (light.type)
                 {
                     case LightType.Directional:
@@ -217,6 +222,9 @@ public class RayTracingRenderPipeline : RenderPipeline
             sphereBuffer = new ComputeBuffer(1, 16);     // need to be at least 16 bytes long for RTSphere_t
         }
         m_computeShader.SetBuffer(0, "_Spheres", sphereBuffer);
+        
+        // Ambient Light
+        
         m_computeShader.SetVector("_AmbientGlobal", m_config.ambitent);
         
         // Directional Lights
