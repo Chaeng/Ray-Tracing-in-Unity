@@ -25,7 +25,7 @@ public class RayTracingRenderPipelineAsset : RenderPipelineAsset
 {
     public RenderPipelineConfigObject m_defaultConfig;
     public List<RenderPipelineConfigObject> m_config;
-    
+
     public ComputeShader computeShader;
 
     /// <summary>
@@ -34,17 +34,6 @@ public class RayTracingRenderPipelineAsset : RenderPipelineAsset
     /// <returns>The create pipeline.</returns>
     protected override IRenderPipeline InternalCreatePipeline()
     {
-        var scene = SceneManager.GetActiveScene();
-        var sceneIndex = scene.buildIndex;
-
-        if (sceneIndex >= 0 && sceneIndex < m_config.Count)
-        {
-            return new RayTracingRenderPipeline(computeShader, m_config[sceneIndex]);
-        }
-        
-        Debug.LogWarning(
-            $"Current scene has index of {sceneIndex}. There is no corresponding render pipeline config with this index. Fallback to default.");
-        return new RayTracingRenderPipeline(computeShader, m_defaultConfig);
-
+        return new RayTracingRenderPipeline(computeShader, m_config);
     }
 }

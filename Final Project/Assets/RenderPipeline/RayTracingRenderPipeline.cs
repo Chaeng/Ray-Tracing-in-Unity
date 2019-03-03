@@ -14,8 +14,9 @@ public class RayTracingRenderPipeline : RenderPipeline
     private ComputeShader m_computeShader;  // The compute shader we are going to write our ray tracing program on
 
     private RenderTexture m_target;         // The texture to hold the ray tracing result from the compute shader
-    private RenderPipelineConfigObject m_config;    // The config object containing all global rendering settings
-
+    private List<RenderPipelineConfigObject> m_allConfig;    // A list of config objects containing all global rendering settings      
+    private RenderPipelineConfigObject m_config;
+    
     private List<RTLightStructureDirectional_t> m_directionalLights;
     
     private List<RTSphere_t> m_sphereGeom;
@@ -32,13 +33,13 @@ public class RayTracingRenderPipeline : RenderPipeline
     /// </summary>
     /// <param name="computeShader">Compute shader to use.</param>
     /// <param name="skybox">Skybox to use</param>
-    public RayTracingRenderPipeline(ComputeShader computeShader, RenderPipelineConfigObject config)
+    public RayTracingRenderPipeline(ComputeShader computeShader, List<RenderPipelineConfigObject> allConfig)
     {
         m_computeShader = computeShader;
 
-        m_config = config;
+        m_allConfig = allConfig;
+        m_config = m_allConfig[0];
     }
-
 
 
     /// <summary>
@@ -54,7 +55,13 @@ public class RayTracingRenderPipeline : RenderPipeline
         // method and invoke the base implementation, to keep this check.
         base.Render(renderContext, cameras);
 
-        ParseScene(SceneManager.GetActiveScene());
+        var scene = SceneManager.GetActiveScene();
+        ApplyRenderConfig(scene);
+        if (m_config == null)
+        {
+            return;
+        }
+        ParseScene(scene);
 
         foreach (var camera in cameras)
         {
@@ -63,6 +70,26 @@ public class RayTracingRenderPipeline : RenderPipeline
     }
 
 
+    private void ApplyRenderConfig(Scene scene)
+    {
+        var sceneIndex = scene.buildIndex;
+
+        if (m_allConfig.Count == 0)
+        {
+            return;
+        }
+
+        if (sceneIndex >= 0 && sceneIndex < m_allConfig.Count)
+        {
+            m_config = m_allConfig[sceneIndex];
+            return;
+        }
+        
+        // No matching scene index, use the first one
+        m_config = m_allConfig[0];
+    }
+    
+    
 
     private void ParseScene(Scene scene)
     {
@@ -247,5 +274,12 @@ public class RayTracingRenderPipeline : RenderPipeline
             m_target.enableRandomWrite = true;
             m_target.Create();
         }
+    }
+    
+    
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Debug.Log("OnSceneLoaded: " + scene.name);
+        Debug.Log(mode);
     }
 }
