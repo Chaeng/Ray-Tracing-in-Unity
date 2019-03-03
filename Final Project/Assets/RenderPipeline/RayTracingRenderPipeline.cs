@@ -165,6 +165,7 @@ public class RayTracingRenderPipeline : RenderPipeline
     /// <summary>
     /// This method ensure our RenderTexture is initialized properly for ComputeShader
     /// The code snipet is copied from http://blog.three-eyed-games.com/2018/05/03/gpu-ray-tracing-in-unity-part-1/
+    /// Reference: http://blog.three-eyed-games.com/2018/05/03/gpu-ray-tracing-in-unity-part-1/
     /// </summary>
     private void InitRenderTexture()
     {
