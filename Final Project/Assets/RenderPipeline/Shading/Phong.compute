@@ -1,0 +1,17 @@
+﻿static const float PI = 3.14159265f;
+
+float3 Shade(inout Ray ray, RayHit hit, Texture2D<float4> skybox, SamplerState skyboxSampler)
+{
+    if (hit.distance < 1.#INF)
+    {
+        // Return the normal
+        return hit.normal * 0.5f + 0.5f;
+    }
+    else
+    {
+        // Sample the skybox and write it
+        float theta = acos(ray.direction.y) / -PI;
+        float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
+        return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
+    }
+}
