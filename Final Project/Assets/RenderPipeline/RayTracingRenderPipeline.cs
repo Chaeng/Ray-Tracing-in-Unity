@@ -16,8 +16,9 @@ public class RayTracingRenderPipeline : RenderPipeline
     private RenderTexture m_target;         // The texture to hold the ray tracing result from the compute shader
     private List<RenderPipelineConfigObject> m_allConfig;    // A list of config objects containing all global rendering settings      
     private RenderPipelineConfigObject m_config;
-    
+
     private List<RTLightStructureDirectional_t> m_directionalLights;
+    private List<RTLightStructurePoint_t> m_pointLights;
     
     private List<RTSphere_t> m_sphereGeom;
 
@@ -128,6 +129,12 @@ public class RayTracingRenderPipeline : RenderPipeline
             m_directionalLights = new List<RTLightStructureDirectional_t>();
         }
         m_directionalLights.Clear();
+
+        if (m_pointLights == null)
+        {
+            m_pointLights = new List<RTLightStructurePoint_t>();
+        }
+        m_pointLights.Clear();
         
         foreach (var root in roots)
         {
@@ -147,9 +154,16 @@ public class RayTracingRenderPipeline : RenderPipeline
                         m_directionalLights.Add(directional);
                     }
                         break;
-                    
-                    case LightType.Point:
 
+                    case LightType.Point:
+                    {
+                        Color lightColor = light.color;
+                        
+                        RTLightStructurePoint_t point = new RTLightStructurePoint_t();
+                        point.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
+                        point.position = light.transform.position;
+                        m_pointLights.Add(point);
+                    }
                         break;
                     
                     case LightType.Spot:
@@ -274,12 +288,5 @@ public class RayTracingRenderPipeline : RenderPipeline
             m_target.enableRandomWrite = true;
             m_target.Create();
         }
-    }
-    
-    
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        Debug.Log("OnSceneLoaded: " + scene.name);
-        Debug.Log(mode);
     }
 }
