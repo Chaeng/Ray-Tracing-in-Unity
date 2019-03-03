@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;                // Import Unity stuff related to rendering that is shared by all rendering pipelines
@@ -9,18 +10,22 @@ using UnityEngine.SceneManagement;
 
 public class RayTracingRenderPipeline : RenderPipeline
 {
+    [SerializeField] private List<RenderPipelineConfigObject> m_renderConfig;
+    [SerializeField] private RenderPipelineConfigObject m_configObject;
+    
     private ComputeShader m_computeShader;  // The compute shader we are going to write our ray tracing program on
 
     private RenderTexture m_target;         // The texture to hold the ray tracing result from the compute shader
-    private Texture m_skyboxTex;            // The skybox we used as the background
+    private RenderPipelineConfigObject m_config;    // The config object containing all global rendering settings
 
     private List<RTSphere_t> m_sphereGeom;
 
 
-    public RayTracingRenderPipeline(ComputeShader computeShader, Texture skybox)
+    public RayTracingRenderPipeline(ComputeShader computeShader, RenderPipelineConfigObject config)
     {
         m_computeShader = computeShader;
-        m_skyboxTex = skybox;
+
+        m_config = config;
     }
 
 
@@ -77,7 +82,7 @@ public class RayTracingRenderPipeline : RenderPipeline
     {
         InitRenderTexture();
 
-        renderContext.SetupCameraProperties(camera);    // This tells the renderer the camera position and orientation, projection type (perspective/orthographic)
+        //renderContext.SetupCameraProperties(camera);    // This tells the renderer the camera position and orientation, projection type (perspective/orthographic)
 
 
         #region Clear Flag - Clear the previous frame
@@ -97,7 +102,7 @@ public class RayTracingRenderPipeline : RenderPipeline
 
         m_computeShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
         m_computeShader.SetMatrix("_CameraInverseProjection", camera.projectionMatrix.inverse);
-        m_computeShader.SetTexture(0, "_SkyboxTexture", m_skyboxTex);
+        m_computeShader.SetTexture(0, "_SkyboxTexture", m_config.skybox);
         m_computeShader.SetInt("_NumOfSpheres", m_sphereGeom.Count);
         ComputeBuffer sphereBuffer = null;
         if (m_sphereGeom.Count> 0)
