@@ -1,5 +1,26 @@
 ﻿static const float PI = 3.14159265f;
 
+float3 PhongDiffuseShading(float3 lightDir, float3 lightColor, float3 hitNormal)
+{
+    float nDotL = dot(hitNormal, lightDir);
+    if(nDotL > 0)
+    {
+        return lightColor * dot(hitNormal, lightDir);
+    }
+    return float3(0, 0, 0);
+}
+
+float3 PhongSpecularShading(float3 lightDir, float3 lightColor, float3 rayDir, float3 hitNormal, float shinyness)
+{
+    float3 R = reflect(-1 * lightDir, hitNormal);
+    float vDotR = dot(-1 * rayDir, R);
+    if(vDotR > 0)
+    {
+        return lightColor * pow(vDotR, shinyness);
+    }
+    return float3(0, 0, 0);
+}
+
 float3 Shade(
     inout Ray ray, 
     RayHit hit, 
@@ -17,9 +38,17 @@ float3 Shade(
         
         for(int i = 0; i < numOfDirLight; i++)
         {
-            float3 R = reflect(-1 * dirLights[i].direction, hit.normal);
-            float vDotR = dot(-1 * ray.direction, R);
-            color = color + dirLights[i].color * dot(hit.normal, dirLights[i].direction) + dirLights[i].color * pow(vDotR, 5);
+            color = color 
+                    + PhongDiffuseShading(dirLights[i].direction, dirLights[i].color, hit.normal) 
+                    + PhongSpecularShading(dirLights[i].direction, dirLights[i].color, ray.direction, hit.normal, 5);
+        }
+        
+        for(int i = 0; i < numOfPointLight; i++)
+        {
+            float3 L = normalize(pointLights[i].position - hit.position);
+            color = color
+                    + PhongDiffuseShading(dirLights[i].direction, dirLights[i].color, hit.normal) 
+                    + PhongSpecularShading(L, pointLights[i].color, ray.direction, hit.normal, 5);
         }
         
         return color;
@@ -32,3 +61,5 @@ float3 Shade(
         return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
     }
 }
+
+
