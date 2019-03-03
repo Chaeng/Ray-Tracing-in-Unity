@@ -127,6 +127,7 @@ public class RayTracingRenderPipeline : RenderPipeline
             sphereBuffer = new ComputeBuffer(1, 16);     // need to be at least 16 bytes long for RTSphere_t
         }
         m_computeShader.SetBuffer(0, "_Spheres", sphereBuffer);
+        m_computeShader.SetVector("_AmbientGlobal", m_config.ambitent);
         m_computeShader.SetTexture(0, "Result", m_target);
         int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);
         int threadGroupsY = Mathf.CeilToInt(Screen.height / 8.0f);
@@ -164,6 +165,7 @@ public class RayTracingRenderPipeline : RenderPipeline
     /// <summary>
     /// This method ensure our RenderTexture is initialized properly for ComputeShader
     /// The code snipet is copied from http://blog.three-eyed-games.com/2018/05/03/gpu-ray-tracing-in-unity-part-1/
+    /// Reference: http://blog.three-eyed-games.com/2018/05/03/gpu-ray-tracing-in-unity-part-1/
     /// </summary>
     private void InitRenderTexture()
     {

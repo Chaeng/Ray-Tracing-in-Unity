@@ -1,6 +1,7 @@
 ﻿#include "Ray.compute"
 #include "RayHit.compute"
 #include "RTSphere.compute"
+#include "Shading/Phong.compute"
 
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
@@ -9,10 +10,16 @@
 // with cs.SetTexture
 RWTexture2D<float4> Result;
 
+// Global Settings
+
 //Skybox
 Texture2D<float4> _SkyboxTexture;
 SamplerState sampler_SkyboxTexture;
-static const float PI = 3.14159265f;
+
+
+// Ambient
+float3 _AmbientGlobal;
+
 
 float4x4 _CameraToWorld;
 float4x4 _CameraInverseProjection;
@@ -48,22 +55,6 @@ RayHit Trace(Ray ray)
     return bestHit;
 }
 
-float3 Shade(inout Ray ray, RayHit hit)
-{
-    if (hit.distance < 1.#INF)
-    {
-        // Return the normal
-        return hit.normal * 0.5f + 0.5f;
-    }
-    else
-    {
-        // Sample the skybox and write it
-        float theta = acos(ray.direction.y) / -PI;
-        float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
-        return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz;
-    }
-}
-
 
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
@@ -83,7 +74,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     
     // Trace and shade
     RayHit hit = Trace(ray);
-    float3 result = Shade(ray, hit);
+    float3 result = Shade(ray, hit, _AmbientGlobal, _SkyboxTexture, sampler_SkyboxTexture);
     Result[id.xy] = float4(result, 1);
 }
 
