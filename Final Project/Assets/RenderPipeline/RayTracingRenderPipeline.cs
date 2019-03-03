@@ -234,6 +234,20 @@ public class RayTracingRenderPipeline : RenderPipeline
         }
         m_computeShader.SetBuffer(0, "_DirectionalLights", dirLightBuf);
         
+        // Point Lights
+        
+        m_computeShader.SetInt("_NumOfPointLights", m_pointLights.Count);
+        ComputeBuffer pointLightBuf = null;
+        if (m_pointLights.Count > 0)
+        {
+            pointLightBuf = new ComputeBuffer(m_pointLights.Count, RTLightStructurePoint_t.GetSize());
+            pointLightBuf.SetData(m_pointLights);
+        }
+        else
+        {
+            pointLightBuf = new ComputeBuffer(1, 4);    // Dummy
+        }
+        m_computeShader.SetBuffer(0, "_PointLights", pointLightBuf);
         
         m_computeShader.SetTexture(0, "Result", m_target);
         int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);
@@ -246,6 +260,7 @@ public class RayTracingRenderPipeline : RenderPipeline
         
         sphereBuffer.Release();
         dirLightBuf.Release();
+        pointLightBuf.Release();
         
 
         m_buffer.Blit(m_target, camera.activeTexture);
