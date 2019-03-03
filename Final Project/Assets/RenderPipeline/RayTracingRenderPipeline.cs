@@ -16,6 +16,8 @@ public class RayTracingRenderPipeline : RenderPipeline
     private RenderTexture m_target;         // The texture to hold the ray tracing result from the compute shader
     private RenderPipelineConfigObject m_config;    // The config object containing all global rendering settings
 
+    private List<RTLightStructureDirectional_t> m_directionalLights;
+    
     private List<RTSphere_t> m_sphereGeom;
 
     // We batch the commands into a buffer to reduce the amount of sending commands to GPU
@@ -66,6 +68,13 @@ public class RayTracingRenderPipeline : RenderPipeline
     {
         GameObject[] roots = scene.GetRootGameObjects();
 
+        ParseLight(roots);
+        ParseSphere(roots);
+    }
+
+
+    private void ParseSphere(GameObject[] roots)
+    {
         // TODO: Optimize dynamic array generation
         if(m_sphereGeom == null)
         {
@@ -80,6 +89,47 @@ public class RayTracingRenderPipeline : RenderPipeline
             foreach (var renderer in sphereRenderers)
             {
                 m_sphereGeom.Add(renderer.GetGeometry());
+            }
+        }
+    }
+
+
+    private void ParseLight(GameObject[] roots)
+    {
+        if (m_directionalLights == null)
+        {
+            m_directionalLights = new List<RTLightStructureDirectional_t>();
+        }
+        m_directionalLights.Clear();
+        
+        foreach (var root in roots)
+        {
+            Light[] lights = root.GetComponentsInChildren<Light>();
+
+            foreach (var light in lights)
+            {
+                switch (light.type)
+                {
+                    case LightType.Directional:
+                    {
+                        Color lightColor = light.color;
+                        
+                        RTLightStructureDirectional_t directional = new RTLightStructureDirectional_t();
+                        directional.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
+                        directional.direction = -1 * Vector3.Normalize(light.transform.rotation * Vector3.forward);
+                        m_directionalLights.Add(directional);
+                    }
+                        break;
+                    
+                    case LightType.Point:
+
+                        break;
+                    
+                    case LightType.Spot:
+
+                        break;
+                }
+
             }
         }
     }
@@ -120,7 +170,6 @@ public class RayTracingRenderPipeline : RenderPipeline
         {
             sphereBuffer = new ComputeBuffer(m_sphereGeom.Count, 4*sizeof(float));
             sphereBuffer.SetData(m_sphereGeom);
-            m_computeShader.SetBuffer(0, "_Spheres", sphereBuffer);
         }
         else
         {
@@ -128,6 +177,23 @@ public class RayTracingRenderPipeline : RenderPipeline
         }
         m_computeShader.SetBuffer(0, "_Spheres", sphereBuffer);
         m_computeShader.SetVector("_AmbientGlobal", m_config.ambitent);
+        
+        // Directional Lights
+        
+        m_computeShader.SetInt("_NumOfDirectionalLights", m_directionalLights.Count);
+        ComputeBuffer dirLightBuf = null;
+        if (m_directionalLights.Count > 0)
+        {
+            dirLightBuf = new ComputeBuffer(m_directionalLights.Count, RTLightStructureDirectional_t.GetSize());
+            dirLightBuf.SetData(m_directionalLights);
+        }
+        else
+        {
+            dirLightBuf = new ComputeBuffer(1, 4);    // Dummy
+        }
+        m_computeShader.SetBuffer(0, "_DirectionalLights", dirLightBuf);
+        
+        
         m_computeShader.SetTexture(0, "Result", m_target);
         int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);
         int threadGroupsY = Mathf.CeilToInt(Screen.height / 8.0f);
@@ -136,10 +202,10 @@ public class RayTracingRenderPipeline : RenderPipeline
             m_computeShader.Dispatch(0, threadGroupsX, threadGroupsY, 1);
         }
 
-        if (sphereBuffer != null)
-        {
-            sphereBuffer.Release();
-        }
+        
+        sphereBuffer.Release();
+        dirLightBuf.Release();
+        
 
         m_buffer.Blit(m_target, camera.activeTexture);
 

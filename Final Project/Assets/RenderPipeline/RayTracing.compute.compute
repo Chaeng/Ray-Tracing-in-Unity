@@ -1,5 +1,6 @@
 ﻿#include "Ray.compute"
 #include "RayHit.compute"
+#include "Light/RTDirectionalLight.compute"
 #include "RTSphere.compute"
 #include "Shading/Phong.compute"
 
@@ -20,10 +21,13 @@ SamplerState sampler_SkyboxTexture;
 // Ambient
 float3 _AmbientGlobal;
 
-
+// Camera
 float4x4 _CameraToWorld;
 float4x4 _CameraInverseProjection;
 
+// Light
+int _NumOfDirectionalLights;
+StructuredBuffer<RTDirectionalLight> _DirectionalLights;
 
 // sphere
 int _NumOfSpheres;
