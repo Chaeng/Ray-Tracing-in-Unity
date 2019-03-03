@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;                // Import Unity stuff related to rendering that is shared by all rendering pipelines
-using UnityEngine.Experimental.Rendering;
+using UnityEngine.Experimental.Rendering;   // Since SRP is an experimental feature, we have to import it using this namespace
 using UnityEngine.SceneManagement;
 
-// Since SRP is an experimental feature, we have to import it using this namespace
 
 public class RayTracingRenderPipeline : RenderPipeline
 {
+    private readonly static string s_bufferName = "Ray Tracing Render Camera";
+
     private ComputeShader m_computeShader;  // The compute shader we are going to write our ray tracing program on
 
     private RenderTexture m_target;         // The texture to hold the ray tracing result from the compute shader
@@ -16,7 +17,18 @@ public class RayTracingRenderPipeline : RenderPipeline
 
     private List<RTSphere_t> m_sphereGeom;
 
+    // We batch the commands into a buffer to reduce the amount of sending commands to GPU
+    // Reusing the command buffer object avoids continuous memory allocation
+    private CommandBuffer m_buffer = new CommandBuffer
+    {
+        name = s_bufferName
+    };
 
+    /// <summary>
+    /// Constructs the render pipeline for Unity.
+    /// </summary>
+    /// <param name="computeShader">Compute shader to use.</param>
+    /// <param name="skybox">Skybox to use</param>
     public RayTracingRenderPipeline(ComputeShader computeShader, Texture skybox)
     {
         m_computeShader = computeShader;
@@ -32,6 +44,10 @@ public class RayTracingRenderPipeline : RenderPipeline
     /// <param name="cameras">All running cameras</param>
     public override void Render(ScriptableRenderContext renderContext, Camera[] cameras)
     {
+        // RenderPipeline.Render doesn't draw anything, but checks
+        // whether the pipeline object is valid to use for rendering.
+        // If not, it will raise an exception. We will override this
+        // method and invoke the base implementation, to keep this check.
         base.Render(renderContext, cameras);
 
         ParseScene(SceneManager.GetActiveScene());
@@ -81,18 +97,16 @@ public class RayTracingRenderPipeline : RenderPipeline
 
 
         #region Clear Flag - Clear the previous frame
-
-        var buffer = new CommandBuffer { name = "Ray Tracing Renderer" };  // We batch the commands into a buffer to reduce the amount of sending commands to GPU
-
         CameraClearFlags clearFlags = camera.clearFlags;        // Each camera can config its clear flag to determine what should be shown if nothing can be seen by the camera
-        buffer.ClearRenderTarget(
+        m_buffer.ClearRenderTarget(
             ((clearFlags & CameraClearFlags.Depth) != 0),
             ((clearFlags & CameraClearFlags.Color) != 0),
             camera.backgroundColor);
-
         #endregion
-
-
+        
+        // Begin Unity profiler sample for frame debugger
+        m_buffer.BeginSample(s_bufferName);
+        
         #region Ray Tracing
 
         m_computeShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
@@ -124,13 +138,18 @@ public class RayTracingRenderPipeline : RenderPipeline
             sphereBuffer.Release();
         }
 
-        buffer.Blit(m_target, camera.activeTexture);
+        m_buffer.Blit(m_target, camera.activeTexture);
 
-        renderContext.ExecuteCommandBuffer(buffer);     // We copied all the commands to an internal memory that is ready to send to GPU
-        buffer.Release();                               // Release the memory allocated by the buffer as all the commands already copied to internal memory
+        renderContext.ExecuteCommandBuffer(m_buffer);     // We copied all the commands to an internal memory that is ready to send to GPU
+        m_buffer.Clear();                                 // Clear the command buffer
+
 
         #endregion
 
+        // End Unity profiler sample for frame debugger
+        m_buffer.EndSample(s_bufferName);
+        renderContext.ExecuteCommandBuffer(m_buffer);     // We copied all the commands to an internal memory that is ready to send to GPU
+        m_buffer.Clear();                                 // Clear the command buffer
 
 
 
