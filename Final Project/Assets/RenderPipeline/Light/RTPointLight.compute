@@ -4,6 +4,5 @@
 struct RTPointLight
 {
     float3 color;
-    float3 direction;
     float3 position;
 };
