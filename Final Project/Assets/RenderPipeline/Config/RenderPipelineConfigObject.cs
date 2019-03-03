@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Render Pipeline Config")]
 public class RenderPipelineConfigObject : ScriptableObject
 {
-    public Texture skybox = new Texture2D(2, 2);
+    public Texture skybox;
     
     public Color ambitent = Color.white;
 
@@ -13,5 +13,12 @@ public class RenderPipelineConfigObject : ScriptableObject
 
     public bool enableShadow = false;
 
-    
+
+    private void OnEnable()
+    {
+        if (skybox == null)
+        {
+            skybox = new Texture2D(2, 2);
+        }
+    }
 }
