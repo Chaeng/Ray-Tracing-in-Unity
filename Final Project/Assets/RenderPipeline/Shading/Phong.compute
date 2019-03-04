@@ -3,22 +3,22 @@
 float3 PhongDiffuseShading(float3 lightDir, float3 lightColor, float3 hitNormal)
 {
     float nDotL = dot(hitNormal, lightDir);
-    if(nDotL > 0)
+    if(nDotL < 0)
     {
-        return lightColor * nDotL;
+        nDotL = 0;
     }
-    return float3(0, 0, 0);
+    return lightColor * nDotL;
 }
 
 float3 PhongSpecularShading(float3 lightDir, float3 lightColor, float3 rayDir, float3 hitNormal, float shinyness)
 {
     float3 R = reflect(-1 * lightDir, hitNormal);
     float vDotR = dot(-1 * rayDir, R);
-    if(vDotR > 0)
+    if(vDotR < 0)
     {
-        return lightColor * pow(vDotR, shinyness);
+        vDotR = 0;
     }
-    return float3(0, 0, 0);
+    return pow(vDotR, shinyness) * lightColor;
 }
 
 float3 Shade(
