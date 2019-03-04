@@ -1,0 +1,8 @@
+﻿// Represent a point light in HLSL Shader
+// Corresponding to RTLightStructurePoint.cs
+
+struct RTPointLight
+{
+    float3 color;
+    float3 position;
+};
