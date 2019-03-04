@@ -36,19 +36,19 @@ float3 Shade(
     {
         float3 color = ambientColor;
         
-        for(int i = 0; i < numOfDirLight; i++)
+        for(int d = 0; d < numOfDirLight; d++)
         {
             color = color 
-                    + PhongDiffuseShading(dirLights[i].direction, dirLights[i].color, hit.normal) 
-                    + PhongSpecularShading(dirLights[i].direction, dirLights[i].color, ray.direction, hit.normal, 5);
+                    + PhongDiffuseShading(dirLights[d].direction, dirLights[d].color, hit.normal) 
+                    + PhongSpecularShading(dirLights[d].direction, dirLights[d].color, ray.direction, hit.normal, 5);
         }
         
-        for(int i = 0; i < numOfPointLight; i++)
+        for(int s = 0; s < numOfPointLight; s++)
         {
-            float3 L = normalize(pointLights[i].position - hit.position);
+            float3 L = normalize(pointLights[s].position - hit.position);
             color = color
-                    + PhongDiffuseShading(L, pointLights[i].color, hit.normal) 
-                    + PhongSpecularShading(L, pointLights[i].color, ray.direction, hit.normal, 5);
+                    + PhongDiffuseShading(L, pointLights[s].color, hit.normal) 
+                    + PhongSpecularShading(L, pointLights[s].color, ray.direction, hit.normal, 5);
         }
         
         return color;
