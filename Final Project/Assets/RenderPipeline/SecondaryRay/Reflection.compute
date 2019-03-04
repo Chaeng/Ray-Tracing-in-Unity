@@ -4,6 +4,8 @@
 	float3 ambientColor,
 	int numOfDirLight,
 	StructuredBuffer<RTDirectionalLight> dirLights,
+	int numOfPointLight,
+	StructuredBuffer<RTPointLight> pointLights,
 	Texture2D<float4> skybox,
 	SamplerState skyboxSampler)
 {
@@ -23,21 +25,14 @@
 	float refl = 0.5;
 	float k = 1 - refl - trans;
 	
-	/*
-	float refl[mGen + 2] = {0.5, 0.5, 0.5};
-	float trans = 0;
-	float k = 1 - refl_1 - trans;*/
-	
-	// ?? float3[] mPhongResultArray;
-	float3 skyboxResult = Shade(ray, hit, ambientColor, numOfDirLight, dirLights, skybox, skyboxSampler);
+	float3 skyboxResult = Shade(ray, hit, ambientColor, numOfDirLight, dirLights, numOfPointLight, pointLights, skybox, skyboxSampler);
 	float3 result = float3(0, 0, 0);
 	float3 finalResult = float3(0, 0, 0);
 	
 	// TODO: Return result
 	// if mGen = 1, iterate 3 times => 0th and 1st for r&t, 2nd for Phong
-    // for(int i = 0; i < 3; ++i){ => i = {0, 1, 2}
 	if(hit.distance < 1.#INF && reflectEffect == true){
-	
+	/*
 	    for(int i = 0; i< (mGen + 2); i++){
 	        result = Shade(ray, hit, ambientColor, numOfDirLight, dirLights, skybox, skyboxSampler);    
 	        result *= k;  
@@ -71,13 +66,3 @@
 	return skyboxResult; //float3(0.1, 0.1, 0.1);
 }
 
-/*
-float3 Shade(
-	inout Ray ray,
-	RayHit hit,
-	float3 ambientColor,
-	int numOfDirLight,
-	StructuredBuffer<RTDirectionalLight> dirLights,
-	Texture2D<float4> skybox,
-	SamplerState skyboxSampler)
-*/
