@@ -6,8 +6,6 @@ public class RTSphere : RTGeometry
 {
     [SerializeField] private float m_radius = 1;
 
-    [SerializeField] private int m_materialIndex = -1;
-
 
     public override RTGeometryType GetGeometryType()
     {
@@ -25,10 +23,5 @@ public class RTSphere : RTGeometry
             center = _center,
             radius = m_radius
         };
-    }
-
-    public override int GetMaterialIndex()
-    {
-        return m_materialIndex;
     }
 }

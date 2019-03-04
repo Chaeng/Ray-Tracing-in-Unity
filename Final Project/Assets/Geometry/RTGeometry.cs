@@ -5,5 +5,4 @@ using UnityEngine;
 public abstract class RTGeometry : MonoBehaviour
 {
     public abstract RTGeometryType GetGeometryType();
-    public abstract int GetMaterialIndex();
 }
