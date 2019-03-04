@@ -1,0 +1,6 @@
+﻿// compute and initialize depth map for spot light
+// input array must be a spot light, there is no error check
+
+void initDepthMap() {
+    
+}

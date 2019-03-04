@@ -1,11 +1,15 @@
 ﻿// lightType: 0 ---> Directional
 //            1 ---> Point
 //            2 ---> Spot 
-// ExceptIndex : will ignore the index to prevent self shadow
+// ExceptType : will ignore the index to prevent self shadow
+//            0 ---> Sphere
+//            1 ---> Triangle
+// ExcepteIndex: index the of object
 float PercentageVisibility(
     int lightType,
     float3 position,
     float3 direction,
+    int exceptType,
     int exceptIndex,
     int numOfSphere,
     StructuredBuffer<RTSphere> spheres)
