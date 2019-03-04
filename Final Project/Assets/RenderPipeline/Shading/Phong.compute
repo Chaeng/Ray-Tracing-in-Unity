@@ -3,22 +3,22 @@
 float3 PhongDiffuseShading(float3 lightDir, float3 lightColor, float3 hitNormal)
 {
     float nDotL = dot(hitNormal, lightDir);
-    if(nDotL > 0)
+    if(nDotL < 0)
     {
-        return lightColor * nDotL;
+        nDotL = 0;
     }
-    return float3(0, 0, 0);
+    return lightColor * nDotL;
 }
 
 float3 PhongSpecularShading(float3 lightDir, float3 lightColor, float3 rayDir, float3 hitNormal, float shinyness)
 {
     float3 R = reflect(-1 * lightDir, hitNormal);
     float vDotR = dot(-1 * rayDir, R);
-    if(vDotR > 0)
+    if(vDotR < 0)
     {
-        return lightColor * pow(vDotR, shinyness);
+        vDotR = 0;
     }
-    return float3(0, 0, 0);
+    return pow(vDotR, shinyness) * lightColor;
 }
 
 float3 Shade(
@@ -36,19 +36,19 @@ float3 Shade(
     {
         float3 color = ambientColor;
         
-        for(int i = 0; i < numOfDirLight; i++)
+        for(int d = 0; d < numOfDirLight; d++)
         {
             color = color 
-                    + PhongDiffuseShading(dirLights[i].direction, dirLights[i].color, hit.normal) 
-                    + PhongSpecularShading(dirLights[i].direction, dirLights[i].color, ray.direction, hit.normal, 5);
+                    + PhongDiffuseShading(dirLights[d].direction, dirLights[d].color, hit.normal) 
+                    + PhongSpecularShading(dirLights[d].direction, dirLights[d].color, ray.direction, hit.normal, 5);
         }
         
-        for(int i = 0; i < numOfPointLight; i++)
+        for(int s = 0; s < numOfPointLight; s++)
         {
-            float3 L = normalize(pointLights[i].position - hit.position);
+            float3 L = normalize(pointLights[s].position - hit.position);
             color = color
-                    + PhongDiffuseShading(L, pointLights[i].color, hit.normal) 
-                    + PhongSpecularShading(L, pointLights[i].color, ray.direction, hit.normal, 5);
+                    + PhongDiffuseShading(L, pointLights[s].color, hit.normal) 
+                    + PhongSpecularShading(L, pointLights[s].color, ray.direction, hit.normal, 5);
         }
         
         return color;
