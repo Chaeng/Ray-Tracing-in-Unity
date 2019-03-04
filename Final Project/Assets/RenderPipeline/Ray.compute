@@ -1,4 +1,7 @@
-﻿/*
+﻿#ifndef RAY_COMPUTE
+#define RAY_COMPUTE
+
+/*
 The Ray structure
 */
 
@@ -15,3 +18,5 @@ Ray CreateRay(float3 origin, float3 direction)
     ray.direction = direction;
     return ray;
 }
+
+#endif  // RAY_COMPUTE

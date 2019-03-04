@@ -1,6 +1,7 @@
 ﻿#include "Ray.compute"
 #include "RayHit.compute"
 #include "Light/RTDirectionalLight.compute"
+#include "Light/RTPointLight.compute"
 #include "RTSphere.compute"
 #include "Shading/Phong.compute"
 
@@ -28,6 +29,8 @@ float4x4 _CameraInverseProjection;
 // Light
 int _NumOfDirectionalLights;
 StructuredBuffer<RTDirectionalLight> _DirectionalLights;
+int _NumOfPointLights;
+StructuredBuffer<RTPointLight> _PointLights;
 
 // sphere
 int _NumOfSpheres;
@@ -79,13 +82,15 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     // Trace and shade
     RayHit hit = Trace(ray);
     float3 result = Shade(
-        ray, 
-        hit, 
-        _AmbientGlobal,
-        _NumOfDirectionalLights,
-         _DirectionalLights,
-        _SkyboxTexture, 
-        sampler_SkyboxTexture);
+                        ray, 
+                        hit, 
+                        _AmbientGlobal,
+                        _NumOfDirectionalLights,
+                        _DirectionalLights,
+                        _NumOfPointLights,
+                        _PointLights,
+                        _SkyboxTexture, 
+                        sampler_SkyboxTexture);
     Result[id.xy] = float4(result, 1);
 }
 

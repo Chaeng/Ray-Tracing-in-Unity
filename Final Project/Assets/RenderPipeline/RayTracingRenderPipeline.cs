@@ -16,8 +16,9 @@ public class RayTracingRenderPipeline : RenderPipeline
     private RenderTexture m_target;         // The texture to hold the ray tracing result from the compute shader
     private List<RenderPipelineConfigObject> m_allConfig;    // A list of config objects containing all global rendering settings      
     private RenderPipelineConfigObject m_config;
-    
+
     private List<RTLightStructureDirectional_t> m_directionalLights;
+    private List<RTLightStructurePoint_t> m_pointLights;
     
     private List<RTSphere_t> m_sphereGeom;
 
@@ -128,6 +129,12 @@ public class RayTracingRenderPipeline : RenderPipeline
             m_directionalLights = new List<RTLightStructureDirectional_t>();
         }
         m_directionalLights.Clear();
+
+        if (m_pointLights == null)
+        {
+            m_pointLights = new List<RTLightStructurePoint_t>();
+        }
+        m_pointLights.Clear();
         
         foreach (var root in roots)
         {
@@ -135,6 +142,11 @@ public class RayTracingRenderPipeline : RenderPipeline
 
             foreach (var light in lights)
             {
+                if (!light.gameObject.activeSelf)
+                {
+                    continue;
+                }
+                
                 switch (light.type)
                 {
                     case LightType.Directional:
@@ -147,9 +159,16 @@ public class RayTracingRenderPipeline : RenderPipeline
                         m_directionalLights.Add(directional);
                     }
                         break;
-                    
-                    case LightType.Point:
 
+                    case LightType.Point:
+                    {
+                        Color lightColor = light.color;
+                        
+                        RTLightStructurePoint_t point = new RTLightStructurePoint_t();
+                        point.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
+                        point.position = light.transform.position;
+                        m_pointLights.Add(point);
+                    }
                         break;
                     
                     case LightType.Spot:
@@ -203,6 +222,9 @@ public class RayTracingRenderPipeline : RenderPipeline
             sphereBuffer = new ComputeBuffer(1, 16);     // need to be at least 16 bytes long for RTSphere_t
         }
         m_computeShader.SetBuffer(0, "_Spheres", sphereBuffer);
+        
+        // Ambient Light
+        
         m_computeShader.SetVector("_AmbientGlobal", m_config.ambitent);
         
         // Directional Lights
@@ -220,6 +242,20 @@ public class RayTracingRenderPipeline : RenderPipeline
         }
         m_computeShader.SetBuffer(0, "_DirectionalLights", dirLightBuf);
         
+        // Point Lights
+        
+        m_computeShader.SetInt("_NumOfPointLights", m_pointLights.Count);
+        ComputeBuffer pointLightBuf = null;
+        if (m_pointLights.Count > 0)
+        {
+            pointLightBuf = new ComputeBuffer(m_pointLights.Count, RTLightStructurePoint_t.GetSize());
+            pointLightBuf.SetData(m_pointLights);
+        }
+        else
+        {
+            pointLightBuf = new ComputeBuffer(1, 4);    // Dummy
+        }
+        m_computeShader.SetBuffer(0, "_PointLights", pointLightBuf);
         
         m_computeShader.SetTexture(0, "Result", m_target);
         int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);
@@ -232,6 +268,7 @@ public class RayTracingRenderPipeline : RenderPipeline
         
         sphereBuffer.Release();
         dirLightBuf.Release();
+        pointLightBuf.Release();
         
 
         m_buffer.Blit(m_target, camera.activeTexture);
@@ -274,12 +311,5 @@ public class RayTracingRenderPipeline : RenderPipeline
             m_target.enableRandomWrite = true;
             m_target.Create();
         }
-    }
-    
-    
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        Debug.Log("OnSceneLoaded: " + scene.name);
-        Debug.Log(mode);
     }
 }
