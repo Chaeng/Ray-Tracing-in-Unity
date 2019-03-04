@@ -17,7 +17,7 @@ public class RTRenderer : MonoBehaviour
                 return RTGeometryType.Nothing;
             }
 
-            return m_geom.GetGeomtryType();
+            return m_geom.GetGeometryType();
         }
     }
     
