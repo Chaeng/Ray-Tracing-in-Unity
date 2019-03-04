@@ -3,13 +3,16 @@
 
 struct RayHit
 {
-    float3 position;
+    float3 barycentric;
     float distance;
+    float3 position;
     float3 normal;
 };
+
 RayHit CreateRayHit()
 {
     RayHit hit;
+    hit.barycentric = float3(1.0f, 0.0f, 0.0f);
     hit.position = float3(0.0f, 0.0f, 0.0f);
     hit.distance = 1.#INF;
     hit.normal = float3(0.0f, 0.0f, 0.0f);
