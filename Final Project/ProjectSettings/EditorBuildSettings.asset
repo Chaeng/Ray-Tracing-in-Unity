@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/JoeScene.unity
     guid: 0da3b84f2f46f424db88b5890249bd11
+  - enabled: 1
+    path: Assets/Scenes/Kai.unity
+    guid: 4f1cf62a2226267489ed2b25443beff5
   m_configObjects: {}
