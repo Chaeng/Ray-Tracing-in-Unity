@@ -23,7 +23,7 @@ public class RTTriangle : RTGeometry
     private float m_cachedArea;
 
 
-    public override RTGeometryType GetGeomtryType()
+    public override RTGeometryType GetGeometryType()
     {
         return RTGeometryType.Triangle;
     }
