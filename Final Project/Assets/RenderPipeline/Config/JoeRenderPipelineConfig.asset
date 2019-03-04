@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: JoeRenderPipelineConfig
   m_EditorClassIdentifier: 
   skybox: {fileID: 2800000, guid: 18a0be10f0f64ac4c9f679d68e2cf857, type: 3}
-  ambitent: {r: 1, g: 1, b: 1, a: 1}
+  ambitent: {r: 0, g: 0, b: 0, a: 1}
   secondaryRayGeneration: 0
   enableShadow: 0
