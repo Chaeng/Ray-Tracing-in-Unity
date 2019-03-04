@@ -4,5 +4,5 @@ using UnityEngine;
 
 public abstract class RTGeometry : MonoBehaviour
 {
-    public abstract RTGeometryType GetGeomtryType();
+    public abstract RTGeometryType GetGeometryType();
 }

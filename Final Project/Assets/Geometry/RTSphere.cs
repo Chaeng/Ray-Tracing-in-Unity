@@ -7,7 +7,7 @@ public class RTSphere : RTGeometry
     [SerializeField] private float m_radius = 1;
 
 
-    public override RTGeometryType GetGeomtryType()
+    public override RTGeometryType GetGeometryType()
     {
         return RTGeometryType.Sphere;
     }
