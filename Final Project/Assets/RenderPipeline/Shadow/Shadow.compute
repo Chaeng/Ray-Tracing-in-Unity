@@ -1,0 +1,36 @@
+﻿// lightType: 0 ---> Directional
+//            1 ---> Point
+//            2 ---> Spot 
+// ExceptIndex : will ignore the index to prevent self shadow
+float PercentageVisibility(
+    int lightType,
+    float3 position,
+    float3 direction,
+    int exceptIndex,
+    int numOfSphere,
+    StructuredBuffer<RTSphere> spheres)
+{
+    Ray ray;
+    RayHit hit;
+
+    if (lightType == 0)
+    {
+        ray = CreateRay(position, -direction);
+        hit = CreateRayHit();
+
+        for (int i = 0; i < numOfSphere; i++)
+        {
+            if (exceptIndex == i)
+            {
+                continue;
+            }
+            
+            IntersectSphere(ray, hit, spheres[i]);
+            if (hit.distance == 1.#INF)
+            {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
