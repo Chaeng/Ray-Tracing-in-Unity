@@ -1,10 +1,16 @@
 ﻿#ifndef RAYHIT_COMPUTE
 #define RAYHIT_COMPUTE
 
+#define GT_NONE -1
+#define GT_SPHERE 0
+#define GT_TRIANGLE 3
+
 struct RayHit
 {
     float3 barycentric;
     float distance;
+    int geometryType;   // 0 for sphere; 3 for Triangle
+    int geometryIndex;  // The index of the geometry in their corresponding array
     float3 position;
     float3 normal;
 };
@@ -15,6 +21,8 @@ RayHit CreateRayHit()
     hit.barycentric = float3(1.0f, 0.0f, 0.0f);
     hit.position = float3(0.0f, 0.0f, 0.0f);
     hit.distance = 1.#INF;
+    hit.geometryType = GT_NONE;
+    hit.geometryIndex = 0;
     hit.normal = float3(0.0f, 0.0f, 0.0f);
     return hit;
 }
