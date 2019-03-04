@@ -1,4 +1,7 @@
-﻿struct RayHit
+﻿#ifndef RAYHIT_COMPUTE
+#define RAYHIT_COMPUTE
+
+struct RayHit
 {
     float3 position;
     float distance;
@@ -12,3 +15,5 @@ RayHit CreateRayHit()
     hit.normal = float3(0.0f, 0.0f, 0.0f);
     return hit;
 }
+
+#endif  // RAYHIT_COMPUTE
