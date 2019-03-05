@@ -7,6 +7,8 @@ struct RayHit
     float distance;
     float3 position;
     float3 normal;
+    int GeoType;
+    int GeoIndex;
 };
 
 RayHit CreateRayHit()
@@ -16,6 +18,8 @@ RayHit CreateRayHit()
     hit.position = float3(0.0f, 0.0f, 0.0f);
     hit.distance = 1.#INF;
     hit.normal = float3(0.0f, 0.0f, 0.0f);
+    hit.GeoType = -1;
+    hit.GeoIndex = -1;
     return hit;
 }
 
