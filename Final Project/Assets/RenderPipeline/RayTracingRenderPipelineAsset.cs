@@ -27,6 +27,7 @@ public class RayTracingRenderPipelineAsset : RenderPipelineAsset
     public List<RenderPipelineConfigObject> m_config;
 
     public ComputeShader computeShader;
+    public ComputeShader shadowMapShader;
 
     /// <summary>
     /// This return a render pipeline to Unity. It is used by Unity.
@@ -34,6 +35,6 @@ public class RayTracingRenderPipelineAsset : RenderPipelineAsset
     /// <returns>The create pipeline.</returns>
     protected override IRenderPipeline InternalCreatePipeline()
     {
-        return new RayTracingRenderPipeline(computeShader, m_config);
+        return new RayTracingRenderPipeline(computeShader, shadowMapShader, m_config);
     }
 }

@@ -10,7 +10,8 @@ public class RayTracingRenderPipeline : RenderPipeline
 {
     private readonly static string s_bufferName = "Ray Tracing Render Camera";
 
-    private ComputeShader m_computeShader; // The compute shader we are going to write our ray tracing program on
+    private ComputeShader m_mainShader; // The compute shader we are going to write our ray tracing program on
+    private ComputeShader m_shadowMapShader;
 
     private RenderTexture m_target; // The texture to hold the ray tracing result from the compute shader
 
@@ -36,9 +37,11 @@ public class RayTracingRenderPipeline : RenderPipeline
     /// </summary>
     /// <param name="computeShader">Compute shader to use.</param>
     /// <param name="skybox">Skybox to use</param>
-    public RayTracingRenderPipeline(ComputeShader computeShader, List<RenderPipelineConfigObject> allConfig)
+    public RayTracingRenderPipeline(ComputeShader mainShader, ComputeShader shadowMapShader, List<RenderPipelineConfigObject> allConfig)
     {
-        m_computeShader = computeShader;
+        m_mainShader = mainShader;
+        
+        m_shadowMapShader = shadowMapShader;
 
         m_allConfig = allConfig;
         m_config = m_allConfig[0];
@@ -242,13 +245,13 @@ public class RayTracingRenderPipeline : RenderPipeline
 
         #region Ray Tracing
 
-        m_computeShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
-        m_computeShader.SetMatrix("_CameraInverseProjection", camera.projectionMatrix.inverse);
-        m_computeShader.SetTexture(0, "_SkyboxTexture", m_config.skybox);
+        m_mainShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
+        m_mainShader.SetMatrix("_CameraInverseProjection", camera.projectionMatrix.inverse);
+        m_mainShader.SetTexture(0, "_SkyboxTexture", m_config.skybox);
 
         // Sphere
 
-        m_computeShader.SetInt("_NumOfSpheres", m_sphereGeom.Count);
+        m_mainShader.SetInt("_NumOfSpheres", m_sphereGeom.Count);
         ComputeBuffer sphereBuffer = null;
         if (m_sphereGeom.Count > 0)
         {
@@ -260,11 +263,11 @@ public class RayTracingRenderPipeline : RenderPipeline
             sphereBuffer = new ComputeBuffer(1, 16); // need to be at least 16 bytes long for RTSphere_t
         }
 
-        m_computeShader.SetBuffer(0, "_Spheres", sphereBuffer);
+        m_mainShader.SetBuffer(0, "_Spheres", sphereBuffer);
 
         // Triangle
 
-        m_computeShader.SetInt("_NumOfTriangles", m_triangleGeom.Count);
+        m_mainShader.SetInt("_NumOfTriangles", m_triangleGeom.Count);
         ComputeBuffer triangleBuffer = null;
         if (m_triangleGeom.Count > 0)
         {
@@ -276,15 +279,15 @@ public class RayTracingRenderPipeline : RenderPipeline
             triangleBuffer = new ComputeBuffer(1, RTTriangle_t.GetSize());
         }
 
-        m_computeShader.SetBuffer(0, "_Triangles", triangleBuffer);
+        m_mainShader.SetBuffer(0, "_Triangles", triangleBuffer);
 
         // Ambient Light
 
-        m_computeShader.SetVector("_AmbientGlobal", m_config.ambitent);
+        m_mainShader.SetVector("_AmbientGlobal", m_config.ambitent);
 
         // Directional Lights
 
-        m_computeShader.SetInt("_NumOfDirectionalLights", m_directionalLights.Count);
+        m_mainShader.SetInt("_NumOfDirectionalLights", m_directionalLights.Count);
         ComputeBuffer dirLightBuf = null;
         if (m_directionalLights.Count > 0)
         {
@@ -296,11 +299,11 @@ public class RayTracingRenderPipeline : RenderPipeline
             dirLightBuf = new ComputeBuffer(1, 4); // Dummy
         }
 
-        m_computeShader.SetBuffer(0, "_DirectionalLights", dirLightBuf);
+        m_mainShader.SetBuffer(0, "_DirectionalLights", dirLightBuf);
 
         // Point Lights
 
-        m_computeShader.SetInt("_NumOfPointLights", m_pointLights.Count);
+        m_mainShader.SetInt("_NumOfPointLights", m_pointLights.Count);
         ComputeBuffer pointLightBuf = null;
         if (m_pointLights.Count > 0)
         {
@@ -312,15 +315,15 @@ public class RayTracingRenderPipeline : RenderPipeline
             pointLightBuf = new ComputeBuffer(1, 4); // Dummy
         }
 
-        m_computeShader.SetBuffer(0, "_PointLights", pointLightBuf);
+        m_mainShader.SetBuffer(0, "_PointLights", pointLightBuf);
 
-        m_computeShader.SetTexture(0, "Result", m_target);
+        m_mainShader.SetTexture(0, "Result", m_target);
         int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);
         int threadGroupsY = Mathf.CeilToInt(Screen.height / 8.0f);
         if (threadGroupsX > 0 && threadGroupsY > 0
         ) // Prevent dispatching 0 threads to GPU (when the editor is starting or there is no screen to render) 
         {
-            m_computeShader.Dispatch(0, threadGroupsX, threadGroupsY, 1);
+            m_mainShader.Dispatch(0, threadGroupsX, threadGroupsY, 1);
         }
 
 
