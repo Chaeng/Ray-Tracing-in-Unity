@@ -5,13 +5,20 @@ using UnityEngine;
 [RequireComponent(typeof(RTSphere))]
 public class RTSphereRenderer : RTRenderer
 {
+    /// <summary>
+    /// Awake is used to initialize any variables or game state before
+    /// the game starts
+    /// </summary>
     private void Awake()
     {
         m_geom = GetComponent<RTSphere>();    // Require Component Directive enforce that there must be a RTSphere component 
     }
 
-
-    public RTSphere mySphere
+    /// <summary>
+    /// Property to get attached RTSphere component
+    /// </summary>
+    /// <returns>RTSphere component</returns>
+    private RTSphere mySphere
     {
         get
         {
@@ -24,7 +31,10 @@ public class RTSphereRenderer : RTRenderer
         }
     }
 
-
+    /// <summary>
+    /// Get RTSphere_t geometry for attached RTSphere component
+    /// </summary>
+    /// <returns>RTSphere_t geometry</returns>
     public RTSphere_t GetGeometry()
     {
         if (mySphere == null)
