@@ -4,18 +4,22 @@ using UnityEngine;
 
 public class RTMaterialDatabase : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private RTMaterial[] m_materials = null;
+
+    private void Awake()
     {
-        
+        m_materials = GetComponents<RTMaterial>();
     }
 
-    // Update is called once per frame
-    void Update()
+    /// <summary>
+    /// This returns material type struct for renderer
+    /// </summary>
+    /// <returns>material type struct</returns>
+    public RTMaterial[] Materials
     {
-        
+        get
+        {
+            return m_materials;
+        }
     }
-
-    // TODO: Set in Awake function per child objects RTMaterial
-    public RTMaterial[] materials;
 }

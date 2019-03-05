@@ -6,8 +6,10 @@ using UnityEngine;
 
 public class RTRenderer : MonoBehaviour
 {
+    [SerializeField] protected int m_materialIndex = -1;
+    // [SerializeField] protected int m_materialName = -1;  // TODO
+
     protected RTGeometry m_geom = null;
-    protected int m_materialIndex = -1;
     private RTMaterialDatabase m_materialDatabase = null;
 
     /// <summary>
@@ -52,23 +54,22 @@ public class RTRenderer : MonoBehaviour
     /// This returns material type struct for renderer
     /// </summary>
     /// <returns>material type struct</returns>
-    public RTMaterialType MaterialType
+    public RTMaterial Material
     {
         get
         {
             if (m_materialDatabase == null)
             {
-                return new RTMaterialType();
+                return new RTMaterial();
             }
 
             if (m_materialIndex < 0
-                || m_materialIndex > m_materialDatabase.materials.Length - 1)
+                || m_materialIndex > m_materialDatabase.Materials.Length - 1)
             {
-                return new RTMaterialType();
+                return new RTMaterial();
             }
 
-            return m_materialDatabase.materials[m_materialIndex]
-                .GetMaterialType();
+            return m_materialDatabase.Materials[m_materialIndex];
         }
     }
 }
