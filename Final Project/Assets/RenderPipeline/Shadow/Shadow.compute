@@ -17,7 +17,7 @@
             
         IntersectSphere(ray, record, spheres[i], i);
         
-        if (record.distance != 1.#INF)
+        if (record.GeoType != -1)
         {
             return 0;
         }
@@ -32,7 +32,7 @@
 
         IntersectTriangle(ray, record, triangles[t], t);
 
-        if (record.distance != 1.#INF)
+        if (record.GeoType != -1)
         {
             return 0;
         }
@@ -74,9 +74,8 @@ float PercentageVisibility(
         ray = CreateRay(position, direction);
 
     } else if (lightType == 1) { // point light
-        
-        float3 dir = lightPosition - position;
-        normalize(dir);
+
+        float3 dir = normalize(lightPosition - position);
         ray = CreateRay(position, dir);
 
     } else if (lightType == 2) { // spot light
