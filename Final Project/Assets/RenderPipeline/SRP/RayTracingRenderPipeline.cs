@@ -6,11 +6,12 @@ using UnityEngine.Experimental.Rendering; // Since SRP is an experimental featur
 using UnityEngine.SceneManagement;
 
 
-public class RayTracingRenderPipeline : RenderPipeline
+public partial class RayTracingRenderPipeline : RenderPipeline
 {
     private readonly static string s_bufferName = "Ray Tracing Render Camera";
 
-    private ComputeShader m_computeShader; // The compute shader we are going to write our ray tracing program on
+    private ComputeShader m_mainShader; // The compute shader we are going to write our ray tracing program on
+    private ComputeShader m_shadowMapShader;
 
     private RenderTexture m_target; // The texture to hold the ray tracing result from the compute shader
 
@@ -36,9 +37,11 @@ public class RayTracingRenderPipeline : RenderPipeline
     /// </summary>
     /// <param name="computeShader">Compute shader to use.</param>
     /// <param name="skybox">Skybox to use</param>
-    public RayTracingRenderPipeline(ComputeShader computeShader, List<RenderPipelineConfigObject> allConfig)
+    public RayTracingRenderPipeline(ComputeShader mainShader, ComputeShader shadowMapShader, List<RenderPipelineConfigObject> allConfig)
     {
-        m_computeShader = computeShader;
+        m_mainShader = mainShader;
+
+        m_shadowMapShader = shadowMapShader;
 
         m_allConfig = allConfig;
         m_config = m_allConfig[0];
@@ -183,25 +186,25 @@ public class RayTracingRenderPipeline : RenderPipeline
                 switch (light.type)
                 {
                     case LightType.Directional:
-                    {
-                        Color lightColor = light.color;
+                        {
+                            Color lightColor = light.color;
 
-                        RTLightStructureDirectional_t directional = new RTLightStructureDirectional_t();
-                        directional.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
-                        directional.direction = -1 * Vector3.Normalize(light.transform.rotation * Vector3.forward);
-                        m_directionalLights.Add(directional);
-                    }
+                            RTLightStructureDirectional_t directional = new RTLightStructureDirectional_t();
+                            directional.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
+                            directional.direction = -1 * Vector3.Normalize(light.transform.rotation * Vector3.forward);
+                            m_directionalLights.Add(directional);
+                        }
                         break;
 
                     case LightType.Point:
-                    {
-                        Color lightColor = light.color;
+                        {
+                            Color lightColor = light.color;
 
-                        RTLightStructurePoint_t point = new RTLightStructurePoint_t();
-                        point.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
-                        point.position = light.transform.position;
-                        m_pointLights.Add(point);
-                    }
+                            RTLightStructurePoint_t point = new RTLightStructurePoint_t();
+                            point.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
+                            point.position = light.transform.position;
+                            m_pointLights.Add(point);
+                        }
                         break;
 
                     case LightType.Spot:
@@ -240,51 +243,51 @@ public class RayTracingRenderPipeline : RenderPipeline
         // Begin Unity profiler sample for frame debugger
         m_buffer.BeginSample(s_bufferName);
 
+
+
+        #region Geometry Preparation
+
+        ComputeBuffer sphereBuffer = null;
+        LoadBufferWithSpheres(ref sphereBuffer);
+        ComputeBuffer triangleBuffer = LoadBufferWithTriangles();
+
+        #endregion
+
+
+
+        #region Shadow Map Pass
+
+        ShadowMapPass(Vector3.zero, Vector3.zero, m_sphereGeom.Count, sphereBuffer, m_triangleGeom.Count, triangleBuffer);
+
+        #endregion
+
+
+
         #region Ray Tracing
 
-        m_computeShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
-        m_computeShader.SetMatrix("_CameraInverseProjection", camera.projectionMatrix.inverse);
-        m_computeShader.SetTexture(0, "_SkyboxTexture", m_config.skybox);
+        m_mainShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
+        m_mainShader.SetMatrix("_CameraInverseProjection", camera.projectionMatrix.inverse);
+        m_mainShader.SetTexture(0, "_SkyboxTexture", m_config.skybox);
 
         // Sphere
 
-        m_computeShader.SetInt("_NumOfSpheres", m_sphereGeom.Count);
-        ComputeBuffer sphereBuffer = null;
-        if (m_sphereGeom.Count > 0)
-        {
-            sphereBuffer = new ComputeBuffer(m_sphereGeom.Count, 4 * sizeof(float));
-            sphereBuffer.SetData(m_sphereGeom);
-        }
-        else
-        {
-            sphereBuffer = new ComputeBuffer(1, 16); // need to be at least 16 bytes long for RTSphere_t
-        }
-
-        m_computeShader.SetBuffer(0, "_Spheres", sphereBuffer);
+        m_mainShader.SetInt("_NumOfSpheres", m_sphereGeom.Count);
+        m_mainShader.SetBuffer(0, "_Spheres", sphereBuffer);
 
         // Triangle
 
-        m_computeShader.SetInt("_NumOfTriangles", m_triangleGeom.Count);
-        ComputeBuffer triangleBuffer = null;
-        if (m_triangleGeom.Count > 0)
-        {
-            triangleBuffer = new ComputeBuffer(m_triangleGeom.Count, RTTriangle_t.GetSize());
-            triangleBuffer.SetData(m_triangleGeom);
-        }
-        else
-        {
-            triangleBuffer = new ComputeBuffer(1, RTTriangle_t.GetSize());
-        }
+        m_mainShader.SetInt("_NumOfTriangles", m_triangleGeom.Count);
 
-        m_computeShader.SetBuffer(0, "_Triangles", triangleBuffer);
+
+        m_mainShader.SetBuffer(0, "_Triangles", triangleBuffer);
 
         // Ambient Light
 
-        m_computeShader.SetVector("_AmbientGlobal", m_config.ambitent);
+        m_mainShader.SetVector("_AmbientGlobal", m_config.ambitent);
 
         // Directional Lights
 
-        m_computeShader.SetInt("_NumOfDirectionalLights", m_directionalLights.Count);
+        m_mainShader.SetInt("_NumOfDirectionalLights", m_directionalLights.Count);
         ComputeBuffer dirLightBuf = null;
         if (m_directionalLights.Count > 0)
         {
@@ -296,11 +299,11 @@ public class RayTracingRenderPipeline : RenderPipeline
             dirLightBuf = new ComputeBuffer(1, 4); // Dummy
         }
 
-        m_computeShader.SetBuffer(0, "_DirectionalLights", dirLightBuf);
+        m_mainShader.SetBuffer(0, "_DirectionalLights", dirLightBuf);
 
         // Point Lights
 
-        m_computeShader.SetInt("_NumOfPointLights", m_pointLights.Count);
+        m_mainShader.SetInt("_NumOfPointLights", m_pointLights.Count);
         ComputeBuffer pointLightBuf = null;
         if (m_pointLights.Count > 0)
         {
@@ -312,15 +315,15 @@ public class RayTracingRenderPipeline : RenderPipeline
             pointLightBuf = new ComputeBuffer(1, 4); // Dummy
         }
 
-        m_computeShader.SetBuffer(0, "_PointLights", pointLightBuf);
+        m_mainShader.SetBuffer(0, "_PointLights", pointLightBuf);
 
-        m_computeShader.SetTexture(0, "Result", m_target);
+        m_mainShader.SetTexture(0, "Result", m_target);
         int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);
         int threadGroupsY = Mathf.CeilToInt(Screen.height / 8.0f);
         if (threadGroupsX > 0 && threadGroupsY > 0
         ) // Prevent dispatching 0 threads to GPU (when the editor is starting or there is no screen to render) 
         {
-            m_computeShader.Dispatch(0, threadGroupsX, threadGroupsY, 1);
+            m_mainShader.Dispatch(0, threadGroupsX, threadGroupsY, 1);
         }
 
 
@@ -348,6 +351,36 @@ public class RayTracingRenderPipeline : RenderPipeline
 
 
         renderContext.Submit(); // Send all the batched commands to GPU
+    }
+
+
+    private void LoadBufferWithSpheres(ref ComputeBuffer sphereBuffer)
+    {
+        if (m_sphereGeom.Count > 0)
+        {
+            sphereBuffer = new ComputeBuffer(m_sphereGeom.Count, 4 * sizeof(float));
+            sphereBuffer.SetData(m_sphereGeom);
+        }
+        else
+        {
+            sphereBuffer = new ComputeBuffer(1, 16); // need to be at least 16 bytes long for RTSphere_t
+        }
+    }
+
+
+    private ComputeBuffer LoadBufferWithTriangles()
+    {
+        ComputeBuffer triangleBuffer = null;
+        if (m_triangleGeom.Count > 0)
+        {
+            triangleBuffer = new ComputeBuffer(m_triangleGeom.Count, RTTriangle_t.GetSize());
+            triangleBuffer.SetData(m_triangleGeom);
+        }
+        else
+        {
+            triangleBuffer = new ComputeBuffer(1, RTTriangle_t.GetSize());
+        }
+        return triangleBuffer;
     }
 
 
