@@ -1,4 +1,7 @@
-﻿struct RTSphere
+﻿#include "Ray.compute"
+#include "RayHit.compute"
+
+struct RTSphere
 {
     float3 center;
     float radius;
