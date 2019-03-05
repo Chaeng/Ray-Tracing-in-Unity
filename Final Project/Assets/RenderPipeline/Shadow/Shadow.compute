@@ -2,7 +2,7 @@
                      int exceptType,
                      int exceptIndex,
                      int numOfSphere,
-                     StructuredBuffer<RTSphere> spheres，
+                     StructuredBuffer<RTSphere> spheres,
                      int numOfTriangle,
                      StructuredBuffer<RTTriangle> triangles) 
 {
@@ -15,9 +15,9 @@
             continue;
         }
             
-        IntersectSphere(ray, record, spheres[i]);
+        IntersectSphere(ray, record, spheres[i], i);
         
-        if (hit.distance != 1.#INF)
+        if (record.distance != 1.#INF)
         {
             return 0;
         }
@@ -30,9 +30,9 @@
             continue;
         }
 
-        IntersectTriangle(ray, record, triangles[t]);
+        IntersectTriangle(ray, record, triangles[t], t);
 
-        if (hit.distance != 1.#INF)
+        if (record.distance != 1.#INF)
         {
             return 0;
         }
@@ -62,7 +62,7 @@ float PercentageVisibility(
     int exceptType,
     int exceptIndex,
     int numOfSphere,
-    StructuredBuffer<RTSphere> spheres，
+    StructuredBuffer<RTSphere> spheres,
     int numOfTriangle,
     StructuredBuffer<RTTriangle> triangles)
 {
@@ -71,7 +71,7 @@ float PercentageVisibility(
 
     if (lightType == 0) // directional light
     {
-        ray = CreateRay(position, -direction);
+        ray = CreateRay(position, direction);
 
     } else if (lightType == 1) { // point light
         
