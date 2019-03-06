@@ -30,6 +30,8 @@ float3 Shade(
     StructuredBuffer<RTDirectionalLight> dirLights,
     int numOfPointLight,
     StructuredBuffer<RTPointLight> pointLights,
+    int numOfSpotLight,
+    StructuredBuffer<RTSpotLight> spotLights,
     Texture2D<float4> skybox, 
     SamplerState skyboxSampler,
     int numOfSphere,
@@ -65,11 +67,11 @@ float3 Shade(
             color = color + (tempColor * visibility);
         } 
         
-        for (int x = 0; x < numOfPointLight; x++)
+        for (int x = 0; x < numOfSpotLight; x++)
         {
             tempColor = 0;  // result of spot light
             
-            visibility = PercentageVisibility(hit.position, 2, pointLights[x].position, pointLights[x].direction,
+            visibility = PercentageVisibility(hit.position, 2, spotLights[x].position, spotLights[x].direction,
                                               hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles);
            
             color = color + (tempColor * visibility);

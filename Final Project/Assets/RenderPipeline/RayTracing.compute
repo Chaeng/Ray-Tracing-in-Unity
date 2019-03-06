@@ -103,6 +103,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _DirectionalLights,
                         _NumOfPointLights,
                         _PointLights,
+                        _NumOfSpotLights,
+                        _SpotLights,
                         _SkyboxTexture, 
                         sampler_SkyboxTexture,
                         _NumOfSpheres,
