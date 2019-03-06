@@ -15,7 +15,7 @@ public partial class RayTracingRenderPipeline
         if(m_shadowMap == null)
         {
             m_shadowMap = new RenderTexture(m_shadowMapWidth, m_shadowMapHeight, 0,
-                RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+                                            RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
             m_shadowMap.enableRandomWrite = true;
             m_shadowMap.Create();
         }

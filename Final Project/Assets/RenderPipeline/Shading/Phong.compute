@@ -63,7 +63,17 @@ float3 Shade(
                                               hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
            
             color = color + (tempColor * visibility);
-        }         
+        } 
+        
+        for (int x = 0; x < numOfPointLight; x++)
+        {
+            tempColor = 0;  // result of spot light
+            
+            visibility = PercentageVisibility(hit.position, 2, pointLights[x].position, pointLights[x].direction,
+                                              hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles);
+           
+            color = color + (tempColor * visibility);
+        }
         
         return color;
     }
