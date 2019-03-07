@@ -132,7 +132,7 @@ public partial class RayTracingRenderPipeline : RenderPipeline
                             spot.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
                             spot.position = light.transform.position;
                             spot.direction = -1 * Vector3.Normalize(light.transform.rotation * Vector3.forward);
-                            spot.coneAngle = light.spotAngle;
+                            spot.coneAngle = light.spotAngle * (Mathf.PI / 180);
                             m_spotLights.Add(spot);
                         }
                         break;
