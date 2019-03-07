@@ -10,6 +10,8 @@ struct RTTriangle
     float planeD;
     float area;
     int isDoubleSide;
+    int geometryIndex;
+    int materialIndex;
 };
 
 void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri, int GeoIndex)
@@ -70,8 +72,9 @@ void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri, int GeoInd
     bestHit.barycentric = float3(areaABQ / tri.area, areaBCQ / tri.area, areaAQC / tri.area);
     bestHit.position = hit;
     bestHit.distance = t;
-    bestHit.GeoIndex = GeoIndex;
+    bestHit.GeoIndex = tri.geometryIndex;
     bestHit.GeoType = 1; // 1 represent triangle
+    bestHit.MatIndex = tri.materialIndex;
     if(nDotD > 0)
     {
         bestHit.normal = -tri.normal;
