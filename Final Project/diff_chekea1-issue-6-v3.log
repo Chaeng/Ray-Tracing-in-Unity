@@ -1,0 +1,361 @@
+diff --git a/Final Project/Assets/Extension/Vector3Extension.cs b/Final Project/Assets/Extension/Vector3Extension.cs
+index 4e934c3..2e2ad22 100644
+--- a/Final Project/Assets/Extension/Vector3Extension.cs	
++++ b/Final Project/Assets/Extension/Vector3Extension.cs	
+@@ -11,12 +11,4 @@ public static class Vector3Extension
+     {
+         return new float[]{v.x, v.y, v.z};
+     }
+-
+-    ///<summary>
+-    /// Return number of bytes in a vector3
+-    ///</summary>
+-    public static int SizeOf()
+-    {
+-        return sizeof(float) * 3;
+-    }
+ }
+diff --git a/Final Project/Assets/Geometry/RTSphere.cs b/Final Project/Assets/Geometry/RTSphere.cs
+index 21b3e4b..ea16490 100644
+--- a/Final Project/Assets/Geometry/RTSphere.cs	
++++ b/Final Project/Assets/Geometry/RTSphere.cs	
+@@ -5,7 +5,6 @@ using UnityEngine;
+ public class RTSphere : RTGeometry
+ {
+     [SerializeField] private float m_radius = 1;
+-    [SerializeField] private int m_materialIndex = -1;
+ 
+ 
+     public override RTGeometryType GetGeometryType()
+@@ -22,8 +21,7 @@ public class RTSphere : RTGeometry
+         return new RTSphere_t 
+         {
+             center = _center,
+-            radius = m_radius,
+-            materialIndex = m_materialIndex
++            radius = m_radius
+         };
+     }
+ }
+diff --git a/Final Project/Assets/Geometry/RTSphereStructure.cs b/Final Project/Assets/Geometry/RTSphereStructure.cs
+index dadc9f8..cb66ff1 100644
+--- a/Final Project/Assets/Geometry/RTSphereStructure.cs	
++++ b/Final Project/Assets/Geometry/RTSphereStructure.cs	
+@@ -8,5 +8,4 @@ public struct RTSphere_t
+ {
+     public Vector3 center;
+     public float radius;
+-    public int materialIndex;
+ }
+diff --git a/Final Project/Assets/Geometry/RTTriangle.cs b/Final Project/Assets/Geometry/RTTriangle.cs
+index da84a33..0e790b7 100644
+--- a/Final Project/Assets/Geometry/RTTriangle.cs	
++++ b/Final Project/Assets/Geometry/RTTriangle.cs	
+@@ -11,7 +11,6 @@ public class RTTriangle : RTGeometry
+     [SerializeField] private Vector3 m_vertices1 = Vector3.zero;
+     [SerializeField] private Vector3 m_vertices2 = Vector3.zero;
+     [SerializeField] private bool m_isDoubleSide = true;
+-    [SerializeField] private int m_materialIndex = -1;
+ 
+ 
+     private Vector4 m_worldVert0 = Vector4.zero;
+@@ -41,8 +40,7 @@ public class RTTriangle : RTGeometry
+             normal = m_cachedNormal,
+             planeD = m_cachedPlaneD,
+             area = m_cachedArea,
+-            isDoubleSide = m_isDoubleSide ? 1 : 0,
+-            materialIndex = m_materialIndex
++            isDoubleSide = m_isDoubleSide ? 1 : 0
+         };
+     }
+ 
+diff --git a/Final Project/Assets/Geometry/RTTriangleStructure.cs b/Final Project/Assets/Geometry/RTTriangleStructure.cs
+index eeaed4a..4a8014f 100644
+--- a/Final Project/Assets/Geometry/RTTriangleStructure.cs	
++++ b/Final Project/Assets/Geometry/RTTriangleStructure.cs	
+@@ -13,7 +13,6 @@ public struct RTTriangle_t
+     public float planeD;
+     public float area;
+     public int isDoubleSide;
+-    public int materialIndex;
+     
+     public static int GetSize()
+     {
+diff --git a/Final Project/Assets/RenderPipeline/Geometry/RTTriangle.compute b/Final Project/Assets/RenderPipeline/Geometry/RTTriangle.compute
+index fb0b8ca..c3fb486 100644
+--- a/Final Project/Assets/RenderPipeline/Geometry/RTTriangle.compute	
++++ b/Final Project/Assets/RenderPipeline/Geometry/RTTriangle.compute	
+@@ -12,7 +12,7 @@ struct RTTriangle
+     int isDoubleSide;
+ };
+ 
+-void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri)
++void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri, int GeoIndex)
+ {
+     // (1) Here we try to intersect the plane equation of the triangle with the ray and see if there is intersect
+     // (2) If there is intersection, calculate the Barycentric coordinates
+@@ -80,5 +80,4 @@ void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri)
+     {
+         bestHit.normal = tri.normal;
+     }
+-    bestHit.materialIndex = tri.materialIndex;
+ }
+diff --git a/Final Project/Assets/RenderPipeline/RTSphere.compute b/Final Project/Assets/RenderPipeline/RTSphere.compute
+index a61c471..4ef7f14 100644
+--- a/Final Project/Assets/RenderPipeline/RTSphere.compute	
++++ b/Final Project/Assets/RenderPipeline/RTSphere.compute	
+@@ -7,7 +7,7 @@ struct RTSphere
+     float radius;
+ };
+ 
+-void IntersectSphere(Ray ray, inout RayHit bestHit, RTSphere sphere)
++void IntersectSphere(Ray ray, inout RayHit bestHit, RTSphere sphere, int GeoIndex)
+ {
+     // The ray equation in from of (ray.origin) + (distance travelled, d) * (ray.direction) = (the contact point)   Equ(1)
+     // The sphere equation in form of [|(contact point) - (center; sphere.xyz)|]^2 = (radius; sphere.w)^2.0f          Equ(2)
+@@ -70,9 +70,8 @@ void IntersectSphere(Ray ray, inout RayHit bestHit, RTSphere sphere)
+     {
+         bestHit.distance = hitDis;
+         bestHit.GeoType = 0;  // 0 represent sphere
+-        bestHit.GeoIndex = sphere.GeoIndex;
++        bestHit.GeoIndex = GeoIndex;
+         bestHit.position = ray.origin + hitDis * ray.direction;
+         bestHit.normal = normalize(bestHit.position - sphere.center);
+-        bestHit.materialIndex = sphere.materialIndex;
+     }
+ }
+\ No newline at end of file
+diff --git a/Final Project/Assets/RenderPipeline/RayHit.compute b/Final Project/Assets/RenderPipeline/RayHit.compute
+index 0e6f11c..b4a5975 100644
+--- a/Final Project/Assets/RenderPipeline/RayHit.compute	
++++ b/Final Project/Assets/RenderPipeline/RayHit.compute	
+@@ -7,7 +7,6 @@ struct RayHit
+     float distance;
+     float3 position;
+     float3 normal;
+-    int materialIndex;  // TODO: Plumbing
+     int GeoType;
+     int GeoIndex;
+ };
+@@ -19,7 +18,6 @@ RayHit CreateRayHit()
+     hit.position = float3(0.0f, 0.0f, 0.0f);
+     hit.distance = 1.#INF;
+     hit.normal = float3(0.0f, 0.0f, 0.0f);
+-    hit.materialIndex = -1;
+     hit.GeoType = -1;
+     hit.GeoIndex = -1;
+     return hit;
+diff --git a/Final Project/Assets/RenderPipeline/RayTracing.compute b/Final Project/Assets/RenderPipeline/RayTracing.compute
+index 8ee37d0..7c71683 100644
+--- a/Final Project/Assets/RenderPipeline/RayTracing.compute	
++++ b/Final Project/Assets/RenderPipeline/RayTracing.compute	
+@@ -41,10 +41,6 @@ StructuredBuffer<RTSphere> _Spheres;
+ int _NumOfTriangles;
+ StructuredBuffer<RTTriangle> _Triangles;
+ 
+-// material
+-int _NumOfMaterials;
+-StructuredBuffer<RTMaterial> _Materials;
+-
+ 
+ Ray CreateCameraRay(float2 uv)
+ {
+@@ -66,12 +62,12 @@ RayHit Trace(Ray ray)
+ 
+     for(int i = 0; i < _NumOfSpheres; i++)
+     {
+-        IntersectSphere(ray, bestHit, _Spheres[i]);
++        IntersectSphere(ray, bestHit, _Spheres[i], i);
+     }
+     
+     for(int t = 0; t < _NumOfTriangles; t++)
+     {
+-        IntersectTriangle(ray, bestHit, _Triangles[t]);
++        IntersectTriangle(ray, bestHit, _Triangles[t], t);
+     }
+ 
+     return bestHit;
+diff --git a/Final Project/Assets/RenderPipeline/SRP/RayTracingRenderPipeline.cs b/Final Project/Assets/RenderPipeline/SRP/RayTracingRenderPipeline.cs
+index eb29db3..11a63e5 100644
+--- a/Final Project/Assets/RenderPipeline/SRP/RayTracingRenderPipeline.cs	
++++ b/Final Project/Assets/RenderPipeline/SRP/RayTracingRenderPipeline.cs	
+@@ -24,7 +24,6 @@ public partial class RayTracingRenderPipeline : RenderPipeline
+ 
+     private List<RTSphere_t> m_sphereGeom;
+     private List<RTTriangle_t> m_triangleGeom;
+-    private List<RTMaterial_t> m_materials;
+ 
+     // We batch the commands into a buffer to reduce the amount of sending commands to GPU
+     // Reusing the command buffer object avoids continuous memory allocation
+@@ -105,7 +104,6 @@ public partial class RayTracingRenderPipeline : RenderPipeline
+         ParseLight(roots);
+         ParseSphere(roots);
+         ParseTriangle(roots);
+-        ParseMaterial(roots);
+     }
+ 
+ 
+@@ -157,12 +155,6 @@ public partial class RayTracingRenderPipeline : RenderPipeline
+         }
+     }
+ 
+-    private void ParseMaterial(GameObject[] roots)
+-    {
+-        // TODO
+-
+-    }
+-
+ 
+     private void ParseLight(GameObject[] roots)
+     {
+@@ -289,22 +281,6 @@ public partial class RayTracingRenderPipeline : RenderPipeline
+ 
+         m_mainShader.SetBuffer(0, "_Triangles", triangleBuffer);
+ 
+-        // Material
+-
+-        m_mainShader.SetInt("_NumOfMaterials", m_materials.Count);
+-        ComputeBuffer materialBuffer = null;
+-        if (m_materials.Count > 0)
+-        {
+-            materialBuffer = new ComputeBuffer(m_materials.Count, RTMaterial_t.GetSize());
+-            materialBuffer.SetData(m_materials);
+-        }
+-        else
+-        {
+-            materialBuffer = new ComputeBuffer(1, RTMaterial_t.GetSize());
+-        }
+-
+-        m_mainShader.SetBuffer(0, "_Materials", materialBuffer);
+-
+         // Ambient Light
+ 
+         m_mainShader.SetVector("_AmbientGlobal", m_config.ambitent);
+@@ -353,7 +329,6 @@ public partial class RayTracingRenderPipeline : RenderPipeline
+ 
+         sphereBuffer.Release();
+         triangleBuffer.Release();
+-        materialBuffer.Release();
+         dirLightBuf.Release();
+         pointLightBuf.Release();
+ 
+diff --git a/Final Project/Assets/RenderPipeline/Shadow/Shadow.compute b/Final Project/Assets/RenderPipeline/Shadow/Shadow.compute
+index 8f9c116..346d779 100644
+--- a/Final Project/Assets/RenderPipeline/Shadow/Shadow.compute	
++++ b/Final Project/Assets/RenderPipeline/Shadow/Shadow.compute	
+@@ -15,7 +15,7 @@
+             continue;
+         }
+             
+-        IntersectSphere(ray, record, spheres[i]);
++        IntersectSphere(ray, record, spheres[i], i);
+         
+         if (record.GeoType != -1)
+         {
+diff --git a/Final Project/Assets/SceneResourceSupport/Materials/RTMaterial.cs b/Final Project/Assets/SceneResourceSupport/Materials/RTMaterial.cs
+index 29887ef..cfe5388 100644
+--- a/Final Project/Assets/SceneResourceSupport/Materials/RTMaterial.cs	
++++ b/Final Project/Assets/SceneResourceSupport/Materials/RTMaterial.cs	
+@@ -3,34 +3,20 @@ using System.Collections.Generic;
+ using UnityEngine;
+ 
+ public class RTMaterial : MonoBehaviour
+-{
++{   
++    // [SerializeField] private string m_MaterialName;  // TODO
++    
+     // classic Ambient, Diffuse, Specular
+     [SerializeField] private Vector3 m_ka, m_ks, m_kd;
+-    [SerializeField] private Vector3 m_n;
++    [SerializeField] Vector3 m_n;
+ 
+     // support for transparency and refractiveIndex
+-    [SerializeField] private float m_transparency;
+-    [SerializeField] private float m_refractiveIndex; 
++    [SerializeField] float m_transparency;
++    [SerializeField] float m_refractiveIndex; 
+ 
+     // support for reflection
+-    [SerializeField] private float m_reflectivity;
++    [SerializeField] float m_reflectivity;
+     
+     // support for normal and positional map
+-    [SerializeField] private Vector3 m_normal, m_position;
+-
+-    public RTMaterial_t GetMaterial()
+-    {
+-        return new RTMaterial_t
+-        {
+-            ka = m_ka,
+-            ks = m_ks,
+-            kd = m_kd,
+-            n = m_n,
+-            transparency = m_transparency,
+-            refractiveIndex = m_refractiveIndex,
+-            reflectivity = m_reflectivity,
+-            normal = m_normal,
+-            position = m_position
+-        };
+-    }
++    [SerializeField] Vector3 m_normal, m_position;
+ }
+diff --git a/Final Project/Assets/SceneResourceSupport/Materials/RTMaterial.cs.meta b/Final Project/Assets/SceneResourceSupport/Materials/RTMaterial.cs.meta
+index 4493155..fd11ebf 100644
+--- a/Final Project/Assets/SceneResourceSupport/Materials/RTMaterial.cs.meta	
++++ b/Final Project/Assets/SceneResourceSupport/Materials/RTMaterial.cs.meta	
+@@ -1,5 +1,5 @@
+ fileFormatVersion: 2
+-guid: 34f1eef1b9c3528428bb647783687cef
++guid: 12715149fa0fd044a9e13e2de7f7ee09
+ MonoImporter:
+   externalObjects: {}
+   serializedVersion: 2
+diff --git a/Final Project/Assets/SceneResourceSupport/Materials/RTMaterialStructure.cs b/Final Project/Assets/SceneResourceSupport/Materials/RTMaterialStructure.cs
+deleted file mode 100644
+index b9a1096..0000000
+--- a/Final Project/Assets/SceneResourceSupport/Materials/RTMaterialStructure.cs	
++++ /dev/null
+@@ -1,26 +0,0 @@
+-﻿using UnityEngine;
+-
+-public struct RTMaterial_t
+-{   
+-    // private string MaterialName;  // TODO
+-    
+-    // classic Ambient, Diffuse, Specular
+-    public Vector3 ka, ks, kd;
+-    public Vector3 n;
+-
+-    // support for transparency and refractiveIndex
+-    public float transparency;
+-    public float refractiveIndex; 
+-
+-    // support for reflection
+-    public float reflectivity;
+-    
+-    // support for normal and positional map
+-    public Vector3 normal, position;
+-
+-    public static int GetSize()
+-    {
+-        return Vector3Extension.SizeOf() * 6
+-            + sizeof(float) * 3;
+-    }
+-}
+diff --git a/Final Project/Assets/SceneResourceSupport/Materials/RTMaterialStructure.cs.meta b/Final Project/Assets/SceneResourceSupport/Materials/RTMaterialStructure.cs.meta
+deleted file mode 100644
+index fd11ebf..0000000
+--- a/Final Project/Assets/SceneResourceSupport/Materials/RTMaterialStructure.cs.meta	
++++ /dev/null
+@@ -1,11 +0,0 @@
+-fileFormatVersion: 2
+-guid: 12715149fa0fd044a9e13e2de7f7ee09
+-MonoImporter:
+-  externalObjects: {}
+-  serializedVersion: 2
+-  defaultReferences: []
+-  executionOrder: 0
+-  icon: {instanceID: 0}
+-  userData: 
+-  assetBundleName: 
+-  assetBundleVariant: 
