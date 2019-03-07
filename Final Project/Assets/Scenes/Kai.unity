@@ -142,7 +142,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a707b232e61a247379604c2635881a1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_materialIndex: -1
 --- !u!114 &75494344
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -156,6 +155,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_radius: 1
+  m_geometryIndex: -1
+  m_materialIndex: -1
 --- !u!4 &75494345
 Transform:
   m_ObjectHideFlags: 0
@@ -269,7 +270,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21bc9b1c2c63c46ca82b8320b3f40bf9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_materialIndex: -1
 --- !u!114 &839135419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -286,6 +286,8 @@ MonoBehaviour:
   m_vertices1: {x: 10, y: -10, z: 0}
   m_vertices2: {x: 0, y: 5, z: 0}
   m_isDoubleSide: 1
+  m_geometryIndex: -1
+  m_materialIndex: -1
 --- !u!4 &839135420
 Transform:
   m_ObjectHideFlags: 0
@@ -468,7 +470,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a707b232e61a247379604c2635881a1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_materialIndex: -1
 --- !u!114 &1184342850
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -482,6 +483,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_radius: 1
+  m_geometryIndex: -1
+  m_materialIndex: -1
 --- !u!4 &1184342851
 Transform:
   m_ObjectHideFlags: 0
