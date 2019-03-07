@@ -48,21 +48,6 @@ float3 Reflection(
             float theta = acos(rayBuffer[i].direction.y) / -PI;
             float phi = atan2(rayBuffer[i].direction.x, -rayBuffer[i].direction.z) / -PI * 0.5f;  
             reflColor += skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;     
-	        /*
-                float3 newColor = Shade(
-                                    ray, 
-                                    hit, 
-                                    ambientColor,
-                                    numOfDirLight,
-                                    dirLights,
-                                    numOfPointLight,
-                                    pointLights,
-                                    skybox, 
-                                    skyboxSampler,
-                                    _NumOfSpheres,
-                                    _Spheres,
-                                    numOfTriangle,
-                                    triangles);*/
                 
         }
         final_reflColor = reflColor;

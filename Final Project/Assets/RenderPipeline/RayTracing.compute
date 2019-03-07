@@ -109,7 +109,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _NumOfTriangles,
                         _Triangles);
   
-    bool reflEffect = true;     
+    
+    bool reflEffect = true;  // Temporary hard code 
+       
     float3 refl = Reflection(
                         result,
                         ray, 

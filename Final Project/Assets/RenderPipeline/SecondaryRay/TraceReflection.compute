@@ -7,7 +7,7 @@ RayHit TraceReflection_Sphere(
     RayHit bestHit = CreateRayHit();
     for(int i = 0; i < _NumOfSpheres; i++)
     {
-        IntersectSphere(ray, bestHit, _Spheres[i]);
+        //IntersectSphere(ray, bestHit, _Spheres[i]);
     }
     return bestHit;
 }
