@@ -13,6 +13,7 @@ public struct RTTriangle_t
     public float planeD;
     public float area;
     public int isDoubleSide;
+    public int materialIndex;
     
     public static int GetSize()
     {

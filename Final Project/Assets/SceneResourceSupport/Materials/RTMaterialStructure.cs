@@ -2,9 +2,6 @@
 
 public struct RTMaterial_t
 {   
-    // TODO: Move to common reference utility class
-    static readonly int SIZEOF_VECTOR3 = sizeof(float) * 3;
-
     // private string MaterialName;  // TODO
     
     // classic Ambient, Diffuse, Specular
@@ -23,7 +20,7 @@ public struct RTMaterial_t
 
     public static int GetSize()
     {
-        return SIZEOF_VECTOR3 * 6
+        return Vector3Extension.SizeOf() * 6
             + sizeof(float) * 3;
     }
 }

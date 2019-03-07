@@ -291,7 +291,7 @@ public partial class RayTracingRenderPipeline : RenderPipeline
 
         // Material
 
-        m_computeShader.SetInt("_NumOfMaterials", m_materials.Count);
+        m_mainShader.SetInt("_NumOfMaterials", m_materials.Count);
         ComputeBuffer materialBuffer = null;
         if (m_materials.Count > 0)
         {
@@ -303,7 +303,7 @@ public partial class RayTracingRenderPipeline : RenderPipeline
             materialBuffer = new ComputeBuffer(1, RTMaterial_t.GetSize());
         }
 
-        m_computeShader.SetBuffer(0, "_Materials", materialBuffer);
+        m_mainShader.SetBuffer(0, "_Materials", materialBuffer);
 
         // Ambient Light
 

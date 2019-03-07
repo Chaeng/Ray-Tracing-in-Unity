@@ -8,4 +8,5 @@ public struct RTSphere_t
 {
     public Vector3 center;
     public float radius;
+    public int materialIndex;
 }

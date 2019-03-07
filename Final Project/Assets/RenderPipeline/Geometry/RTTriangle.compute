@@ -12,7 +12,7 @@ struct RTTriangle
     int isDoubleSide;
 };
 
-void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri, int GeoIndex)
+void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri)
 {
     // (1) Here we try to intersect the plane equation of the triangle with the ray and see if there is intersect
     // (2) If there is intersection, calculate the Barycentric coordinates
@@ -80,4 +80,5 @@ void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri, int GeoInd
     {
         bestHit.normal = tri.normal;
     }
+    bestHit.materialIndex = tri.materialIndex;
 }
