@@ -41,6 +41,10 @@ StructuredBuffer<RTSphere> _Spheres;
 int _NumOfTriangles;
 StructuredBuffer<RTTriangle> _Triangles;
 
+// material
+int _NumOfMaterials;
+StructuredBuffer<RTMaterial> _Materials;
+
 
 Ray CreateCameraRay(float2 uv)
 {

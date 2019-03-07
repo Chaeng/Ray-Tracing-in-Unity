@@ -23,6 +23,7 @@ public class RayTracingRenderPipeline : RenderPipeline
 
     private List<RTSphere_t> m_sphereGeom;
     private List<RTTriangle_t> m_triangleGeom;
+    private List<RTMaterial_t> m_materials;
 
     // We batch the commands into a buffer to reduce the amount of sending commands to GPU
     // Reusing the command buffer object avoids continuous memory allocation
@@ -101,6 +102,7 @@ public class RayTracingRenderPipeline : RenderPipeline
         ParseLight(roots);
         ParseSphere(roots);
         ParseTriangle(roots);
+        ParseMaterial(roots);
     }
 
 
@@ -150,6 +152,12 @@ public class RayTracingRenderPipeline : RenderPipeline
                 }
             }
         }
+    }
+
+    private void ParseMaterial(GameObject[] roots)
+    {
+        // TODO
+
     }
 
 
@@ -278,6 +286,22 @@ public class RayTracingRenderPipeline : RenderPipeline
 
         m_computeShader.SetBuffer(0, "_Triangles", triangleBuffer);
 
+        // Material
+
+        m_computeShader.SetInt("_NumOfMaterials", m_materials.Count);
+        ComputeBuffer materialBuffer = null;
+        if (m_materials.Count > 0)
+        {
+            materialBuffer = new ComputeBuffer(m_materials.Count, RTMaterial_t.GetSize());
+            materialBuffer.SetData(m_materials);
+        }
+        else
+        {
+            materialBuffer = new ComputeBuffer(1, RTMaterial_t.GetSize());
+        }
+
+        m_computeShader.SetBuffer(0, "_Materials", materialBuffer);
+
         // Ambient Light
 
         m_computeShader.SetVector("_AmbientGlobal", m_config.ambitent);
@@ -326,6 +350,7 @@ public class RayTracingRenderPipeline : RenderPipeline
 
         sphereBuffer.Release();
         triangleBuffer.Release();
+        materialBuffer.Release();
         dirLightBuf.Release();
         pointLightBuf.Release();
 
