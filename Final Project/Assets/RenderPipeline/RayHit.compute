@@ -7,9 +7,9 @@ struct RayHit
     float distance;
     float3 position;
     float3 normal;
-    float3 rayDirection;  // TODO: Plumbing
-    int geomIndex;  // TODO: Plumbing
     int materialIndex;  // TODO: Plumbing
+    int GeoType;
+    int GeoIndex;
 };
 
 RayHit CreateRayHit()
@@ -19,9 +19,9 @@ RayHit CreateRayHit()
     hit.position = float3(0.0f, 0.0f, 0.0f);
     hit.distance = 1.#INF;
     hit.normal = float3(0.0f, 0.0f, 0.0f);
-    hit.rayDirection = float3(0.0f, 0.0f, 0.0f);
-    hit.geomIndex = 0;
-    hit.materialIndex = 0;
+    hit.materialIndex = -1;
+    hit.GeoType = -1;
+    hit.GeoIndex = -1;
     return hit;
 }
 

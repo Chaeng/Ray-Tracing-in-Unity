@@ -1,36 +1,92 @@
-﻿// lightType: 0 ---> Directional
-//            1 ---> Point
-//            2 ---> Spot 
-// ExceptIndex : will ignore the index to prevent self shadow
-float PercentageVisibility(
-    int lightType,
-    float3 position,
-    float3 direction,
-    int exceptIndex,
-    int numOfSphere,
-    StructuredBuffer<RTSphere> spheres)
+﻿float ShadowRayCast( Ray ray,
+                     int exceptType,
+                     int exceptIndex,
+                     int numOfSphere,
+                     StructuredBuffer<RTSphere> spheres,
+                     int numOfTriangle,
+                     StructuredBuffer<RTTriangle> triangles) 
 {
-    Ray ray;
-    RayHit hit;
+    RayHit record = CreateRayHit();
 
-    if (lightType == 0)
+    for (int i = 0; i < numOfSphere; i++)
     {
-        ray = CreateRay(position, -direction);
-        hit = CreateRayHit();
-
-        for (int i = 0; i < numOfSphere; i++)
+        if (exceptType == 0 && exceptIndex == i)
         {
-            if (exceptIndex == i)
-            {
-                continue;
-            }
+            continue;
+        }
             
-            IntersectSphere(ray, hit, spheres[i]);
-            if (hit.distance == 1.#INF)
-            {
-                return 0;
-            }
+        IntersectSphere(ray, record, spheres[i], i);
+        
+        if (record.GeoType != -1)
+        {
+            return 0;
         }
     }
+
+    for (int t = 0; t < numOfTriangle; t++)
+    {
+        if (exceptType == 1 && exceptIndex == t)
+        {
+            continue;
+        }
+
+        IntersectTriangle(ray, record, triangles[t], t);
+
+        if (record.GeoType != -1)
+        {
+            return 0;
+        }
+    }
+
     return 1;
+
+}
+
+
+
+// position: visible point position
+// lightType: 0 ---> Directional
+//            1 ---> Point
+//            2 ---> Spot 
+// lightPosition: The position of point and spot light
+// direction: The diretion of direction and spot light 
+// ExceptType : Will ignore the index to prevent self shadow
+//            0 ---> Sphere
+//            1 ---> Triangle
+// ExcepteIndex: index the of object
+float PercentageVisibility(
+    float3 position,
+    int lightType,
+    float3 lightPosition,
+    float3 direction,
+    int exceptType,
+    int exceptIndex,
+    int numOfSphere,
+    StructuredBuffer<RTSphere> spheres,
+    int numOfTriangle,
+    StructuredBuffer<RTTriangle> triangles)
+{
+    Ray ray;
+    float result;
+
+    if (lightType == 0) // directional light
+    {
+        ray = CreateRay(position, direction);
+
+    } else if (lightType == 1) { // point light
+
+        float3 dir = normalize(lightPosition - position);
+        ray = CreateRay(position, dir);
+
+    } else if (lightType == 2) { // spot light
+        
+        float3 dir = lightPosition - position;
+        normalize(dir);
+        ray = CreateRay(position, dir);
+        
+    }
+
+    result = ShadowRayCast(ray, exceptType, exceptIndex, numOfSphere, spheres, numOfTriangle, triangles);
+
+    return result;
 }
