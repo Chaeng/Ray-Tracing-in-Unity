@@ -1,0 +1,13 @@
+﻿
+RayHit TraceReflection_Sphere(
+                             Ray ray, 
+                             int _NumOfSpheres,
+                             StructuredBuffer<RTSphere> _Spheres)
+{
+    RayHit bestHit = CreateRayHit();
+    for(int i = 0; i < _NumOfSpheres; i++)
+    {
+        IntersectSphere(ray, bestHit, _Spheres[i]);
+    }
+    return bestHit;
+}
