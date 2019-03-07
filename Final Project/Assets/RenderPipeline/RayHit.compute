@@ -9,6 +9,7 @@ struct RayHit
     float3 normal;
     int GeoType;
     int GeoIndex;
+    int MatIndex;
 };
 
 RayHit CreateRayHit()
@@ -20,6 +21,7 @@ RayHit CreateRayHit()
     hit.normal = float3(0.0f, 0.0f, 0.0f);
     hit.GeoType = -1;
     hit.GeoIndex = -1;
+    hit.MatIndex = -1;
     return hit;
 }
 
