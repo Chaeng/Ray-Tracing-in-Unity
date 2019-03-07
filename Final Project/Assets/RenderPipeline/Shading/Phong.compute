@@ -1,25 +1,25 @@
-﻿
+﻿#include "../Shadow/Shadow.compute"
 static const float PI = 3.14159265f;
 
 float3 PhongDiffuseShading(float3 lightDir, float3 lightColor, float3 hitNormal)
 {
     float nDotL = dot(hitNormal, lightDir);
-    if(nDotL > 0)
+    if(nDotL < 0)
     {
-        return lightColor * nDotL;
+        nDotL = 0;
     }
-    return float3(0, 0, 0);
+    return lightColor * nDotL;
 }
 
 float3 PhongSpecularShading(float3 lightDir, float3 lightColor, float3 rayDir, float3 hitNormal, float shinyness)
 {
     float3 R = reflect(-1 * lightDir, hitNormal);
     float vDotR = dot(-1 * rayDir, R);
-    if(vDotR > 0)
+    if(vDotR < 0)
     {
-        return lightColor * pow(vDotR, shinyness);
+        vDotR = 0;
     }
-    return float3(0, 0, 0);
+    return pow(vDotR, shinyness) * lightColor;
 }
 
 float3 Shade(
@@ -31,26 +31,39 @@ float3 Shade(
     int numOfPointLight,
     StructuredBuffer<RTPointLight> pointLights,
     Texture2D<float4> skybox, 
-    SamplerState skyboxSampler)
+    SamplerState skyboxSampler,
+    int numOfSphere,
+    StructuredBuffer<RTSphere> spheres,
+    int numOfTriangle,
+    StructuredBuffer<RTTriangle> triangles)
 {
     if (hit.distance < 1.#INF)
     {
         float3 color = ambientColor;
-                
-        for(int i = 0; i < numOfDirLight; i++)
+        float3 tempColor;
+        float visibility;
+        
+        for(int d = 0; d < numOfDirLight; d++)
         {
-            color = color 
-                    + PhongDiffuseShading(dirLights[i].direction, dirLights[i].color, hit.normal) 
-                    + PhongSpecularShading(dirLights[i].direction, dirLights[i].color, ray.direction, hit.normal, 5);
+            tempColor  =   PhongDiffuseShading(dirLights[d].direction, dirLights[d].color, hit.normal) 
+                         + PhongSpecularShading(dirLights[d].direction, dirLights[d].color, ray.direction, hit.normal, 5);
+            
+            visibility = PercentageVisibility(hit.position, 0, dirLights[d].direction, dirLights[d].direction, 
+                                              hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
+            color = color + (tempColor * visibility);
         }
         
-        for(int i = 0; i < numOfPointLight; i++)
+        for(int s = 0; s < numOfPointLight; s++)
         {
-            float3 L = normalize(pointLights[i].position - hit.position);
-            color = color
-                    + PhongDiffuseShading(L, pointLights[i].color, hit.normal) 
-                    + PhongSpecularShading(L, pointLights[i].color, ray.direction, hit.normal, 5);
-        }
+            float3 L = normalize(pointLights[s].position - hit.position);
+            tempColor =   PhongDiffuseShading(L, pointLights[s].color, hit.normal) 
+                        + PhongSpecularShading(L, pointLights[s].color, ray.direction, hit.normal, 5);
+            
+            visibility = PercentageVisibility(hit.position, 1, pointLights[s].position, pointLights[s].position, 
+                                              hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
+           
+            color = color + (tempColor * visibility);
+        }         
         
         return color;
     }

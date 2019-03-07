@@ -3,10 +3,8 @@
 #include "Light/RTDirectionalLight.compute"
 #include "Light/RTPointLight.compute"
 #include "RTSphere.compute"
+#include "Geometry/RTTriangle.compute"
 #include "Shading/Phong.compute"
-#include "SecondaryRay/TraceReflection.compute"
-#include "SecondaryRay/Reflection.compute"
-
 
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
@@ -39,6 +37,11 @@ StructuredBuffer<RTPointLight> _PointLights;
 int _NumOfSpheres;
 StructuredBuffer<RTSphere> _Spheres;
 
+// triangle
+int _NumOfTriangles;
+StructuredBuffer<RTTriangle> _Triangles;
+
+
 Ray CreateCameraRay(float2 uv)
 {
     // Transform the camera origin to world space
@@ -59,7 +62,12 @@ RayHit Trace(Ray ray)
 
     for(int i = 0; i < _NumOfSpheres; i++)
     {
-        IntersectSphere(ray, bestHit, _Spheres[i]);
+        IntersectSphere(ray, bestHit, _Spheres[i], i);
+    }
+    
+    for(int t = 0; t < _NumOfTriangles; t++)
+    {
+        IntersectTriangle(ray, bestHit, _Triangles[t], t);
     }
 
     return bestHit;
@@ -93,25 +101,11 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _NumOfPointLights,
                         _PointLights,
                         _SkyboxTexture, 
-                        sampler_SkyboxTexture);                      
-   
-    bool reflEffect = true; 
-    if(reflEffect){
-         float3 refEffect = Reflection(
-                        result,
-                        ray, 
-                        hit, 
-                        _AmbientGlobal,
-                        _NumOfDirectionalLights,
-                        _DirectionalLights,
-                        _NumOfPointLights,
-                        _PointLights,
+                        sampler_SkyboxTexture,
                         _NumOfSpheres,
                         _Spheres,
-                        _SkyboxTexture, 
-                        sampler_SkyboxTexture);   
-         result += refEffect;
-    }  
+                        _NumOfTriangles,
+                        _Triangles);
     Result[id.xy] = float4(result, 1);
 }
 
