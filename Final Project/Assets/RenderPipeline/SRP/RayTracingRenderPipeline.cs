@@ -21,6 +21,7 @@ public partial class RayTracingRenderPipeline : RenderPipeline
 
     private List<RTLightStructureDirectional_t> m_directionalLights;
     private List<RTLightStructurePoint_t> m_pointLights;
+    private List<RTLightStructureSpot_t> m_spotLights;
 
     private List<RTSphere_t> m_sphereGeom;
     private List<RTTriangle_t> m_triangleGeom;
@@ -172,6 +173,13 @@ public partial class RayTracingRenderPipeline : RenderPipeline
 
         m_pointLights.Clear();
 
+        if (m_spotLights == null)
+        {
+            m_spotLights = new List<RTLightStructureSpot_t>();
+        }
+
+        m_spotLights.Clear();
+
         foreach (var root in roots)
         {
             Light[] lights = root.GetComponentsInChildren<Light>();
@@ -208,7 +216,16 @@ public partial class RayTracingRenderPipeline : RenderPipeline
                         break;
 
                     case LightType.Spot:
+                        {
+                            Color lightColor = light.color;
 
+                            RTLightStructureSpot_t spot = new RTLightStructureSpot_t();
+                            spot.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
+                            spot.position = light.transform.position;
+                            spot.direction = -1 * Vector3.Normalize(light.transform.rotation * Vector3.forward);
+                            spot.coneAngle = light.spotAngle;
+                            m_spotLights.Add(spot);
+                        }
                         break;
                 }
             }
@@ -316,6 +333,25 @@ public partial class RayTracingRenderPipeline : RenderPipeline
         }
 
         m_mainShader.SetBuffer(0, "_PointLights", pointLightBuf);
+
+
+        // Spot Lights
+
+        m_mainShader.SetInt("_NumOfSpotLights", m_spotLights.Count);
+        ComputeBuffer spotLightBuf = null;
+        if (m_spotLights.Count > 0)
+        {
+            spotLightBuf = new ComputeBuffer(m_spotLights.Count, RTLightStructureSpot_t.GetSize());
+            spotLightBuf.SetData(m_spotLights);
+        }
+        else
+        {
+            spotLightBuf = new ComputeBuffer(1, 4); // Dummy
+        }
+
+        m_mainShader.SetBuffer(0, "_SpotLights", spotLightBuf);
+
+
 
         m_mainShader.SetTexture(0, "Result", m_target);
         int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);

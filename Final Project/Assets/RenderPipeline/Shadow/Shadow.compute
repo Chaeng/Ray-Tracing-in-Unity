@@ -80,8 +80,7 @@ float PercentageVisibility(
 
     } else if (lightType == 2) { // spot light
         
-        float3 dir = lightPosition - position;
-        normalize(dir);
+        float3 dir = normalize(lightPosition - position);
         ray = CreateRay(position, dir);
         
     }
