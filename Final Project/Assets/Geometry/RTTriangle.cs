@@ -11,8 +11,6 @@ public class RTTriangle : RTGeometry
     [SerializeField] private Vector3 m_vertices1 = Vector3.zero;
     [SerializeField] private Vector3 m_vertices2 = Vector3.zero;
     [SerializeField] private bool m_isDoubleSide = true;
-    [SerializeField] private int m_geometryIndex = -1;
-    [SerializeField] private int m_materialIndex = -1;
 
 
     private Vector4 m_worldVert0 = Vector4.zero;
@@ -42,9 +40,7 @@ public class RTTriangle : RTGeometry
             normal = m_cachedNormal,
             planeD = m_cachedPlaneD,
             area = m_cachedArea,
-            isDoubleSide = m_isDoubleSide ? 1 : 0,
-            geometryIndex = m_geometryIndex,
-            materialIndex = m_materialIndex
+            isDoubleSide = m_isDoubleSide ? 1 : 0
         };
     }
 

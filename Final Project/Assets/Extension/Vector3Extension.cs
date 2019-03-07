@@ -11,12 +11,4 @@ public static class Vector3Extension
     {
         return new float[]{v.x, v.y, v.z};
     }
-
-    ///<summary>
-    /// Return number of bytes in a vector3
-    ///</summary>
-    public static int SizeOf()
-    {
-        return sizeof(float) * 3;
-    }
 }
