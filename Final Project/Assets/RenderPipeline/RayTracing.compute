@@ -16,6 +16,9 @@ RWTexture2D<float4> Result;
 
 // Global Settings
 
+// ShadowDepth Map
+Texture2D<float4> _DepthMap;
+
 //Skybox
 Texture2D<float4> _SkyboxTexture;
 SamplerState sampler_SkyboxTexture;
@@ -111,7 +114,10 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _Spheres,
                         _NumOfTriangles,
                         _Triangles);
-    Result[id.xy] = float4(result, 1);
+      Result[id.xy] = float4(result, 1);
+     //uint2 a = uint2(0,0);
+     //Result[id.xy] = _DepthMap[a];
+
 }
 
 
