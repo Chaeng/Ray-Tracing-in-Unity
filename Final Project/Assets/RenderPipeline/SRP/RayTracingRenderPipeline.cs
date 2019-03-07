@@ -113,7 +113,8 @@ public partial class RayTracingRenderPipeline : RenderPipeline
 
         ComputeBuffer sphereBuffer = null;
         LoadBufferWithSpheres(ref sphereBuffer);
-        ComputeBuffer triangleBuffer = LoadBufferWithTriangles();
+        ComputeBuffer triangleBuffer = null;
+        LoadBufferWithTriangles(ref triangleBuffer);
 
         #endregion
 
@@ -248,36 +249,6 @@ public partial class RayTracingRenderPipeline : RenderPipeline
 
 
         renderContext.Submit(); // Send all the batched commands to GPU
-    }
-
-
-    private void LoadBufferWithSpheres(ref ComputeBuffer sphereBuffer)
-    {
-        if (m_sphereGeom.Count > 0)
-        {
-            sphereBuffer = new ComputeBuffer(m_sphereGeom.Count, RTSphere_t.GetSize());
-            sphereBuffer.SetData(m_sphereGeom);
-        }
-        else
-        {
-            sphereBuffer = new ComputeBuffer(1, RTSphere_t.GetSize()); // need to be at least 16 bytes long for RTSphere_t
-        }
-    }
-
-
-    private ComputeBuffer LoadBufferWithTriangles()
-    {
-        ComputeBuffer triangleBuffer = null;
-        if (m_triangleGeom.Count > 0)
-        {
-            triangleBuffer = new ComputeBuffer(m_triangleGeom.Count, RTTriangle_t.GetSize());
-            triangleBuffer.SetData(m_triangleGeom);
-        }
-        else
-        {
-            triangleBuffer = new ComputeBuffer(1, RTTriangle_t.GetSize());
-        }
-        return triangleBuffer;
     }
 
 

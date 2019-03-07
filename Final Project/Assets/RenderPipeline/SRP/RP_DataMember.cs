@@ -31,19 +31,18 @@ public partial class RayTracingRenderPipeline
     {
         if (m_sphereGeom.Count > 0)
         {
-            sphereBuffer = new ComputeBuffer(m_sphereGeom.Count, 4 * sizeof(float));
+            sphereBuffer = new ComputeBuffer(m_sphereGeom.Count, RTSphere_t.GetSize());
             sphereBuffer.SetData(m_sphereGeom);
         }
         else
         {
-            sphereBuffer = new ComputeBuffer(1, 16); // need to be at least 16 bytes long for RTSphere_t
+            sphereBuffer = new ComputeBuffer(1, RTSphere_t.GetSize());
         }
     }
 
 
-    private ComputeBuffer LoadBufferWithTriangles()
+    private void LoadBufferWithTriangles(ref ComputeBuffer triangleBuffer)
     {
-        ComputeBuffer triangleBuffer = null;
         if (m_triangleGeom.Count > 0)
         {
             triangleBuffer = new ComputeBuffer(m_triangleGeom.Count, RTTriangle_t.GetSize());
@@ -53,6 +52,5 @@ public partial class RayTracingRenderPipeline
         {
             triangleBuffer = new ComputeBuffer(1, RTTriangle_t.GetSize());
         }
-        return triangleBuffer;
     }
 }
