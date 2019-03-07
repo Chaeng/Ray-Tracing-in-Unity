@@ -13,13 +13,9 @@ public struct RTTriangle_t
     public float planeD;
     public float area;
     public int isDoubleSide;
-    public int geometryIndex;
-    public int materialIndex;
     
     public static int GetSize()
     {
-        return Vector3Extension.SizeOf() * 4
-            + sizeof(float) * 2
-            + sizeof(int) * 3;;    // (vertices: 3 * 3 = 9) + (normal: 3) + (planeD: 1) + (area: 1)
+        return sizeof(float) * 14 + sizeof(int);    // (vertices: 3 * 3 = 9) + (normal: 3) + (planeD: 1) + (area: 1)
     }
 }

@@ -5,8 +5,6 @@ using UnityEngine;
 public class RTSphere : RTGeometry
 {
     [SerializeField] private float m_radius = 1;
-    [SerializeField] private int m_geometryIndex = -1;
-    [SerializeField] private int m_materialIndex = -1;
 
 
     public override RTGeometryType GetGeometryType()
@@ -23,9 +21,7 @@ public class RTSphere : RTGeometry
         return new RTSphere_t 
         {
             center = _center,
-            radius = m_radius,
-            geometryIndex = m_geometryIndex,
-            materialIndex = m_materialIndex
+            radius = m_radius
         };
     }
 }
