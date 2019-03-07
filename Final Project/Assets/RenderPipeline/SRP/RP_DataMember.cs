@@ -31,12 +31,12 @@ public partial class RayTracingRenderPipeline
     {
         if (m_sphereGeom.Count > 0)
         {
-            sphereBuffer = new ComputeBuffer(m_sphereGeom.Count, RTSphere_t.GetSize());
+            sphereBuffer = new ComputeBuffer(m_sphereGeom.Count, sizeof(float)*4);
             sphereBuffer.SetData(m_sphereGeom);
         }
         else
         {
-            sphereBuffer = new ComputeBuffer(1, RTSphere_t.GetSize());
+            sphereBuffer = new ComputeBuffer(1, sizeof(float) * 4);
         }
     }
 
