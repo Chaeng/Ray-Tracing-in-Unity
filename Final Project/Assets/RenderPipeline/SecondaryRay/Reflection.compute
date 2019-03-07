@@ -1,32 +1,4 @@
-﻿/*
-sampler MeshTextureSampler = 
-sampler_state
-{
-    Texture = ;
-    MipFilter = LINEAR;
-    MinFilter = LINEAR;
-    MagFilter = LINEAR;
-};
-// Object Declarations
-Texture1D g_txRandom;
-
-SamplerState g_samPoint
-{
-    Filter = MIN_MAG_MIP_POINT;
-    AddressU = Wrap;
-    AddressV = Wrap;
-};
-
-
-*/
-
-SamplerState _GeomSampler
-{
-    Filter = MIN_MAG_MIP_LINEAR;
-    AddressU = Wrap;
-    AddressV = Wrap;
-};
-
+﻿
 float3 Reflection(
     float3 result,
     inout Ray ray, 
@@ -36,12 +8,14 @@ float3 Reflection(
     StructuredBuffer<RTDirectionalLight> dirLights,
     int numOfPointLight,
     StructuredBuffer<RTPointLight> pointLights,
+    Texture2D<float4> skybox, 
+    SamplerState skyboxSampler,
     int _NumOfSpheres,
     StructuredBuffer<RTSphere> _Spheres,
-    Texture2D<float4> skybox, 
-    SamplerState skyboxSampler)
+    int numOfTriangle,
+    StructuredBuffer<RTTriangle> triangles)
 {
-	float refl = 0.5;
+	float refl = 0.9;
 	float k = 1 - refl;
     float3 final_reflColor = float3(0, 0, 0);
     
@@ -51,16 +25,16 @@ float3 Reflection(
         Ray rayBuffer[3];
         RayHit hitBuffer[3];
         float3 reflColorArr[3];
-        //Texture2D<float4> materialBuffer[3];
         reflColorArr[0] = (result * k);
         reflColorArr[1] = float3(0, 0, 0);
         reflColorArr[2] = float3(0, 0, 0);
         Ray curRay = ray;
         RayHit curHit = hit;
+        float3 final_reflColor = float3(result.x, result.y, result.z); 
+        float3 reflColor = float3(result.x, result.y, result.z); 
         
         for(int i = 0; i < 3; ++i){
-            
-            float3 reflColor = float3(result.x, result.y, result.z);             
+                                
             reflColor += (reflColorArr[i]);	
       
             float3 hit_normal_1st = normalize(curHit.normal);
@@ -70,106 +44,36 @@ float3 Reflection(
             // i'th ray
             Ray r1 = CreateRay(curHit.position, R); 
             rayBuffer[i] = r1; 
-            
-            RayHit h2 = TraceReflection_Sphere(rayBuffer[i], _NumOfSpheres, _Spheres);
-            hitBuffer[i] = h2;         
-            
-            if(h2.distance > 1.#INF){
-            
-                Texture2D<float4> material;
-	            float theta = acos(r1.direction.y) / -PI;
-                float phi = atan2(r1.direction.x, -r1.direction.z) / -PI * 0.5f;
-                //reflColor +=  skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
-                if(i > 0){
-                   reflColor *= k;
-                   float3 tmp = float3(reflColorArr[i-1].x * k, reflColorArr[i-1].y * k, reflColorArr[i-1].z *k);
-                   //reflColor += reflColorArr[i-1];
-                   //reflColor +=  skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
-                } else {
-                   //reflColor += float3(0, 0, 0);
-                }
-                          
-	        } else{
-	            
-	            float3 newColor = Shade(
-    r1, 
-    h2, 
-    ambientColor,
-    numOfDirLight,
-    dirLights,
-    numOfPointLight,
-    pointLights,
-    skybox, 
-    skyboxSampler);
+         
+            float theta = acos(rayBuffer[i].direction.y) / -PI;
+            float phi = atan2(rayBuffer[i].direction.x, -rayBuffer[i].direction.z) / -PI * 0.5f;  
+            reflColor += skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;     
+	        /*
+                float3 newColor = Shade(
+                                    ray, 
+                                    hit, 
+                                    ambientColor,
+                                    numOfDirLight,
+                                    dirLights,
+                                    numOfPointLight,
+                                    pointLights,
+                                    skybox, 
+                                    skyboxSampler,
+                                    _NumOfSpheres,
+                                    _Spheres,
+                                    numOfTriangle,
+                                    triangles);*/
                 
-                newColor *= k;
-                if(i < 1)
-                   newColor += reflColorArr[0];
-	        
-	            float theta = acos(r1.direction.y) / -PI;
-                float phi = atan2(r1.direction.x, -r1.direction.z) / -PI * 0.5f;
-                reflColor +=  skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
-                reflColor += newColor;//  skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;    
-	        }
-             // Sample the skybox and write it
-            //float theta = acos(r1.direction.y) / -PI;
-            //float phi = atan2(r1.direction.x, -r1.direction.z) / -PI * 0.5f;
-            //reflColor +=  skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
-            reflColorArr[i] = reflColor;
-            reflColor = float3(0, 0, 0);
         }
-        //reflColorArr[1] = float3(0, 0, 0);
-        //reflColorArr[2] = float3(0, 0, 0);
-        
-        float3 result1 = float3(reflColorArr[1].x, reflColorArr[1].y, reflColorArr[1].z);
-        float3 result2 = float3(result1.x * k, result1.y * k, result1.z* k);
-        result2 += float3(reflColorArr[0].x * k, reflColorArr[0].y * k, reflColorArr[0].z * k);
-        /*
-        float3 result3 = float3(result2.x * k, result2.y * k, result2.z* k);
-        result3 += float3(reflColorArr[1].x * k, reflColorArr[1].y * k, reflColorArr[1].z * k);*/
-
-        final_reflColor = result2;
+        final_reflColor = reflColor;
         return final_reflColor;
-	    /*
-	    // Check hit ray
-	    RayHit rh1 = TraceReflection_Sphere(r1, _NumOfSpheres, _Spheres);
-	    
-	    if(rh1.distance < 1.#INF){   
-            reflectResult[1] = reflColor;
-            float3 hit_normal_2nd = normalize(rh1.normal);
-	        float3 ray_dir_2nd  = normalize(r1.direction);
-	        float3 R_2nd  =  reflect(ray_dir_2nd, hit_normal_2nd); 
-	        
-	        // 2nd ray
-	        Ray r2 = CreateRay(rh1.position, R_2nd); rayBuffer[2] = r2;
-	        RayHit rh2 = TraceReflection_Sphere(r2, _NumOfSpheres, _Spheres);
-	        
-	        if(rh2.distance > 1.#INF){
-	            float theta = acos(r2.direction.y) / -PI;
-                float phi = atan2(r2.direction.x, r2.direction.z) / -PI * 0.5f;
-                reflColor = float3(1, 1, 1); //+=  skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
-             
-                
-	        } else {
-	            float3 addColor = float3(1, k, k);
-	            addColor += reflectResult[0];
-	            //reflColor += addColor;
-	            reflColor = float3(1, 0, 0);
-	        } 
-	          
-	    } 
-	    else {
-	    	// Sample the skybox and write it
-            float theta = acos(r1.direction.y) / -PI;
-            float phi = atan2(r1.direction.x, -r1.direction.z) / -PI * 0.5f;
-            reflColor +=  skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
-	    }	*/    
-    } else {
+         
+       } else {
 
         // Sample the skybox and write it
         float theta = acos(ray.direction.y) / -PI;
         float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
-        return float3(0, 0, 0);//skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;   
+        return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;   
     }	
 }
 

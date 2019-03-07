@@ -5,6 +5,8 @@
 #include "RTSphere.compute"
 #include "Geometry/RTTriangle.compute"
 #include "Shading/Phong.compute"
+#include "SecondaryRay/TraceReflection.compute"
+#include "SecondaryRay/Reflection.compute"
 
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
@@ -106,7 +108,25 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _Spheres,
                         _NumOfTriangles,
                         _Triangles);
-    Result[id.xy] = float4(result, 1);
+  
+    bool reflEffect = true;     
+    float3 refl = Reflection(
+                        result,
+                        ray, 
+                        hit, 
+                        _AmbientGlobal,
+                        _NumOfDirectionalLights,
+                        _DirectionalLights,
+                        _NumOfPointLights,
+                        _PointLights,
+                        _SkyboxTexture, 
+                        sampler_SkyboxTexture,
+                        _NumOfSpheres,
+                        _Spheres,
+                        _NumOfTriangles,
+                        _Triangles);
+     result += refl;
+     Result[id.xy] = float4(result, 1);
 }
 
 
