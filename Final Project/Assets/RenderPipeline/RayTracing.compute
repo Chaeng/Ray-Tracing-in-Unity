@@ -17,7 +17,7 @@ RWTexture2D<float4> Result;
 // Global Settings
 
 // ShadowDepth Map
-Texture2DArray<float4> _ShadowMap;
+Texture2DArray<float4> _SpotShadowMap;
 
 //Skybox
 Texture2D<float4> _SkyboxTexture;
@@ -113,9 +113,11 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _NumOfSpheres,
                         _Spheres,
                         _NumOfTriangles,
-                        _Triangles);
+                        _Triangles,
+                        _SpotShadowMap);
       Result[id.xy] = float4(result, 1);
-
+     //uint3 a = uint3(id.x, id.y, 0);
+     //Result[id.xy] = _SpotShadowMap[a];
 }
 
 

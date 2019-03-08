@@ -37,7 +37,8 @@ float3 Shade(
     int numOfSphere,
     StructuredBuffer<RTSphere> spheres,
     int numOfTriangle,
-    StructuredBuffer<RTTriangle> triangles)
+    StructuredBuffer<RTTriangle> triangles,
+    Texture2DArray<float4> shadowMap)
 {
     if (hit.distance < 1.#INF)
     {
@@ -50,7 +51,7 @@ float3 Shade(
             tempColor  =   PhongDiffuseShading(dirLights[d].direction, dirLights[d].color, hit.normal) 
                          + PhongSpecularShading(dirLights[d].direction, dirLights[d].color, ray.direction, hit.normal, 5);
             
-            visibility = PercentageVisibility(hit.position, 0, dirLights[d].direction, dirLights[d].direction, 
+            visibility = HardShadow(hit.position, 0, dirLights[d].direction, dirLights[d].direction, 
                                               hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
             color = color + (tempColor * visibility);
         }
@@ -61,7 +62,7 @@ float3 Shade(
             tempColor =   PhongDiffuseShading(L, pointLights[s].color, hit.normal) 
                         + PhongSpecularShading(L, pointLights[s].color, ray.direction, hit.normal, 5);
             
-            visibility = PercentageVisibility(hit.position, 1, pointLights[s].position, pointLights[s].position, 
+            visibility = HardShadow(hit.position, 1, pointLights[s].position, pointLights[s].position,
                                               hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
            
             color = color + (tempColor * visibility);
@@ -69,10 +70,20 @@ float3 Shade(
         
         for (int x = 0; x < numOfSpotLight; x++)
         {
-            tempColor = 0;  // result of spot light
+            tempColor = float3(0,0,0); // result of spot light
             
-            visibility = PercentageVisibility(hit.position, 2, spotLights[x].position, spotLights[x].direction,
+            bool useDepthMap = true;
+
+            if (useDepthMap)
+            {
+                visibility = SoftShadow(hit.position, hit.GeoType, hit.GeoIndex, x, spotLights[x], shadowMap);
+
+            }
+            else
+            {
+                visibility = HardShadow(hit.position, 2, spotLights[x].position, spotLights[x].direction,
                                               hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles);
+            }
            
             color = color + (tempColor * visibility);
         }
