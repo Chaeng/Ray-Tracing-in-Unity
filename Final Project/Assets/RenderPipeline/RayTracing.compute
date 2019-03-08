@@ -3,9 +3,11 @@
 #include "Light/RTDirectionalLight.compute"
 #include "Light/RTPointLight.compute"
 #include "Light/RTSpotLight.compute"
+#include "Light/RTSpotLight_UW.compute"
 #include "RTSphere.compute"
 #include "Geometry/RTTriangle.compute"
 #include "Shading/Phong.compute"
+
 
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
@@ -18,6 +20,7 @@ RWTexture2D<float4> Result;
 
 // ShadowDepth Map
 Texture2DArray<float4> _SpotShadowMap;
+StructuredBuffer<RTSpotLight_UW> _ShadowUtility;
 
 //Skybox
 Texture2D<float4> _SkyboxTexture;
@@ -98,24 +101,25 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     
     // Trace and shade
     RayHit hit = Trace(ray);
-    float3 result = Shade(
-                        ray, 
-                        hit, 
-                        _AmbientGlobal,
-                        _NumOfDirectionalLights,
-                        _DirectionalLights,
-                        _NumOfPointLights,
-                        _PointLights,
-                        _NumOfSpotLights,
-                        _SpotLights,
-                        _SkyboxTexture, 
-                        sampler_SkyboxTexture,
-                        _NumOfSpheres,
-                        _Spheres,
-                        _NumOfTriangles,
-                        _Triangles,
-                        _SpotShadowMap);
-      Result[id.xy] = float4(result, 1);
+    float3 result = Shade( ray,
+                           hit,
+                          _AmbientGlobal,
+                          _NumOfDirectionalLights,
+                          _DirectionalLights,
+                          _NumOfPointLights,
+                          _PointLights,
+                          _NumOfSpotLights,
+                          _SpotLights,
+                          _SkyboxTexture,
+                          sampler_SkyboxTexture,
+                          _NumOfSpheres,
+                          _Spheres,
+                          _NumOfTriangles,
+                          _Triangles,
+                          _SpotShadowMap,
+                          _ShadowUtility);
+
+     Result[id.xy] = float4(result, 1);
      //uint3 a = uint3(id.x, id.y, 0);
      //Result[id.xy] = _SpotShadowMap[a];
 }

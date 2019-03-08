@@ -1,4 +1,5 @@
 ﻿#include "../Shadow/Shadow.compute"
+
 static const float PI = 3.14159265f;
 
 float3 PhongDiffuseShading(float3 lightDir, float3 lightColor, float3 hitNormal)
@@ -23,8 +24,8 @@ float3 PhongSpecularShading(float3 lightDir, float3 lightColor, float3 rayDir, f
 }
 
 float3 Shade(
-    inout Ray ray, 
-    RayHit hit, 
+    inout Ray ray,
+    RayHit hit,
     float3 ambientColor,
     int numOfDirLight,
     StructuredBuffer<RTDirectionalLight> dirLights,
@@ -32,14 +33,16 @@ float3 Shade(
     StructuredBuffer<RTPointLight> pointLights,
     int numOfSpotLight,
     StructuredBuffer<RTSpotLight> spotLights,
-    Texture2D<float4> skybox, 
+    Texture2D<float4> skybox,
     SamplerState skyboxSampler,
     int numOfSphere,
     StructuredBuffer<RTSphere> spheres,
     int numOfTriangle,
     StructuredBuffer<RTTriangle> triangles,
-    Texture2DArray<float4> shadowMap)
+    Texture2DArray<float4> shadowMap,
+    StructuredBuffer<RTSpotLight_UW> shadowUtility)
 {
+
     if (hit.distance < 1.#INF)
     {
         float3 color = ambientColor;
@@ -70,13 +73,13 @@ float3 Shade(
         
         for (int x = 0; x < numOfSpotLight; x++)
         {
-            tempColor = float3(0,0,0); // result of spot light
+            tempColor = float3(0,1,1); // result of spot light
             
             bool useDepthMap = true;
 
             if (useDepthMap)
             {
-                visibility = SoftShadow(hit.position, hit.GeoType, hit.GeoIndex, x, spotLights[x], shadowMap);
+                visibility = SoftShadow(hit.position, hit.GeoType, hit.GeoIndex, x, spotLights[x], shadowMap, shadowUtility[x]);
 
             }
             else

@@ -4,13 +4,17 @@ using UnityEngine;
 
 public partial class RayTracingRenderPipeline
 {
-    private int m_shadowMapRes = 128;
+    private int m_shadowMapRes = 64;
 
     private RenderTexture m_shadowMap;
 
     private Texture2DArray m_shadowMapList;
 
-    private void ShadowMapPass(int index,
+    private List<ShadowUtility_t> m_shadowUtility;
+
+
+    private void ShadowMapPass(RTLightStructureSpot_t spot,
+                               int index,
                                int numOfSphere, 
                                ComputeBuffer spheres, 
                                int numofTriangle, 
@@ -24,8 +28,8 @@ public partial class RayTracingRenderPipeline
             m_shadowMap.Create();
         }
 
-        Vector3 lightPosition = m_spotLights[index].position;
-        Vector3 direction = m_spotLights[index].direction;
+        Vector3 lightPosition = spot.position;
+        Vector3 direction = spot.direction;
 
         Vector3 center = lightPosition + (5 * -direction);
         Vector3 up = new Vector3(0, 1, 0);
@@ -39,16 +43,25 @@ public partial class RayTracingRenderPipeline
         U.Normalize();
         W.Normalize();
 
-        float imageSize = 5 * Mathf.Tan(m_spotLights[index].coneAngle / 2);
+        float imageSize = 5 * Mathf.Tan(spot.coneAngle / 2);
         imageSize = imageSize * 2;
         float pixelSize = imageSize / m_shadowMapRes;
 
         Vector3 pref = center - U * (imageSize / 2) - W * (imageSize / 2);
 
-        m_spotLights[index].SetU(U);
-        m_spotLights[index].SetW(W);
-        m_spotLights[index].SetPref(pref);
-        m_spotLights[index].SetPixelSize(pixelSize);
+        if (m_shadowUtility == null)
+        {
+            m_shadowUtility = new List<ShadowUtility_t>();
+        }
+
+        ShadowUtility_t temp = new ShadowUtility_t();
+
+        temp.U = U;
+        temp.W = W;
+        temp.Pref = pref;
+        temp.PixelSize = pixelSize;
+        m_shadowUtility.Add(temp);
+
 
         int kIndex = m_shadowMapShader.FindKernel("ShadowMap");
 

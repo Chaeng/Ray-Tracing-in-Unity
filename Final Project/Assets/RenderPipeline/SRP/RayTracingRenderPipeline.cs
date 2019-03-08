@@ -129,13 +129,25 @@ public partial class RayTracingRenderPipeline : RenderPipeline
             for (int i = 0; i < spotSize; i++)
             {
 
-                ShadowMapPass(i, m_sphereGeom.Count, sphereBuffer, m_triangleGeom.Count, triangleBuffer);
+                ShadowMapPass(m_spotLights[i], i, m_sphereGeom.Count, sphereBuffer, m_triangleGeom.Count, triangleBuffer);
 
             }
         }
         else
         {
             m_shadowMapList = new Texture2DArray(2, 2, 1, TextureFormat.RGBAFloat, false, false);
+        }
+
+        ComputeBuffer shadowUtilityBuffer = null;
+
+        if (m_shadowUtility.Count > 0)
+        {
+            shadowUtilityBuffer = new ComputeBuffer(m_shadowUtility.Count, ShadowUtility_t.GetSize());
+            shadowUtilityBuffer.SetData(m_shadowUtility);
+        }
+        else
+        {
+            shadowUtilityBuffer = new ComputeBuffer(1, ShadowUtility_t.GetSize());
         }
 
         #endregion
@@ -148,6 +160,7 @@ public partial class RayTracingRenderPipeline : RenderPipeline
 
         // Shadow Depth Map for Spot Light
         m_mainShader.SetTexture(kIndex, "_SpotShadowMap", m_shadowMapList);
+        m_mainShader.SetBuffer(kIndex, "_ShadowUtility", shadowUtilityBuffer);
 
         // 
         m_mainShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
@@ -237,7 +250,7 @@ public partial class RayTracingRenderPipeline : RenderPipeline
         dirLightBuf.Release();
         pointLightBuf.Release();
         spotLightBuf.Release();
-
+        shadowUtilityBuffer.Release();
 
         m_buffer.Blit(m_target, camera.activeTexture);
 
