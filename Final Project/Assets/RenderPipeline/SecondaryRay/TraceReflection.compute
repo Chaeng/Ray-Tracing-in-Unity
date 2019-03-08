@@ -1,13 +1,34 @@
 ﻿
-RayHit TraceReflection_Sphere(
-                             Ray ray, 
+void TraceReflection(
+                             Ray ray,
+                             inout RayHit bestHit,
                              int _NumOfSpheres,
-                             StructuredBuffer<RTSphere> _Spheres)
+                             StructuredBuffer<RTSphere> sphere)
+                             //int numOfTriangle,
+                             //StructuredBuffer<RTTriangle> triangles)
 {
-    RayHit bestHit = CreateRayHit();
-    for(int i = 0; i < _NumOfSpheres; i++)
+    //RayHit bestHit = CreateRayHit();
+
+    float3 oriToCtr = sphere.center - ray.origin;
+    float d = dot(ray.direction, oriToCtr);
+    
+    float discriminant = d * d - dot(-oriToCtr, -oriToCtr) + sphere.radius * sphere.radius;
+    if(discriminant < 0)
     {
-        //IntersectSphere(ray, bestHit, _Spheres[i]);
+        return;
     }
-    return bestHit;
+
+    // Step 3: Calculate hit distance
+    float disSqrt = sqrt(discriminant);
+    float hitDis = d - disSqrt > 0 ? d - disSqrt : d + disSqrt;     // If d - disSqrt > 0, then d + disSqrt must be greater than d - disSqrt, we take the least positive value; Otherwise, we take d + disSqrt
+
+    // Step 4: Update best hit distance
+    if (hitDis > 0 && hitDis < bestHit.distance)
+    {
+        bestHit.distance = hitDis;
+        bestHit.GeoType = 0;  // 0 represent sphere
+        bestHit.GeoIndex = GeoIndex;
+        bestHit.position = ray.origin + hitDis * ray.direction;
+        bestHit.normal = normalize(bestHit.position - sphere.center);
+    }
 }
