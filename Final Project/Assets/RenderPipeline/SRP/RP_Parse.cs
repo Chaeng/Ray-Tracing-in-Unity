@@ -131,7 +131,7 @@ public partial class RayTracingRenderPipeline : RenderPipeline
                             RTLightStructureSpot_t spot = new RTLightStructureSpot_t();
                             spot.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
                             spot.position = light.transform.position;
-                            spot.direction = -1 * Vector3.Normalize(light.transform.rotation * Vector3.forward);
+                            spot.direction = Vector3.Normalize(light.transform.rotation * Vector3.up);
                             spot.coneAngle = light.spotAngle * (Mathf.PI / 180);
                             m_spotLights.Add(spot);
                         }
