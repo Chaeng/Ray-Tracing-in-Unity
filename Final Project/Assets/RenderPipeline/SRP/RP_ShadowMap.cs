@@ -27,7 +27,7 @@ public partial class RayTracingRenderPipeline
         Vector3 lightPosition = m_spotLights[index].position;
         Vector3 direction = m_spotLights[index].direction;
 
-        Vector3 center = lightPosition + (5 * direction);
+        Vector3 center = lightPosition + (5 * -direction);
         Vector3 up = new Vector3(0, 1, 0);
         if (Mathf.Abs(Vector3.Dot(up, direction)) > 0.99999)
         {
@@ -56,6 +56,8 @@ public partial class RayTracingRenderPipeline
         m_shadowMapShader.SetFloats("_SpotLightPos", lightPosition.ToArray());
         m_shadowMapShader.SetFloats("_UnitU", U.ToArray());
         m_shadowMapShader.SetFloats("_UnitW", W.ToArray());
+        m_shadowMapShader.SetFloats("_PrefPosition", pref.ToArray());
+
         m_shadowMapShader.SetInt("_NumOfSpheres", numOfSphere);
         m_shadowMapShader.SetBuffer(kIndex, "_Spheres", spheres);
         m_shadowMapShader.SetInt("_NumOfTriangles", numofTriangle);
@@ -71,19 +73,7 @@ public partial class RayTracingRenderPipeline
             m_shadowMapShader.Dispatch(kIndex, threadGroupsX, threadGroupsY, 1);
         }
 
-        Graphics.CopyTexture(m_shadowMap, 0, 0, m_shadowMapList, index, 0); // i is the index of the texture
+        Graphics.CopyTexture(m_shadowMap, 0, 0, m_shadowMapList, index, 0); // index is the index of the texture
 
-
-        ///**
-        //The below lines of code are for Kai to debug
-        // */
-
-        //RenderTexture.active = m_shadowMap;
-        //Texture2D tempResult = new Texture2D(m_shadowMap.width, m_shadowMap.height, TextureFormat.ARGB32, false, false);
-        //tempResult.ReadPixels(new Rect(0, 0, m_shadowMap.width, m_shadowMap.height), 0, 0);
-        //tempResult.Apply();
-
-        //// You should be able to get the result of each pixel form here
-        //Vector4 result00 = tempResult.GetPixel(0, 0);
     }
 }

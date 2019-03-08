@@ -8,7 +8,6 @@ using UnityEngine.SceneManagement;
 
 public partial class RayTracingRenderPipeline : RenderPipeline
 {
-
     // We batch the commands into a buffer to reduce the amount of sending commands to GPU
     // Reusing the command buffer object avoids continuous memory allocation
     private CommandBuffer m_buffer = new CommandBuffer
@@ -133,7 +132,8 @@ public partial class RayTracingRenderPipeline : RenderPipeline
                 ShadowMapPass(i, m_sphereGeom.Count, sphereBuffer, m_triangleGeom.Count, triangleBuffer);
 
             }
-        } else
+        }
+        else
         {
             m_shadowMapList = new Texture2DArray(2, 2, 1, TextureFormat.RGBAFloat, false, false);
         }
@@ -147,7 +147,7 @@ public partial class RayTracingRenderPipeline : RenderPipeline
         int kIndex = m_mainShader.FindKernel("CSMain");
 
         // Shadow Depth Map for Spot Light
-        m_mainShader.SetTexture(kIndex, "_ShadowMap", m_shadowMapList);
+        m_mainShader.SetTexture(kIndex, "_SpotShadowMap", m_shadowMapList);
 
         // 
         m_mainShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
