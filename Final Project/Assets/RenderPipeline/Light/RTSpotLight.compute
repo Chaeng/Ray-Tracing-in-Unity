@@ -1,9 +1,10 @@
-﻿// Represent a directional light in HLSL Shader
-// Corresponding to RTLightStructureDirectional.cs
+﻿// Represent a spot light in HLSL Shader
+// Corresponding to RTLightStructureSpot.cs
 
 struct RTSpotLight
 {
     float3 color;
     float3 position;
-    
+    float3 direction;
+    float coneAngle;
 };

@@ -8,22 +8,6 @@ using UnityEngine.SceneManagement;
 
 public partial class RayTracingRenderPipeline : RenderPipeline
 {
-    private readonly static string s_bufferName = "Ray Tracing Render Camera";
-
-    private ComputeShader m_mainShader; // The compute shader we are going to write our ray tracing program on
-    private ComputeShader m_shadowMapShader;
-
-    private RenderTexture m_target; // The texture to hold the ray tracing result from the compute shader
-
-    private List<RenderPipelineConfigObject> m_allConfig; // A list of config objects containing all global rendering settings      
-
-    private RenderPipelineConfigObject m_config;
-
-    private List<RTLightStructureDirectional_t> m_directionalLights;
-    private List<RTLightStructurePoint_t> m_pointLights;
-
-    private List<RTSphere_t> m_sphereGeom;
-    private List<RTTriangle_t> m_triangleGeom;
 
     // We batch the commands into a buffer to reduce the amount of sending commands to GPU
     // Reusing the command buffer object avoids continuous memory allocation
@@ -96,126 +80,6 @@ public partial class RayTracingRenderPipeline : RenderPipeline
         m_config = m_allConfig[0];
     }
 
-
-    private void ParseScene(Scene scene)
-    {
-        GameObject[] roots = scene.GetRootGameObjects();
-
-        ParseLight(roots);
-        ParseSphere(roots);
-        ParseTriangle(roots);
-    }
-
-
-    private void ParseSphere(GameObject[] roots)
-    {
-        // TODO: Optimize dynamic array generation
-        if (m_sphereGeom == null)
-        {
-            m_sphereGeom = new List<RTSphere_t>();
-        }
-
-        m_sphereGeom.Clear();
-
-        foreach (var root in roots)
-        {
-            RTSphereRenderer[] sphereRenderers = root.GetComponentsInChildren<RTSphereRenderer>();
-
-            foreach (var renderer in sphereRenderers)
-            {
-                if (renderer.gameObject.activeSelf)
-                {
-                    m_sphereGeom.Add(renderer.GetGeometry());
-                }
-            }
-        }
-    }
-
-    private void ParseTriangle(GameObject[] roots)
-    {
-        // TODO: Optimize dynamic array generation
-        if (m_triangleGeom == null)
-        {
-            m_triangleGeom = new List<RTTriangle_t>();
-        }
-
-        m_triangleGeom.Clear();
-
-        foreach (var root in roots)
-        {
-            RTTriangleRenderer[] triangleRenderers = root.GetComponentsInChildren<RTTriangleRenderer>();
-
-            foreach (var renderer in triangleRenderers)
-            {
-                if (renderer.gameObject.activeSelf)
-                {
-                    m_triangleGeom.Add(renderer.GetGeometry());
-                }
-            }
-        }
-    }
-
-
-    private void ParseLight(GameObject[] roots)
-    {
-        if (m_directionalLights == null)
-        {
-            m_directionalLights = new List<RTLightStructureDirectional_t>();
-        }
-
-        m_directionalLights.Clear();
-
-        if (m_pointLights == null)
-        {
-            m_pointLights = new List<RTLightStructurePoint_t>();
-        }
-
-        m_pointLights.Clear();
-
-        foreach (var root in roots)
-        {
-            Light[] lights = root.GetComponentsInChildren<Light>();
-
-            foreach (var light in lights)
-            {
-                if (!light.gameObject.activeSelf)
-                {
-                    continue;
-                }
-
-                switch (light.type)
-                {
-                    case LightType.Directional:
-                        {
-                            Color lightColor = light.color;
-
-                            RTLightStructureDirectional_t directional = new RTLightStructureDirectional_t();
-                            directional.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
-                            directional.direction = -1 * Vector3.Normalize(light.transform.rotation * Vector3.forward);
-                            m_directionalLights.Add(directional);
-                        }
-                        break;
-
-                    case LightType.Point:
-                        {
-                            Color lightColor = light.color;
-
-                            RTLightStructurePoint_t point = new RTLightStructurePoint_t();
-                            point.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
-                            point.position = light.transform.position;
-                            m_pointLights.Add(point);
-                        }
-                        break;
-
-                    case LightType.Spot:
-
-                        break;
-                }
-            }
-        }
-    }
-
-
     /// <summary>
     /// This method responsible for rendering on per camera basis
     /// </summary>
@@ -249,7 +113,15 @@ public partial class RayTracingRenderPipeline : RenderPipeline
 
         ComputeBuffer sphereBuffer = null;
         LoadBufferWithSpheres(ref sphereBuffer);
-        ComputeBuffer triangleBuffer = LoadBufferWithTriangles();
+        ComputeBuffer triangleBuffer = null;
+        LoadBufferWithTriangles(ref triangleBuffer);
+
+        #endregion
+
+
+        #region Global map buffer init
+
+        //Shader.SetGlobalTexture("_ShadowMap", m_shadowMap);
 
         #endregion
 
@@ -257,7 +129,7 @@ public partial class RayTracingRenderPipeline : RenderPipeline
 
         #region Shadow Map Pass
 
-        ShadowMapPass(Vector3.zero, Vector3.zero, m_sphereGeom.Count, sphereBuffer, m_triangleGeom.Count, triangleBuffer);
+        //ShadowMapPass(Vector3.zero, Vector3.zero, m_sphereGeom.Count, sphereBuffer, m_triangleGeom.Count, triangleBuffer);
 
         #endregion
 
@@ -265,21 +137,26 @@ public partial class RayTracingRenderPipeline : RenderPipeline
 
         #region Ray Tracing
 
+        int kIndex = m_mainShader.FindKernel("CSMain");
+
+        // Shadow Depth Map for Spot Light
+        // m_mainShader.SetTextureFromGlobal(kIndex, "_DepthMap", "_ShadowMap");
+
         m_mainShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
         m_mainShader.SetMatrix("_CameraInverseProjection", camera.projectionMatrix.inverse);
-        m_mainShader.SetTexture(0, "_SkyboxTexture", m_config.skybox);
+        m_mainShader.SetTexture(kIndex, "_SkyboxTexture", m_config.skybox);
 
         // Sphere
 
         m_mainShader.SetInt("_NumOfSpheres", m_sphereGeom.Count);
-        m_mainShader.SetBuffer(0, "_Spheres", sphereBuffer);
+        m_mainShader.SetBuffer(kIndex, "_Spheres", sphereBuffer);
 
         // Triangle
 
         m_mainShader.SetInt("_NumOfTriangles", m_triangleGeom.Count);
 
 
-        m_mainShader.SetBuffer(0, "_Triangles", triangleBuffer);
+        m_mainShader.SetBuffer(kIndex, "_Triangles", triangleBuffer);
 
         // Ambient Light
 
@@ -288,6 +165,7 @@ public partial class RayTracingRenderPipeline : RenderPipeline
         // Directional Lights
 
         m_mainShader.SetInt("_NumOfDirectionalLights", m_directionalLights.Count);
+
         ComputeBuffer dirLightBuf = null;
         if (m_directionalLights.Count > 0)
         {
@@ -299,7 +177,7 @@ public partial class RayTracingRenderPipeline : RenderPipeline
             dirLightBuf = new ComputeBuffer(1, 4); // Dummy
         }
 
-        m_mainShader.SetBuffer(0, "_DirectionalLights", dirLightBuf);
+        m_mainShader.SetBuffer(kIndex, "_DirectionalLights", dirLightBuf);
 
         // Point Lights
 
@@ -315,15 +193,34 @@ public partial class RayTracingRenderPipeline : RenderPipeline
             pointLightBuf = new ComputeBuffer(1, 4); // Dummy
         }
 
-        m_mainShader.SetBuffer(0, "_PointLights", pointLightBuf);
+        m_mainShader.SetBuffer(kIndex, "_PointLights", pointLightBuf);
 
-        m_mainShader.SetTexture(0, "Result", m_target);
+
+        // Spot Lights
+
+        m_mainShader.SetInt("_NumOfSpotLights", m_spotLights.Count);
+        ComputeBuffer spotLightBuf = null;
+        if (m_spotLights.Count > 0)
+        {
+            spotLightBuf = new ComputeBuffer(m_spotLights.Count, RTLightStructureSpot_t.GetSize());
+            spotLightBuf.SetData(m_spotLights);
+        }
+        else
+        {
+            spotLightBuf = new ComputeBuffer(1, 4); // Dummy
+        }
+
+        m_mainShader.SetBuffer(kIndex, "_SpotLights", spotLightBuf);
+
+
+
+        m_mainShader.SetTexture(kIndex, "Result", m_target);
         int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);
         int threadGroupsY = Mathf.CeilToInt(Screen.height / 8.0f);
         if (threadGroupsX > 0 && threadGroupsY > 0
         ) // Prevent dispatching 0 threads to GPU (when the editor is starting or there is no screen to render) 
         {
-            m_mainShader.Dispatch(0, threadGroupsX, threadGroupsY, 1);
+            m_mainShader.Dispatch(kIndex, threadGroupsX, threadGroupsY, 1);
         }
 
 
@@ -331,6 +228,7 @@ public partial class RayTracingRenderPipeline : RenderPipeline
         triangleBuffer.Release();
         dirLightBuf.Release();
         pointLightBuf.Release();
+        spotLightBuf.Release();
 
 
         m_buffer.Blit(m_target, camera.activeTexture);
@@ -351,36 +249,6 @@ public partial class RayTracingRenderPipeline : RenderPipeline
 
 
         renderContext.Submit(); // Send all the batched commands to GPU
-    }
-
-
-    private void LoadBufferWithSpheres(ref ComputeBuffer sphereBuffer)
-    {
-        if (m_sphereGeom.Count > 0)
-        {
-            sphereBuffer = new ComputeBuffer(m_sphereGeom.Count, 4 * sizeof(float));
-            sphereBuffer.SetData(m_sphereGeom);
-        }
-        else
-        {
-            sphereBuffer = new ComputeBuffer(1, 16); // need to be at least 16 bytes long for RTSphere_t
-        }
-    }
-
-
-    private ComputeBuffer LoadBufferWithTriangles()
-    {
-        ComputeBuffer triangleBuffer = null;
-        if (m_triangleGeom.Count > 0)
-        {
-            triangleBuffer = new ComputeBuffer(m_triangleGeom.Count, RTTriangle_t.GetSize());
-            triangleBuffer.SetData(m_triangleGeom);
-        }
-        else
-        {
-            triangleBuffer = new ComputeBuffer(1, RTTriangle_t.GetSize());
-        }
-        return triangleBuffer;
     }
 
 

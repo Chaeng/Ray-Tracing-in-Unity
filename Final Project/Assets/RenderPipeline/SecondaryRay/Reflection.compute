@@ -10,8 +10,8 @@ float3 Reflection(
     StructuredBuffer<RTPointLight> pointLights,
     Texture2D<float4> skybox, 
     SamplerState skyboxSampler,
-    int _NumOfSpheres,
-    StructuredBuffer<RTSphere> _Spheres,
+    int numOfSpheres,
+    StructuredBuffer<RTSphere> spheres,
     int numOfTriangle,
     StructuredBuffer<RTTriangle> triangles)
 {
@@ -108,8 +108,8 @@ float3 Reflection(
                         pointLights,
                         skybox, 
                         skyboxSampler,
-                        _NumOfSpheres,
-                        _Spheres,
+                        numOfSpheres,
+                        spheres,
                         numOfTriangle,
                         triangles);      
              }
@@ -180,8 +180,8 @@ float3 Reflection(
                         pointLights,
                         skybox, 
                         skyboxSampler,
-                        _NumOfSpheres,
-                        _Spheres,
+                        numOfSpheres,
+                        spheres,
                         numOfTriangle,
                         triangles);      
              }
@@ -251,8 +251,8 @@ float3 Reflection(
                         pointLights,
                         skybox, 
                         skyboxSampler,
-                        _NumOfSpheres,
-                        _Spheres,
+                        numOfSpheres,
+                        spheres,
                         numOfTriangle,
                         triangles);      
              }
