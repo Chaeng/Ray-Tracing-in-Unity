@@ -40,7 +40,7 @@ namespace RayTracingRenderer
 
         private void LoadBufferWithTriangles(ref ComputeBuffer triangleBuffer, SceneParser sceneParser)
         {
-            int triCount = sceneParser.GetSpheres().Count;
+            int triCount = sceneParser.GetTriangles().Count;
             
             if (triCount > 0)
             {
