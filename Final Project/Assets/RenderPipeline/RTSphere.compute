@@ -1,4 +1,7 @@
-﻿#include "Ray.compute"
+﻿#ifndef RTSPHERE_COMPUTE
+#define RTSPHERE_COMPUTE
+
+#include "Ray.compute"
 #include "RayHit.compute"
 
 struct RTSphere
@@ -75,3 +78,5 @@ void IntersectSphere(Ray ray, inout RayHit bestHit, RTSphere sphere, int GeoInde
         bestHit.normal = normalize(bestHit.position - sphere.center);
     }
 }
+
+#endif  // RTSPHERE_COMPUTE
