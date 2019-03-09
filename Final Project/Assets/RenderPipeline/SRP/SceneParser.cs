@@ -154,7 +154,8 @@ namespace RayTracingRenderer
                             spot.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
                             spot.position = light.transform.position;
                             spot.direction = -1 * Vector3.Normalize(light.transform.forward);
-                            spot.coneAngle = light.spotAngle * (Mathf.PI / 180);
+                            spot.coneAngle = light.spotAngle * Mathf.Deg2Rad;
+                            spot.cosConeAngle = Mathf.Cos(spot.coneAngle/2f);
                             m_spotLights.Add(spot);
                         }
                             break;
