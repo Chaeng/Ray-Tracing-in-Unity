@@ -1,0 +1,56 @@
+﻿
+float3 Transparent(
+    float3 result,
+    inout Ray ray, 
+    RayHit hit, 
+    float3 ambientColor,
+    int numOfDirLight,
+    StructuredBuffer<RTDirectionalLight> dirLights,
+    int numOfPointLight,
+    StructuredBuffer<RTPointLight> pointLights,
+    int numOfSpotLight,
+    StructuredBuffer<RTSpotLight> spotLights,
+    Texture2D<float4> skybox, 
+    SamplerState skyboxSampler,
+    int numOfSpheres,
+    StructuredBuffer<RTSphere> spheres,
+    int numOfTriangle,
+    StructuredBuffer<RTTriangle> triangles)
+{
+    // hard code
+    int maxHit = 3;
+    if (hit.distance < 1.#INF)
+    {   
+         int numHit = 1;
+         Ray curRay = ray;
+         RayHit curHit = hit;
+                
+         while(numHit <= maxHit && curHit.distance < 1.#INF){
+             float3 hitNml = normalize(curHit.normal);
+             float3 rayNml = normalize(curRay.direction);
+             float3 reflectDir =  reflect(rayNml, hitNml); 
+             Ray newRay = CreateRay(curHit.position, reflectDir);
+             curRay = newRay;
+             RayHit newHit = CreateRayHit();
+             for(int i = 0; i < numOfSpheres; ++i){
+                
+                IntersectSphere(newRay, newHit, spheres[i], i);
+             }
+             curHit = newHit;
+             numHit++;
+         }
+         
+         if(numHit > 0)
+         {
+             float theta = acos(ray.direction.y) / -PI;
+             float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
+             return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz; 
+         }
+          
+} else {
+
+        // if not a geometry, it must be a skybox
+        float theta = acos(ray.direction.y) / -PI;
+        float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
+        return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;   
+}
