@@ -27,26 +27,37 @@ float3 Reflection(
     // if geometry
     if (hit.distance < 1.#INF)
     {   
-         int numHit = 0;
+         int numHit = 1;
          Ray curRay = ray;
          RayHit curHit = hit;
          
-         /*
-         while(numHit < maxHit && curHit.distance < 1.#INF){
+         
+         while(numHit <= maxHit && curHit.distance < 1.#INF){
              float3 hitNml = normalize(curHit.normal);
              float3 rayNml = normalize(curRay.direction);
              float3 reflectDir =  reflect(rayNml, hitNml); 
              Ray newRay = CreateRay(curHit.position, reflectDir);
              curRay = newRay;
              RayHit newHit = CreateRayHit();
-             for(int i = 0; i < _NumOfSpheres; ++i){
+             for(int i = 0; i < numOfSpheres; ++i){
                 
-                IntersectSphere(newRay, newHit, _Spheres[i], i);
+                IntersectSphere(newRay, newHit, spheres[i], i);
              }
              curHit = newHit;
              numHit++;
          }
-              
+         
+         if(numHit > 0)
+         {
+             float theta = acos(ray.direction.y) / -PI;
+             float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
+             return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz; 
+         } else {
+             return float3(.4, .3, 0);
+         } 
+           
+           
+           /*   
          if(numHit == 4){
             
              curRay = ray;
@@ -275,7 +286,7 @@ float3 Reflection(
          }
          
          */
-         return float3(1, 0, 0); 
+         //return float3(1, 0, 0); 
     }  
     else {
 
