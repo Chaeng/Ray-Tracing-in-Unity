@@ -11,6 +11,8 @@ public class RenderPipelineConfigObject : ScriptableObject
 
     public Color lowerAmbitent = Color.white;
 
+    public float globalRefractiveIndex = 1.0f;
+    
     public int secondaryRayGeneration = 0;
 
     public bool enableShadow = false;
