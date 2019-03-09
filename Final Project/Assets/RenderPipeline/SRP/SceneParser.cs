@@ -113,7 +113,7 @@ namespace RayTracingRenderer
 
             foreach (var root in roots)
             {
-                Light[] lights = root.GetComponentsInChildren<Light>();
+                RTLight[] lights = root.GetComponentsInChildren<RTLight>();
 
                 foreach (var light in lights)
                 {
@@ -122,40 +122,25 @@ namespace RayTracingRenderer
                         continue;
                     }
 
-                    switch (light.type)
+                    switch (light.GetLightType())
                     {
-                        case LightType.Directional:
+                        case RTLight.LightType.Directional:
                         {
-                            Color lightColor = light.color;
-
-                            RTLightStructureDirectional_t directional = new RTLightStructureDirectional_t();
-                            directional.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
-                            directional.direction = -1 * Vector3.Normalize(light.transform.forward);
+                            RTLightStructureDirectional_t directional = light.GetDirectionalLight();
                             m_directionalLights.Add(directional);
                         }
                             break;
 
-                        case LightType.Point:
+                        case RTLight.LightType.Point:
                         {
-                            Color lightColor = light.color;
-
-                            RTLightStructurePoint_t point = new RTLightStructurePoint_t();
-                            point.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
-                            point.position = light.transform.position;
+                            RTLightStructurePoint_t point = light.GetPointLight();
                             m_pointLights.Add(point);
                         }
                             break;
 
-                        case LightType.Spot:
+                        case RTLight.LightType.Spot:
                         {
-                            Color lightColor = light.color;
-
-                            RTLightStructureSpot_t spot = new RTLightStructureSpot_t();
-                            spot.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
-                            spot.position = light.transform.position;
-                            spot.direction = -1 * Vector3.Normalize(light.transform.forward);
-                            spot.coneAngle = light.spotAngle * Mathf.Deg2Rad;
-                            spot.cosConeAngle = Mathf.Cos(spot.coneAngle/2f);
+                            RTLightStructureSpot_t spot = light.GetSpotLight();
                             m_spotLights.Add(spot);
                         }
                             break;
