@@ -1,83 +1,289 @@
-﻿float3 Reflection(
-	inout Ray ray,
-	RayHit hit,
-	float3 ambientColor,
-	int numOfDirLight,
-	StructuredBuffer<RTDirectionalLight> dirLights,
-	Texture2D<float4> skybox,
-	SamplerState skyboxSampler)
+﻿
+float3 Reflection(
+    float3 result,
+    inout Ray ray, 
+    RayHit hit, 
+    float3 ambientColor,
+    int numOfDirLight,
+    StructuredBuffer<RTDirectionalLight> dirLights,
+    int numOfPointLight,
+    StructuredBuffer<RTPointLight> pointLights,
+    int numOfSpotLight,
+    StructuredBuffer<RTSpotLight> spotLights,
+    Texture2D<float4> skybox, 
+    SamplerState skyboxSampler,
+    int numOfSpheres,
+    StructuredBuffer<RTSphere> spheres,
+    int numOfTriangle,
+    StructuredBuffer<RTTriangle> triangles)
 {
-
-/*
-  Need to add
-  
-  - int Generation
-  - bool reflectEffect
-  - Obj[] obj (to check all hit object)
-	;*/
-	 
-    int mGen = 1;
-	float3 reflectResult[3];
-	bool reflectEffect = true;
-	float trans = 0;
-	float refl = 0.5;
-	float k = 1 - refl - trans;
-	
-	/*
-	float refl[mGen + 2] = {0.5, 0.5, 0.5};
-	float trans = 0;
-	float k = 1 - refl_1 - trans;*/
-	
-	// ?? float3[] mPhongResultArray;
-	float3 skyboxResult = Shade(ray, hit, ambientColor, numOfDirLight, dirLights, skybox, skyboxSampler);
-	float3 result = float3(0, 0, 0);
-	float3 finalResult = float3(0, 0, 0);
-	
-	// TODO: Return result
-	// if mGen = 1, iterate 3 times => 0th and 1st for r&t, 2nd for Phong
-    // for(int i = 0; i < 3; ++i){ => i = {0, 1, 2}
-	if(hit.distance < 1.#INF && reflectEffect == true){
-	
-	    for(int i = 0; i< (mGen + 2); i++){
-	        result = Shade(ray, hit, ambientColor, numOfDirLight, dirLights, skybox, skyboxSampler);    
-	        result *= k;  
-	        int indx = (mGen + 1 - i);
-	        reflectResult[indx] = result;
-	    }
-       
-        //for(int i = 0; i < mGen + 2; ++i){
-        
-            // TODO: Compute Phong
-            /*
-            result = Shade(ray, hit, ambientColor, numOfDirLight, dirLights, skybox, skyboxSampler);
-            result *= k;
-            reflectResult[mGen + 2 - i] = result;
+	float refl = 1;
+	float k = 1 - refl;
+    float3 final_reflColor = float3(0, 0, 0);
+    
+    // hard code
+    int maxHit = 3;
+    
+    // if geometry
+    if (hit.distance < 1.#INF)
+    {   
+         int numHit = 0;
+         Ray curRay = ray;
+         RayHit curHit = hit;
+         
+         /*
+         while(numHit < maxHit && curHit.distance < 1.#INF){
+             float3 hitNml = normalize(curHit.normal);
+             float3 rayNml = normalize(curRay.direction);
+             float3 reflectDir =  reflect(rayNml, hitNml); 
+             Ray newRay = CreateRay(curHit.position, reflectDir);
+             curRay = newRay;
+             RayHit newHit = CreateRayHit();
+             for(int i = 0; i < _NumOfSpheres; ++i){
+                
+                IntersectSphere(newRay, newHit, _Spheres[i], i);
+             }
+             curHit = newHit;
+             numHit++;
+         }
+              
+         if(numHit == 4){
             
-            if(i < mGen + 1){                       
-                //if(){
-               // TODO: Compute reflection
-                //}	    
-               // TODO: result*k + reflection          
-            }*/
-        //}
-        // TODO: compute result
-        /*
-        finalResult += (colorArray[mGen + 2 - 0] * k); // k will need to be array later
-        for(int i = mGen + 2 - 1; i >= 0; --i){
-           finalResult = (finalResult * k) + (reflectResult[i] * refl[i]);
-        }*/
-	    return skyboxResult;//float3(1, 0.5, 0.5);
-	} 
-	return skyboxResult; //float3(0.1, 0.1, 0.1);
+             curRay = ray;
+             curHit = hit;
+             int n_th = 0;
+             float3 colorArr[5];
+             colorArr[0] = float3(0, 0, 0);
+             colorArr[1] = float3(0, 0, 0);
+             colorArr[2] = float3(0, 0, 0);
+             colorArr[3] = float3(0, 0, 0);
+             colorArr[4] = float3(0, 0, 0);
+             
+             Ray rayArr[5];
+             rayArr[0] = CreateRay(hit.position, curRay.direction);
+             rayArr[1] = CreateRay(hit.position, curRay.direction);
+             rayArr[2] = CreateRay(hit.position, curRay.direction);
+             rayArr[3] = CreateRay(hit.position, curRay.direction);
+             rayArr[4] = CreateRay(hit.position, curRay.direction);
+             RayHit hitArr[5];
+             hitArr[0] = CreateRayHit();
+             hitArr[1] = CreateRayHit();
+             hitArr[2] = CreateRayHit();
+             hitArr[3] = CreateRayHit();
+             hitArr[4] = CreateRayHit();
+            
+            while(n_th < 4 ){
+                 
+                 //if hit skybox
+                 if( curHit.distance > 1.#INF){
+                     float theta = acos(curRay.direction.y) / -PI;
+                     float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
+                     colorArr[n_th] += skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz; 
+                 }
+                  
+                 float3 hitNml = normalize(curHit.normal);
+                 float3 rayNml = normalize(curRay.direction);
+                 float3 reflectDir =  reflect(rayNml, hitNml); 
+                
+                 Ray newRay = CreateRay(curHit.position, reflectDir);
+                 curRay = newRay;
+                 
+                 RayHit newHit = CreateRayHit();
+                 for(int i = 0; i < _NumOfSpheres; ++i){
+                        
+                    IntersectSphere(newRay, newHit, _Spheres[i], i);
+                 }
+                 
+                 curHit = newHit;
+                 rayArr[n_th] = curRay;
+                 hitArr[n_th] = curHit;
+                 n_th++;
+             }
+             
+             for(int i = 4; i >= 0; --i){
+                colorArr[i] = Shade(
+                        rayArr[n_th], 
+                        hitArr[n_th], 
+                        ambientColor,
+                        numOfDirLight,
+                        dirLights,
+                        numOfPointLight,
+                        pointLights,
+                        skybox, 
+                        skyboxSampler,
+                        numOfSpheres,
+                        spheres,
+                        numOfTriangle,
+                        triangles);      
+             }
+             float3 finalRefl = colorArr[4];
+             for(int i = 3; i >= 0; --i){
+                 finalRefl += (colorArr[i] * k);
+             }
+            return finalRefl;
+            //return float3(0, 0, 0.1);  
+         } else if(numHit == 3){
+             
+             curRay = ray;
+             curHit = hit;
+             int n_th = 0;
+             float3 colorArr[4];
+             colorArr[0] = float3(0, 0, 0);
+             colorArr[1] = float3(0, 0, 0);
+             colorArr[2] = float3(0, 0, 0);
+             colorArr[3] = float3(0, 0, 0);
+             
+             Ray rayArr[4];
+             rayArr[0] = CreateRay(hit.position, curRay.direction);
+             rayArr[1] = CreateRay(hit.position, curRay.direction);
+             rayArr[2] = CreateRay(hit.position, curRay.direction);
+             rayArr[3] = CreateRay(hit.position, curRay.direction);
+             RayHit hitArr[4];
+             hitArr[0] = CreateRayHit();
+             hitArr[1] = CreateRayHit();
+             hitArr[2] = CreateRayHit();
+             hitArr[3] = CreateRayHit();
+             
+             while(n_th < 3 ){
+                 
+                 //if hit skybox
+                 if( curHit.distance > 1.#INF){
+                     float theta = acos(curRay.direction.y) / -PI;
+                     float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
+                     colorArr[n_th] += skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz; 
+                 }
+                  
+                 float3 hitNml = normalize(curHit.normal);
+                 float3 rayNml = normalize(curRay.direction);
+                 float3 reflectDir =  reflect(rayNml, hitNml); 
+                
+                 Ray newRay = CreateRay(curHit.position, reflectDir);
+                 curRay = newRay;
+                 
+                 RayHit newHit = CreateRayHit();
+                 for(int i = 0; i < _NumOfSpheres; ++i){
+                        
+                    IntersectSphere(newRay, newHit, _Spheres[i], i);
+                 }
+                 
+                 curHit = newHit;
+                 rayArr[n_th] = curRay;
+                 hitArr[n_th] = curHit;
+                 n_th++;
+             }
+             
+              for(int i = 3; i >= 0; --i){
+                colorArr[i] = Shade(
+                        rayArr[n_th], 
+                        hitArr[n_th], 
+                        ambientColor,
+                        numOfDirLight,
+                        dirLights,
+                        numOfPointLight,
+                        pointLights,
+                        skybox, 
+                        skyboxSampler,
+                        numOfSpheres,
+                        spheres,
+                        numOfTriangle,
+                        triangles);      
+             }
+             
+             // final reflColor
+             float3 finalRefl = colorArr[3] * k;
+             for(int i = 2; i >= 0; --i){
+                 finalRefl += (colorArr[i] * k);
+             }
+             return finalRefl;
+         } else if(numHit == 2){
+             
+             curRay = ray;
+             curHit = hit;
+             int n_th = 1;
+             float3 colorArr[3];
+             colorArr[0] = float3(0, 0, 0);
+             colorArr[1] = float3(0, 0, 0);
+             colorArr[2] = float3(0, 0, 0);
+             
+             Ray rayArr[4];
+             rayArr[0] = CreateRay(hit.position, curRay.direction);
+             rayArr[1] = CreateRay(hit.position, curRay.direction);
+             rayArr[2] = CreateRay(hit.position, curRay.direction);
+             rayArr[3] = CreateRay(hit.position, curRay.direction);
+             RayHit hitArr[4];
+             hitArr[0] = CreateRayHit();
+             hitArr[1] = CreateRayHit();
+             hitArr[2] = CreateRayHit();
+             hitArr[3] = CreateRayHit();             
+             while(n_th < 3 ){
+                 
+                 //if hit skybox
+                 if( curHit.distance > 1.#INF){
+                     float theta = acos(curRay.direction.y) / -PI;
+                     float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
+                     colorArr[n_th] += skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz; 
+                 }
+                  
+                 float3 hitNml = normalize(curHit.normal);
+                 float3 rayNml = normalize(curRay.direction);
+                 float3 reflectDir =  reflect(rayNml, hitNml); 
+                
+                 Ray newRay = CreateRay(curHit.position, reflectDir);
+                 
+                 
+                 RayHit newHit = CreateRayHit();
+                 for(int i = 0; i < _NumOfSpheres; ++i){
+                        
+                    IntersectSphere(newRay, newHit, _Spheres[i], i);
+                 }
+                 curRay = newRay;
+                 curHit = newHit;
+                 rayArr[n_th] = curRay;
+                 hitArr[n_th] = curHit;
+                 n_th++;
+             }
+             
+             for(int i = 2; i >= 0; --i){
+                colorArr[i] = Shade(
+                        rayArr[n_th], 
+                        hitArr[n_th], 
+                        ambientColor,
+                        numOfDirLight,
+                        dirLights,
+                        numOfPointLight,
+                        pointLights,
+                        skybox, 
+                        skyboxSampler,
+                        numOfSpheres,
+                        spheres,
+                        numOfTriangle,
+                        triangles);      
+             }
+             
+             // final reflColor
+             float3 finalRefl = colorArr[2] * k;
+             for(int i = 1; i >= 0; --i){
+                 finalRefl += (colorArr[i] * k);
+             }
+             return finalRefl;
+             
+             
+         } else {
+                float theta = acos(curRay.direction.y) / -PI;
+                float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
+                return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz; 
+         }
+         
+         */
+         return float3(1, 0, 0); 
+    }  
+    else {
+
+        // if not a geometry, it must be a skybox
+        float theta = acos(ray.direction.y) / -PI;
+        float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
+        return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;   
+    }	
 }
 
-/*
-float3 Shade(
-	inout Ray ray,
-	RayHit hit,
-	float3 ambientColor,
-	int numOfDirLight,
-	StructuredBuffer<RTDirectionalLight> dirLights,
-	Texture2D<float4> skybox,
-	SamplerState skyboxSampler)
-*/
+
