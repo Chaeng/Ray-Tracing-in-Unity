@@ -14,7 +14,7 @@ public class RenderPipelineConfigObject : ScriptableObject
     public bool enableShadow = false;
 
 
-    private void OnEnable()
+    private void Awake()
     {
         if (skybox == null)
         {

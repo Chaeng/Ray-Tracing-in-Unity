@@ -1,296 +1,120 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering; // Import Unity stuff related to rendering that is shared by all rendering pipelines
-using UnityEngine.Experimental.Rendering; // Since SRP is an experimental feature, we have to import it using this namespace
+using UnityEngine.Rendering;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.SceneManagement;
 
 
-public partial class RayTracingRenderPipeline : RenderPipeline
+namespace RayTracingRenderer
 {
-    // We batch the commands into a buffer to reduce the amount of sending commands to GPU
-    // Reusing the command buffer object avoids continuous memory allocation
-    private CommandBuffer m_buffer = new CommandBuffer
-    {
-        name = s_bufferName
-    };
-
     /// <summary>
-    /// Constructs the render pipeline for Unity.
+    /// The rendering pipeline configured to use ray tracing as the rendering mechanism
     /// </summary>
-    /// <param name="computeShader">Compute shader to use.</param>
-    /// <param name="skybox">Skybox to use</param>
-    public RayTracingRenderPipeline(ComputeShader mainShader, ComputeShader shadowMapShader, List<RenderPipelineConfigObject> allConfig)
+    public partial class RayTracingRenderPipeline : RenderPipeline
     {
-        m_mainShader = mainShader;
+        /**
+         * This is the main file for the RayTracingRenderPipeline.
+         * Please only have these three things here:
+         * (1) Member fields
+         * (2) Constructors
+         * (3) Main function
+         *
+         * Any fields declared below should be properly initialized in corresponding InitXXX() method
+         */
 
-        m_shadowMapShader = shadowMapShader;
 
-        m_allConfig = allConfig;
-        m_config = m_allConfig[0];
-    }
+        // Constructor parameters
+        
+        private ComputeShader m_mainShader; // The compute shader we are going to write our ray tracing program on
+        private ComputeShader m_shadowMapShader;
+        private List<RenderPipelineConfigObject> m_allConfig; // A list of config objects containing all global rendering settings   
+        
+        
+        // Constants
+        private const int ShadowMapSize = 64;    // TODO: Get this dimension from RenderConfig
+        
+        
+        // Own member fields
+        private CommandBuffer m_buffer;
+        private ComputeBuffer m_directionalLightBuffer;
+        private ComputeBuffer m_pointLightBuffer;
+        private ComputeBuffer m_shadowUtilityBuffer;
+        private ComputeBuffer m_sphereBuffer;
+        private ComputeBuffer m_spotLightBuffer;
+        private ComputeBuffer m_triangleBuffer;
+        private RenderPipelineConfigObject m_config;
+        private RenderTexture m_shadowMap;
+        private RenderTexture m_target;
+        private SceneParser m_sceneParser;
+        private Texture2DArray m_shadowMapList;
+        private List<ShadowUtility_t> m_shadowUtility;
 
 
-    /// <summary>
-    /// This method get called by Unity every frame to draw on the screen. 
-    /// </summary>
-    /// <param name="renderContext">Render context.</param>
-    /// <param name="cameras">All running cameras</param>
-    public override void Render(ScriptableRenderContext renderContext, Camera[] cameras)
-    {
-        // RenderPipeline.Render doesn't draw anything, but checks
-        // whether the pipeline object is valid to use for rendering.
-        // If not, it will raise an exception. We will override this
-        // method and invoke the base implementation, to keep this check.
-        base.Render(renderContext, cameras);
-
-        var scene = SceneManager.GetActiveScene();
-        ApplyRenderConfig(scene);
-        if (m_config == null)
+        /// <summary>
+        /// Construct the SRP with the following data
+        /// </summary>
+        /// <param name="mainShader">Compute shader containing ray tracing program</param>
+        /// <param name="shadowMapShader">Compute shader containing shadow map program</param>
+        /// <param name="allConfig">SRP configuration files</param>
+        public RayTracingRenderPipeline(ComputeShader mainShader, ComputeShader shadowMapShader,
+            List<RenderPipelineConfigObject> allConfig)
         {
-            return;
+            m_mainShader = mainShader;
+            m_shadowMapShader = shadowMapShader;
+            m_allConfig = allConfig;
+            
+            // Run all inits
+            InitConfig(m_allConfig, ref m_config);
+            InitShadowMap(ShadowMapSize);    // TODO: Get this dimension from RenderConfig
+            InitRender(ref m_buffer, m_mainShader);
+            InitSceneParsing();
         }
 
-        ParseScene(scene);
 
-        foreach (var camera in cameras)
+
+        /// <summary>
+        /// This method get called by Unity every frame to draw on the screen. 
+        /// </summary>
+        /// <param name="renderContext">Render context.</param>
+        /// <param name="cameras">All running cameras</param>
+        public override void Render(ScriptableRenderContext renderContext, Camera[] cameras)
         {
-            RenderPerCamera(renderContext, camera);
-        }
-    }
+            // RenderPipeline.Render doesn't draw anything, but checks
+            // whether the pipeline object is valid to use for rendering.
+            // If not, it will raise an exception. We will override this
+            // method and invoke the base implementation, to keep this check.
+            base.Render(renderContext, cameras);
 
 
-    private void ApplyRenderConfig(Scene scene)
-    {
-        var sceneIndex = scene.buildIndex;
-
-        if (m_allConfig.Count == 0)
-        {
-            return;
-        }
-
-        if (sceneIndex >= 0 && sceneIndex < m_allConfig.Count)
-        {
-            m_config = m_allConfig[sceneIndex];
-            return;
-        }
-
-        // No matching scene index, use the first one
-        m_config = m_allConfig[0];
-    }
-
-    /// <summary>
-    /// This method responsible for rendering on per camera basis
-    /// </summary>
-    /// <param name="renderContext">Render context.</param>
-    /// <param name="camera">Camera.</param>
-    private void RenderPerCamera(ScriptableRenderContext renderContext, Camera camera)
-    {
-        InitRenderTexture();
-
-        //renderContext.SetupCameraProperties(camera);    // This tells the renderer the camera position and orientation, projection type (perspective/orthographic)
-
-
-        #region Clear Flag - Clear the previous frame
-
-        CameraClearFlags
-            clearFlags =
-                camera.clearFlags; // Each camera can config its clear flag to determine what should be shown if nothing can be seen by the camera
-        m_buffer.ClearRenderTarget(
-            ((clearFlags & CameraClearFlags.Depth) != 0),
-            ((clearFlags & CameraClearFlags.Color) != 0),
-            camera.backgroundColor);
-
-        #endregion
-
-        // Begin Unity profiler sample for frame debugger
-        m_buffer.BeginSample(s_bufferName);
-
-
-
-        #region Geometry Preparation
-
-        ComputeBuffer sphereBuffer = null;
-        LoadBufferWithSpheres(ref sphereBuffer);
-        ComputeBuffer triangleBuffer = null;
-        LoadBufferWithTriangles(ref triangleBuffer);
-
-        #endregion
-
-
-        #region Shadow Map Pass
-
-        if (m_spotLights != null && m_spotLights.Count > 0)
-        {
-            int spotSize = m_spotLights.Count;
-
-            m_shadowMapList = new Texture2DArray(m_shadowMapRes, m_shadowMapRes, spotSize, TextureFormat.RGBAFloat, false, false);
-
-            for (int i = 0; i < spotSize; i++)
+            RunConfig(m_allConfig, ref m_config);
+            RunParseScene();
+            
+            
+            foreach (var camera in cameras)
             {
+                RunTargetTextureInit(ref m_target);
+                RunClearCanvas(camera);
+                RunCommandBufferBegin();
+                
+                RunLoadGeometryToBuffer(ref m_sphereBuffer, ref m_triangleBuffer, m_sceneParser);
+                RunLoadLightsToBuffer(ref m_directionalLightBuffer, ref m_pointLightBuffer, ref m_spotLightBuffer, m_sceneParser);
+                
+                RunShadowMap(ref m_shadowMapList, ref m_shadowUtilityBuffer, m_sceneParser, ShadowMapSize, m_sphereBuffer, m_triangleBuffer);
 
-                ShadowMapPass(m_spotLights[i], i, m_sphereGeom.Count, sphereBuffer, m_triangleGeom.Count, triangleBuffer);
-
+                RunSetCameraToMainShader(camera);
+                RunSetSkyboxToMainShader(m_config.skybox);
+                RunSetAmbientToMainShader(m_config.ambitent);
+                RunSetShadowMapToMainShader(m_shadowMapList, m_shadowUtilityBuffer);
+                RunSetSpheresToMainShader(m_sphereBuffer, m_sceneParser.GetSpheres().Count);
+                RunSetTrianglesToMainShader(m_triangleBuffer, m_sceneParser.GetTriangles().Count);
+                RunSetDirectionalLightsToMainShader(m_directionalLightBuffer, m_sceneParser.GetDirectionalLights().Count);
+                RunSetPointLightsToMainShader(m_pointLightBuffer, m_sceneParser.GetPointLights().Count);
+                RunSetSpotLightsToMainShader(m_spotLightBuffer, m_sceneParser.GetSpotLights().Count);
+                RunRayTracing(m_target);
+                RunBufferCleanUp();
+                RunSendTextureToUnity(m_buffer, m_target, renderContext, camera);
             }
-        }
-        else
-        {
-            m_shadowMapList = new Texture2DArray(2, 2, 1, TextureFormat.RGBAFloat, false, false);
-        }
-
-        ComputeBuffer shadowUtilityBuffer = null;
-
-        if (m_shadowUtility.Count > 0)
-        {
-            shadowUtilityBuffer = new ComputeBuffer(m_shadowUtility.Count, ShadowUtility_t.GetSize());
-            shadowUtilityBuffer.SetData(m_shadowUtility);
-        }
-        else
-        {
-            shadowUtilityBuffer = new ComputeBuffer(1, ShadowUtility_t.GetSize());
-        }
-
-        #endregion
-
-
-
-        #region Ray Tracing
-
-        int kIndex = m_mainShader.FindKernel("CSMain");
-
-        // Shadow Depth Map for Spot Light
-        m_mainShader.SetTexture(kIndex, "_SpotShadowMap", m_shadowMapList);
-        m_mainShader.SetBuffer(kIndex, "_ShadowUtility", shadowUtilityBuffer);
-
-        // 
-        m_mainShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
-        m_mainShader.SetMatrix("_CameraInverseProjection", camera.projectionMatrix.inverse);
-        m_mainShader.SetTexture(kIndex, "_SkyboxTexture", m_config.skybox);
-
-        // Sphere
-
-        m_mainShader.SetInt("_NumOfSpheres", m_sphereGeom.Count);
-        m_mainShader.SetBuffer(kIndex, "_Spheres", sphereBuffer);
-
-        // Triangle
-
-        m_mainShader.SetInt("_NumOfTriangles", m_triangleGeom.Count);
-
-
-        m_mainShader.SetBuffer(kIndex, "_Triangles", triangleBuffer);
-
-        // Ambient Light
-
-        m_mainShader.SetVector("_AmbientGlobal", m_config.ambitent);
-
-        // Directional Lights
-
-        m_mainShader.SetInt("_NumOfDirectionalLights", m_directionalLights.Count);
-
-        ComputeBuffer dirLightBuf = null;
-        if (m_directionalLights.Count > 0)
-        {
-            dirLightBuf = new ComputeBuffer(m_directionalLights.Count, RTLightStructureDirectional_t.GetSize());
-            dirLightBuf.SetData(m_directionalLights);
-        }
-        else
-        {
-            dirLightBuf = new ComputeBuffer(1, 4); // Dummy
-        }
-
-        m_mainShader.SetBuffer(kIndex, "_DirectionalLights", dirLightBuf);
-
-        // Point Lights
-
-        m_mainShader.SetInt("_NumOfPointLights", m_pointLights.Count);
-        ComputeBuffer pointLightBuf = null;
-        if (m_pointLights.Count > 0)
-        {
-            pointLightBuf = new ComputeBuffer(m_pointLights.Count, RTLightStructurePoint_t.GetSize());
-            pointLightBuf.SetData(m_pointLights);
-        }
-        else
-        {
-            pointLightBuf = new ComputeBuffer(1, 4); // Dummy
-        }
-
-        m_mainShader.SetBuffer(kIndex, "_PointLights", pointLightBuf);
-
-
-        // Spot Lights
-
-        m_mainShader.SetInt("_NumOfSpotLights", m_spotLights.Count);
-        ComputeBuffer spotLightBuf = null;
-        if (m_spotLights.Count > 0)
-        {
-            spotLightBuf = new ComputeBuffer(m_spotLights.Count, RTLightStructureSpot_t.GetSize());
-            spotLightBuf.SetData(m_spotLights);
-        }
-        else
-        {
-            spotLightBuf = new ComputeBuffer(1, 4); // Dummy
-        }
-
-        m_mainShader.SetBuffer(kIndex, "_SpotLights", spotLightBuf);
-
-
-
-        m_mainShader.SetTexture(kIndex, "Result", m_target);
-        int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);
-        int threadGroupsY = Mathf.CeilToInt(Screen.height / 8.0f);
-        if (threadGroupsX > 0 && threadGroupsY > 0
-        ) // Prevent dispatching 0 threads to GPU (when the editor is starting or there is no screen to render) 
-        {
-            m_mainShader.Dispatch(kIndex, threadGroupsX, threadGroupsY, 1);
-        }
-
-
-        sphereBuffer.Release();
-        triangleBuffer.Release();
-        dirLightBuf.Release();
-        pointLightBuf.Release();
-        spotLightBuf.Release();
-        shadowUtilityBuffer.Release();
-
-        m_buffer.Blit(m_target, camera.activeTexture);
-
-        renderContext
-            .ExecuteCommandBuffer(
-                m_buffer); // We copied all the commands to an internal memory that is ready to send to GPU
-        m_buffer.Clear(); // Clear the command buffer
-
-        #endregion
-
-        // End Unity profiler sample for frame debugger
-        m_buffer.EndSample(s_bufferName);
-        renderContext
-            .ExecuteCommandBuffer(
-                m_buffer); // We copied all the commands to an internal memory that is ready to send to GPU
-        m_buffer.Clear(); // Clear the command buffer
-
-
-        renderContext.Submit(); // Send all the batched commands to GPU
-    }
-
-
-    /// <summary>
-    /// This method ensure our RenderTexture is initialized properly for ComputeShader
-    /// The code snipet is copied from http://blog.three-eyed-games.com/2018/05/03/gpu-ray-tracing-in-unity-part-1/
-    /// Reference: http://blog.three-eyed-games.com/2018/05/03/gpu-ray-tracing-in-unity-part-1/
-    /// </summary>
-    private void InitRenderTexture()
-    {
-        if (m_target == null || m_target.width != Screen.width || m_target.height != Screen.height)
-        {
-            // Release render texture if we already have one
-            if (m_target != null)
-                m_target.Release();
-
-            // Get a render target for Ray Tracing
-            m_target = new RenderTexture(Screen.width, Screen.height, 0,
-                RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-            m_target.enableRandomWrite = true;
-            m_target.Create();
         }
     }
 }
