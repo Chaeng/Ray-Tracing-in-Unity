@@ -76,13 +76,14 @@ float3 Shade(
             float3 L = normalize(spotLights[s].position - hit.position);
             float cosLtoLightDir = dot(-1 * L, -1 * spotLights[s].direction);
             
+
             //TODO: Optimize by get rid of conditional statement
-            if(cosLtoLightDir >= spotLights[s].cosConeAngle)
+            if (cosLtoLightDir > spotLights[s].cosConeAngle && cosLtoLightDir > 0)
             {
                 tempColor = PhongDiffuseShading(L, spotLights[s].color, hit.normal)
                             + PhongSpecularShading(L, spotLights[s].color, ray.direction, hit.normal, 1);
                 
-                bool useDepthMap = false;
+                bool useDepthMap = true;
 
                 if (useDepthMap)
                 {

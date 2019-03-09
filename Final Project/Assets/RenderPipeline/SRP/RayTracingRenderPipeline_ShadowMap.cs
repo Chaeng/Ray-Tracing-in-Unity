@@ -71,7 +71,7 @@ namespace RayTracingRenderer
             Vector3 lightPosition = spot.position;
             Vector3 direction = spot.direction;
 
-            Vector3 center = lightPosition + (5 * -direction);
+            Vector3 center = lightPosition + (50 * -direction);
             Vector3 up = new Vector3(0, 1, 0);
             if (Mathf.Abs(Vector3.Dot(up, direction)) > 0.99999)
             {
@@ -83,12 +83,13 @@ namespace RayTracingRenderer
             U.Normalize();
             W.Normalize();
 
-            float imageSize = 5 * Mathf.Tan(spot.coneAngle / 2);
+            float imageSize = 50 * Mathf.Tan(spot.coneAngle / 2);
             imageSize = imageSize * 2;
             float pixelSize = imageSize / shadowMapRes;
 
             Vector3 pref = center - U * (imageSize / 2) - W * (imageSize / 2);
-            
+            pref = pref + (pixelSize / 2) * U + (pixelSize / 2) * W;
+
             ShadowUtility_t temp = new ShadowUtility_t();
 
             temp.U = U;

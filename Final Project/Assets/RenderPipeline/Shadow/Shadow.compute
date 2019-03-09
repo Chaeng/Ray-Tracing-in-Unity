@@ -55,7 +55,7 @@ float SoftShadow(float3 position,
     ray = normalize(ray);
 
     float cos = dot(ray, -spot.direction);
-    float3 pointP = spot.position + (5 / cos) * ray;
+    float3 pointP = spot.position + (50 / cos) * ray;
 
     float dw = dot(pointP - shadowUtility.Pref, shadowUtility.W);
     float du = dot(pointP - shadowUtility.Pref, shadowUtility.U);
