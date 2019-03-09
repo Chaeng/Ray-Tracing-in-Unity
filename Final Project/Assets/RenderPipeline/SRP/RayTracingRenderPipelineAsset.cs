@@ -13,6 +13,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using RayTracingRenderer;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.SceneManagement;
