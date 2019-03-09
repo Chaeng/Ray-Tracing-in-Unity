@@ -23,9 +23,9 @@ public class RTLightInspector : Editor
                 break;
             
             case RTLight.LightType.Spot:
-                _light.coneAngle = EditorGUILayout.Slider("Cone Angle", _light.coneAngle, 0, 179);
-                _light.penumbraAngle = EditorGUILayout.Slider("Penumbra Angle", _light.penumbraAngle, 0, 179);
-                _light.useShadowMap = EditorGUILayout.Toggle("Use Shadow Map", _light.useShadowMap);
+                _light.coneAngle = EditorGUILayout.Slider("Cone angle", _light.coneAngle, 0, 179);
+                _light.fullIlluminousAngle = EditorGUILayout.Slider("Full illumination angle", _light.fullIlluminousAngle, 0, 179);
+                _light.useShadowMap = EditorGUILayout.Toggle("Use shadow map", _light.useShadowMap);
                 break;
         }
     }

@@ -75,12 +75,25 @@ float3 Shade(
         {
             float3 L = normalize(spotLights[s].position - hit.position);
             float cosLtoLightDir = dot(-1 * L, -1 * spotLights[s].direction);
+            float intensity = 0;
             
             //TODO: Optimize by get rid of conditional statement
-            if(cosLtoLightDir >= spotLights[s].cosConeAngle)
+            if(cosLtoLightDir >= spotLights[s].cosFullIlluminous)
             {
-                tempColor = PhongDiffuseShading(L, spotLights[s].color, hit.normal)
-                            + PhongSpecularShading(L, spotLights[s].color, ray.direction, hit.normal, 1);
+                // Full illumination
+                intensity = 1;
+            }
+            else if(cosLtoLightDir >= spotLights[s].cosConeAngle)
+            {
+                // Penumbra
+                intensity = (cosLtoLightDir - spotLights[s].cosConeAngle) / (spotLights[s].cosFullIlluminous - spotLights[s].cosConeAngle);
+            }
+        
+            if(intensity > 0)
+            {
+                tempColor = intensity * (PhongDiffuseShading(L, spotLights[s].color, hit.normal)
+                            + PhongSpecularShading(L, spotLights[s].color, ray.direction, hit.normal, 1)
+                            );
                 
                 bool useDepthMap = false;
 
@@ -97,8 +110,6 @@ float3 Shade(
                 
                 color = color + (tempColor * visibility);
             }
-        
-            
         }
         
         return color;

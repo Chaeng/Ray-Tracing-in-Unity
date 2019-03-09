@@ -10,7 +10,7 @@ public struct RTLightStructureSpot_t
     public Vector3 direction;
     public float coneAngle;
     public float cosConeAngle;
-    public float cosHalfPenumbra;
+    public float cosFullIlluminous;
 
     public static int GetSize()
     {
