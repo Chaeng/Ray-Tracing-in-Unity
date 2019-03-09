@@ -7,7 +7,9 @@ public class RenderPipelineConfigObject : ScriptableObject
 {
     public Texture skybox;
     
-    public Color ambitent = Color.white;
+    public Color upperAmbitent = Color.white;
+
+    public Color lowerAmbitent = Color.white;
 
     public int secondaryRayGeneration = 0;
 
