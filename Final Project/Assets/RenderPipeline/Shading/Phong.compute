@@ -59,36 +59,46 @@ float3 Shade(
             color = color + (tempColor * visibility);
         }
         
-        for(int s = 0; s < numOfPointLight; s++)
+        for(int p = 0; p < numOfPointLight; p++)
         {
-            float3 L = normalize(pointLights[s].position - hit.position);
-            tempColor =   PhongDiffuseShading(L, pointLights[s].color, hit.normal) 
-                        + PhongSpecularShading(L, pointLights[s].color, ray.direction, hit.normal, 5);
+            float3 L = normalize(pointLights[p].position - hit.position);
+            tempColor =   PhongDiffuseShading(L, pointLights[p].color, hit.normal) 
+                        + PhongSpecularShading(L, pointLights[p].color, ray.direction, hit.normal, 5);
             
-            visibility = HardShadow(hit.position, 1, pointLights[s].position, pointLights[s].position,
+            visibility = HardShadow(hit.position, 1, pointLights[p].position, pointLights[p].position,
                                               hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
            
             color = color + (tempColor * visibility);
         } 
         
-        for (int x = 0; x < numOfSpotLight; x++)
+        for (int s = 0; s < numOfSpotLight; s++)
         {
-            tempColor = float3(0,1,1); // result of spot light
+            float3 L = normalize(spotLights[s].position - hit.position);
+            float cosLtoLightDir = dot(-1 * L, -1 * spotLights[s].direction);
             
-            bool useDepthMap = true;
-
-            if (useDepthMap)
+            //TODO: Optimize by get rid of conditional statement
+            if(cosLtoLightDir >= spotLights[s].cosConeAngle)
             {
-                visibility = SoftShadow(hit.position, hit.GeoType, hit.GeoIndex, x, spotLights[x], shadowMap, shadowUtility[x]);
+                tempColor = PhongDiffuseShading(L, spotLights[s].color, hit.normal)
+                            + PhongSpecularShading(L, spotLights[s].color, ray.direction, hit.normal, 1);
+                
+                bool useDepthMap = false;
 
+                if (useDepthMap)
+                {
+                    visibility = SoftShadow(hit.position, hit.GeoType, hit.GeoIndex, s, spotLights[s], shadowMap, shadowUtility[s]);
+    
+                }
+                else
+                {
+                    visibility = HardShadow(hit.position, 2, spotLights[s].position, spotLights[s].direction,
+                                                  hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles);
+                }
+                
+                color = color + (tempColor * visibility);
             }
-            else
-            {
-                visibility = HardShadow(hit.position, 2, spotLights[x].position, spotLights[x].direction,
-                                              hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles);
-            }
-           
-            color = color + (tempColor * visibility);
+        
+            
         }
         
         return color;
