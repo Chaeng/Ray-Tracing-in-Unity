@@ -6,10 +6,10 @@ namespace RayTracingRenderer
 {
     public partial class RayTracingRenderPipeline
     {
-        private void RunLoadGeometryToBuffer(ref ComputeBuffer sphereBuffer, ref ComputeBuffer triangleBuffer, SceneParser sceneParser)
+        private void RunLoadGeometryToBuffer(SceneParser sceneParser)
         {
-            LoadBufferWithSpheres(ref sphereBuffer, sceneParser);
-            LoadBufferWithTriangles(ref triangleBuffer, sceneParser);
+            LoadBufferWithSpheres(sceneParser);
+            LoadBufferWithTriangles(sceneParser);
         }
 
 
@@ -22,34 +22,40 @@ namespace RayTracingRenderer
         }
         
         
-        private void LoadBufferWithSpheres(ref ComputeBuffer sphereBuffer, SceneParser sceneParser)
+        private void LoadBufferWithSpheres(SceneParser sceneParser)
         {
-            int sphereCount = sceneParser.GetSpheres().Count;
+            //TODO: Can optimize memory usage by checking whether the number of sphere remains the same
             
+            int sphereCount = sceneParser.GetSpheres().Count;
+
+            m_sphereBuffer?.Release();
+
             if (sphereCount > 0)
             {
-                sphereBuffer = new ComputeBuffer(sphereCount, sizeof(float)*4);
-                sphereBuffer.SetData(sceneParser.GetSpheres());
+                m_sphereBuffer = new ComputeBuffer(sphereCount, sizeof(float)*4);
+                m_sphereBuffer.SetData(sceneParser.GetSpheres());
             }
             else
             {
-                sphereBuffer = new ComputeBuffer(1, sizeof(float) * 4);
+                m_sphereBuffer = new ComputeBuffer(1, sizeof(float) * 4);
             }
         }
 
 
-        private void LoadBufferWithTriangles(ref ComputeBuffer triangleBuffer, SceneParser sceneParser)
+        private void LoadBufferWithTriangles(SceneParser sceneParser)
         {
             int triCount = sceneParser.GetSpheres().Count;
             
+            m_triangleBuffer?.Release();
+            
             if (triCount > 0)
             {
-                triangleBuffer = new ComputeBuffer(triCount, RTTriangle_t.GetSize());
-                triangleBuffer.SetData(sceneParser.GetTriangles());
+                m_triangleBuffer = new ComputeBuffer(triCount, RTTriangle_t.GetSize());
+                m_triangleBuffer.SetData(sceneParser.GetTriangles());
             }
             else
             {
-                triangleBuffer = new ComputeBuffer(1, RTTriangle_t.GetSize());
+                m_triangleBuffer = new ComputeBuffer(1, RTTriangle_t.GetSize());
             }
         }
 

@@ -97,7 +97,7 @@ namespace RayTracingRenderer
                 RunClearCanvas(camera);
                 RunCommandBufferBegin();
                 
-                RunLoadGeometryToBuffer(ref m_sphereBuffer, ref m_triangleBuffer, m_sceneParser);
+                RunLoadGeometryToBuffer(m_sceneParser);
                 RunLoadLightsToBuffer(ref m_directionalLightBuffer, ref m_pointLightBuffer, ref m_spotLightBuffer, m_sceneParser);
                 
                 RunShadowMap(ref m_shadowMapList, ref m_shadowUtilityBuffer, m_sceneParser, ShadowMapSize, m_sphereBuffer, m_triangleBuffer);
