@@ -1,0 +1,7 @@
+﻿struct RTSpotLight_UW
+{
+    float3 U;
+    float3 W;
+    float3 Pref;
+    float PixelSize;
+};
