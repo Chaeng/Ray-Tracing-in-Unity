@@ -1,4 +1,6 @@
-﻿
+﻿#include "../RTSphere.compute"
+#include "../RayHit.compute"
+
 void TraceReflection(
                              Ray ray,
                              inout RayHit bestHit,
@@ -8,11 +10,10 @@ void TraceReflection(
                              //StructuredBuffer<RTTriangle> triangles)
 {
     //RayHit bestHit = CreateRayHit();
-
-    float3 oriToCtr = sphere.center - ray.origin;
+    float3 oriToCtr = sphere[0].center - ray.origin;
     float d = dot(ray.direction, oriToCtr);
     
-    float discriminant = d * d - dot(-oriToCtr, -oriToCtr) + sphere.radius * sphere.radius;
+    float discriminant = d * d - dot(-oriToCtr, -oriToCtr) + sphere[0].radius * sphere[0].radius;
     if(discriminant < 0)
     {
         return;
@@ -27,8 +28,8 @@ void TraceReflection(
     {
         bestHit.distance = hitDis;
         bestHit.GeoType = 0;  // 0 represent sphere
-        bestHit.GeoIndex = GeoIndex;
+        bestHit.GeoIndex = 0;   //FIXME: Hard code Geo Index
         bestHit.position = ray.origin + hitDis * ray.direction;
-        bestHit.normal = normalize(bestHit.position - sphere.center);
+        bestHit.normal = normalize(bestHit.position - sphere[0].center);
     }
 }

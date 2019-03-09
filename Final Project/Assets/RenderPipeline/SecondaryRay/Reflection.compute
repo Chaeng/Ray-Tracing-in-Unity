@@ -8,6 +8,8 @@ float3 Reflection(
     StructuredBuffer<RTDirectionalLight> dirLights,
     int numOfPointLight,
     StructuredBuffer<RTPointLight> pointLights,
+    int numOfSpotLight,
+    StructuredBuffer<RTSpotLight> spotLights,
     Texture2D<float4> skybox, 
     SamplerState skyboxSampler,
     int numOfSpheres,
@@ -20,7 +22,7 @@ float3 Reflection(
     float3 final_reflColor = float3(0, 0, 0);
     
     // hard code
-    int maxHit = 4;
+    int maxHit = 3;
     
     // if geometry
     if (hit.distance < 1.#INF)
@@ -29,6 +31,7 @@ float3 Reflection(
          Ray curRay = ray;
          RayHit curHit = hit;
          
+         /*
          while(numHit < maxHit && curHit.distance < 1.#INF){
              float3 hitNml = normalize(curHit.normal);
              float3 rayNml = normalize(curRay.direction);
@@ -263,14 +266,17 @@ float3 Reflection(
                  finalRefl += (colorArr[i] * k);
              }
              return finalRefl;
+             
+             
          } else {
                 float theta = acos(curRay.direction.y) / -PI;
                 float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
                 return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz; 
          }
-            
-    } 
-    
+         
+         */
+         return float3(1, 0, 0); 
+    }  
     else {
 
         // if not a geometry, it must be a skybox
