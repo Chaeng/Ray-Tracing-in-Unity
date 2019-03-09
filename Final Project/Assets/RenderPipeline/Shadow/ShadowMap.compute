@@ -6,21 +6,22 @@
 #pragma kernel ShadowMap
 
 
-RWTexture2D<float4> _ShadowMap1; // Output
-float3 _SpotLightDir;           // Spot Light Direction
-float3 _SpotLightPos;           // Spot Light Position
+RWTexture2D<float4> _ShadowMap; // Output
+
 int _NumOfSpheres;              // Number of sphere
 StructuredBuffer<RTSphere> _Spheres;        // Sphere structure
 int _NumOfTriangles;            // Number of triangle
 StructuredBuffer<RTTriangle> _Triangles;    // Triangle structure
 
+float3 _SpotLightPos; // Spot Light Position
 float3 _PrefPosition;
 float3 _UnitU;
 float3 _UnitW;
+float _PixelSize; // Spot Light Direction
 
-float4 computeDepth(float3 lightPosition, float3 pref, float3 uVector, float3 wVector, int x, int y)
+float4 computeDepth(float3 lightPosition, float3 pref, float pixelSize, float3 uVector, float3 wVector, int x, int y)
 {
-    float3 pixelPosition = pref + x * uVector + y * wVector;
+    float3 pixelPosition = pref + x * uVector * pixelSize + y * wVector * pixelSize;
     float3 direction = normalize(pixelPosition - lightPosition);
 
     Ray ray = CreateRay(lightPosition, direction);
@@ -45,8 +46,8 @@ float4 computeDepth(float3 lightPosition, float3 pref, float3 uVector, float3 wV
 [numthreads(8,8,1)]
 void ShadowMap (uint3 id : SV_DispatchThreadID)
 {
-    //float4 DepthInfo = computeDepth(_SpotLightPos, _PrefPosition, _UnitU, _UnitW, id.x, id.y);
-    //_ShadowMap1[id.xy] = DepthInfo;
-    _ShadowMap1[id.xy] = float4(0,1,0,0);
+     float4 depthinfo = computeDepth(_SpotLightPos, _PrefPosition, _PixelSize, _UnitU, _UnitW, id.x, id.y);
+    _ShadowMap[id.xy] = depthinfo;
 
+  // _ShadowMap[id.xy] = float4(0,0,1,0.5);
 }

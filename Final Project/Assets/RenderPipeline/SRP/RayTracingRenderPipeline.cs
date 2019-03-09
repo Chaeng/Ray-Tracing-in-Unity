@@ -8,7 +8,6 @@ using UnityEngine.SceneManagement;
 
 public partial class RayTracingRenderPipeline : RenderPipeline
 {
-
     // We batch the commands into a buffer to reduce the amount of sending commands to GPU
     // Reusing the command buffer object avoids continuous memory allocation
     private CommandBuffer m_buffer = new CommandBuffer
@@ -119,17 +118,37 @@ public partial class RayTracingRenderPipeline : RenderPipeline
         #endregion
 
 
-        #region Global map buffer init
-
-        //Shader.SetGlobalTexture("_ShadowMap", m_shadowMap);
-
-        #endregion
-
-
-
         #region Shadow Map Pass
 
-        //ShadowMapPass(Vector3.zero, Vector3.zero, m_sphereGeom.Count, sphereBuffer, m_triangleGeom.Count, triangleBuffer);
+        if (m_spotLights != null && m_spotLights.Count > 0)
+        {
+            int spotSize = m_spotLights.Count;
+
+            m_shadowMapList = new Texture2DArray(m_shadowMapRes, m_shadowMapRes, spotSize, TextureFormat.RGBAFloat, false, false);
+
+            for (int i = 0; i < spotSize; i++)
+            {
+
+                ShadowMapPass(m_spotLights[i], i, m_sphereGeom.Count, sphereBuffer, m_triangleGeom.Count, triangleBuffer);
+
+            }
+        }
+        else
+        {
+            m_shadowMapList = new Texture2DArray(2, 2, 1, TextureFormat.RGBAFloat, false, false);
+        }
+
+        ComputeBuffer shadowUtilityBuffer = null;
+
+        if (m_shadowUtility.Count > 0)
+        {
+            shadowUtilityBuffer = new ComputeBuffer(m_shadowUtility.Count, ShadowUtility_t.GetSize());
+            shadowUtilityBuffer.SetData(m_shadowUtility);
+        }
+        else
+        {
+            shadowUtilityBuffer = new ComputeBuffer(1, ShadowUtility_t.GetSize());
+        }
 
         #endregion
 
@@ -140,8 +159,10 @@ public partial class RayTracingRenderPipeline : RenderPipeline
         int kIndex = m_mainShader.FindKernel("CSMain");
 
         // Shadow Depth Map for Spot Light
-        // m_mainShader.SetTextureFromGlobal(kIndex, "_DepthMap", "_ShadowMap");
+        m_mainShader.SetTexture(kIndex, "_SpotShadowMap", m_shadowMapList);
+        m_mainShader.SetBuffer(kIndex, "_ShadowUtility", shadowUtilityBuffer);
 
+        // 
         m_mainShader.SetMatrix("_CameraToWorld", camera.cameraToWorldMatrix);
         m_mainShader.SetMatrix("_CameraInverseProjection", camera.projectionMatrix.inverse);
         m_mainShader.SetTexture(kIndex, "_SkyboxTexture", m_config.skybox);
@@ -229,7 +250,7 @@ public partial class RayTracingRenderPipeline : RenderPipeline
         dirLightBuf.Release();
         pointLightBuf.Release();
         spotLightBuf.Release();
-
+        shadowUtilityBuffer.Release();
 
         m_buffer.Blit(m_target, camera.activeTexture);
 

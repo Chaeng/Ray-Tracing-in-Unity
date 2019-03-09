@@ -14,8 +14,6 @@ public partial class RayTracingRenderPipeline
 
     private RenderTexture m_target; // The texture to hold the ray tracing result from the compute shader
 
-    private RenderTexture m_depthMap; // The texture to hold the shadow depth map
-
     private List<RenderPipelineConfigObject> m_allConfig; // A list of config objects containing all global rendering settings      
 
     private RenderPipelineConfigObject m_config;
