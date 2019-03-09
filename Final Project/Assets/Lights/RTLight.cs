@@ -53,6 +53,7 @@ public class RTLight : MonoBehaviour
             color = color.ToVector3(),
             coneAngle = coneAngle * Mathf.Deg2Rad,
             cosConeAngle = Mathf.Cos(coneAngle * Mathf.Deg2Rad / 2f),
+            cosHalfPenumbra = Mathf.Cos(penumbraAngle * Mathf.Deg2Rad / 2f),
             direction = -1 * Vector3.Normalize(transform.forward),
             position = transform.position,
         };
