@@ -2,6 +2,7 @@
 #include "RayHit.compute"
 #include "Light/RTDirectionalLight.compute"
 #include "Light/RTPointLight.compute"
+#include "Light/RTSpotLight.compute"
 #include "RTSphere.compute"
 #include "Geometry/RTTriangle.compute"
 #include "Shading/Phong.compute"
@@ -14,6 +15,9 @@
 RWTexture2D<float4> Result;
 
 // Global Settings
+
+// ShadowDepth Map
+Texture2D<float4> _DepthMap;
 
 //Skybox
 Texture2D<float4> _SkyboxTexture;
@@ -32,6 +36,8 @@ int _NumOfDirectionalLights;
 StructuredBuffer<RTDirectionalLight> _DirectionalLights;
 int _NumOfPointLights;
 StructuredBuffer<RTPointLight> _PointLights;
+int _NumOfSpotLights;
+StructuredBuffer<RTSpotLight> _SpotLights;
 
 // sphere
 int _NumOfSpheres;
@@ -62,12 +68,12 @@ RayHit Trace(Ray ray)
 
     for(int i = 0; i < _NumOfSpheres; i++)
     {
-        IntersectSphere(ray, bestHit, _Spheres[i]);
+        IntersectSphere(ray, bestHit, _Spheres[i], i);
     }
     
     for(int t = 0; t < _NumOfTriangles; t++)
     {
-        IntersectTriangle(ray, bestHit, _Triangles[t]);
+        IntersectTriangle(ray, bestHit, _Triangles[t], t);
     }
 
     return bestHit;
@@ -100,9 +106,18 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _DirectionalLights,
                         _NumOfPointLights,
                         _PointLights,
+                        _NumOfSpotLights,
+                        _SpotLights,
                         _SkyboxTexture, 
-                        sampler_SkyboxTexture);
-    Result[id.xy] = float4(result, 1);
+                        sampler_SkyboxTexture,
+                        _NumOfSpheres,
+                        _Spheres,
+                        _NumOfTriangles,
+                        _Triangles);
+      Result[id.xy] = float4(result, 1);
+     //uint2 a = uint2(0,0);
+     //Result[id.xy] = _DepthMap[a];
+
 }
 
 

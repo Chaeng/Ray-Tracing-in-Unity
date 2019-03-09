@@ -13,6 +13,8 @@ struct RayHit
     int geometryIndex;  // The index of the geometry in their corresponding array
     float3 position;
     float3 normal;
+    int GeoType;
+    int GeoIndex;
 };
 
 RayHit CreateRayHit()
@@ -24,6 +26,8 @@ RayHit CreateRayHit()
     hit.geometryType = GT_NONE;
     hit.geometryIndex = 0;
     hit.normal = float3(0.0f, 0.0f, 0.0f);
+    hit.GeoType = -1;
+    hit.GeoIndex = -1;
     return hit;
 }
 
