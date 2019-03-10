@@ -1,6 +1,7 @@
 ﻿#include "../RayCasting/Trace.compute"
 
 float3 Reflection(
+    int maxHit,
     float3 result,
     inout Ray ray, 
     RayHit hit, 
@@ -19,14 +20,19 @@ float3 Reflection(
     int numOfTriangle,
     StructuredBuffer<RTTriangle> triangles,
     Texture2DArray<float4> shadowMap,
-    StructuredBuffer<RTSpotLight_UW> shadowUtility)
+    StructuredBuffer<RTSpotLight_UW> shadowUtility,
+    float fogFactor,
+    float3 fogColor)
 {
-	float refl = 1;
+    // Hard code
+    // Request parser to add 
+    // - World
+    //    - maxHit
+    // - Material
+    //    - reflective index
+	float refl = 0.2;
 	float k = 1 - refl;
     float3 final_reflColor = float3(0, 0, 0);
-    
-    // hard code
-    int maxHit = 5;
     
     // if geometry
     if (hit.distance < 1.#INF)
@@ -42,7 +48,7 @@ float3 Reflection(
              float3 reflectDir =  reflect(rayNml, hitNml); 
              Ray newRay = CreateRay(curHit.position, reflectDir);
              curRay = newRay;
-             RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.GeoIndex);
+             RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);
              curHit = newHit;
              numHit++;
          }
@@ -77,7 +83,7 @@ float3 Reflection(
                   Ray newRay = CreateRay(curHit.position, reflectDir);
                   rayArr[count] = newRay;
                   curRay = newRay;
-                  RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.GeoIndex);
+                  RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);
                   hitArr[count] = newHit;
                   curHit = newHit;
                   count++;
@@ -109,7 +115,9 @@ float3 Reflection(
                                 numOfTriangle,
                                 triangles,
                                 shadowMap,
-                                shadowUtility);
+                                shadowUtility,
+                                fogFactor,
+                                fogColor);
                  colorArr[i] += color;    
              }     
             return colorArr[1] + (colorArr[0] * k); 
@@ -139,7 +147,7 @@ float3 Reflection(
                   Ray newRay = CreateRay(curHit.position, reflectDir);
                   rayArr[count] = newRay;
                   curRay = newRay;
-                  RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.GeoIndex);
+                  RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);
                   hitArr[count] = newHit;
                   curHit = newHit;
                   count++;
@@ -173,7 +181,9 @@ float3 Reflection(
                                 numOfTriangle,
                                 triangles,
                                 shadowMap,
-                                shadowUtility);
+                                shadowUtility,
+                                fogFactor,
+                                fogColor);
                  colorArr[i] = color;    
              }     
             return colorArr[3] + ((colorArr[2] + (colorArr[1] * k)) * k); 
@@ -203,7 +213,7 @@ float3 Reflection(
                   Ray newRay = CreateRay(curHit.position, reflectDir);
                   rayArr[count] = newRay;
                   curRay = newRay;
-                  RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.GeoIndex);
+                  RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);
                   hitArr[count] = newHit;
                   curHit = newHit;
                   count++;
@@ -237,7 +247,9 @@ float3 Reflection(
                                 numOfTriangle,
                                 triangles,
                                 shadowMap,
-                                shadowUtility);
+                                shadowUtility,
+                                fogFactor,
+                                fogColor);
                  colorArr[i] = color;    
              }     
             return colorArr[3] + ((colorArr[2] + (colorArr[1] * k)) * k); 
@@ -253,7 +265,7 @@ float3 Reflection(
                  float3 reflectDir =  reflect(rayNml, hitNml); 
                  Ray newRay = CreateRay(curHit.position, reflectDir);
                  curRay = newRay;
-                 RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.GeoIndex);
+                 RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);
                  curHit = newHit;
                  numHit++;
              }
