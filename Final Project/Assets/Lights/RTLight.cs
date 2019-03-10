@@ -66,7 +66,7 @@ public class RTLight : MonoBehaviour
             cosFullIlluminous = Mathf.Cos(fullIlluminousAngle * Mathf.Deg2Rad / 2f),
             direction = -1 * Vector3.Normalize(transform.forward),
             position = transform.position,
-            shadowMap = check
+            enableShadowMap = check
         };
     }
     
