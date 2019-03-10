@@ -48,6 +48,16 @@ public class RTLight : MonoBehaviour
     
     public RTLightStructureSpot_t GetSpotLight()
     {
+        int check;
+        if (useShadowMap == true)
+        {
+            check = 1;
+        }
+        else
+        {
+            check = 0;
+        }
+
         return new RTLightStructureSpot_t()
         {
             color = color.ToVector3(),
@@ -56,6 +66,7 @@ public class RTLight : MonoBehaviour
             cosFullIlluminous = Mathf.Cos(fullIlluminousAngle * Mathf.Deg2Rad / 2f),
             direction = -1 * Vector3.Normalize(transform.forward),
             position = transform.position,
+            enableShadowMap = check
         };
     }
     

@@ -1,6 +1,5 @@
 ﻿float ShadowRayCast( Ray ray,
-                     int exceptType,
-                     int exceptIndex,
+                     int ExceptIndex,
                      int numOfSphere,
                      StructuredBuffer<RTSphere> spheres,
                      int numOfTriangle,
@@ -10,14 +9,14 @@
 
     for (int i = 0; i < numOfSphere; i++)
     {
-        if (exceptType == 0 && exceptIndex == i)
+        if (spheres[i].id == ExceptIndex)
         {
             continue;
         }
             
         IntersectSphere(ray, record, spheres[i]);
         
-        if (record.GeoType != -1)
+        if (record.geoIndex != -1)
         {
             return 0;
         }
@@ -25,14 +24,14 @@
 
     for (int t = 0; t < numOfTriangle; t++)
     {
-        if (exceptType == 1 && exceptIndex == t)
+        if (triangles[t].id == ExceptIndex)
         {
             continue;
         }
 
         IntersectTriangle(ray, record, triangles[t]);
 
-        if (record.GeoType != -1)
+        if (record.geoIndex != -1)
         {
             return 0;
         }
@@ -42,20 +41,18 @@
 
 }
 
-float SoftShadow(float3 position,
-                 int exceptType,
-                 int exceptIndex,
-                 int spotIndex,
+float SoftShadow(RayHit hit,
+                 int MapIndex,
                  RTSpotLight spot,
                  Texture2DArray<float4> shadowMap,
                  RTSpotLight_UW shadowUtility)
 {
-    float3 ray = position - spot.position;
+    float3 ray = hit.position - spot.position;
     float dis = length(ray);
     ray = normalize(ray);
 
     float cos = dot(ray, -spot.direction);
-    float3 pointP = spot.position + (5 / cos) * ray;
+    float3 pointP = spot.position + (10 / cos) * ray;
 
     float dw = dot(pointP - shadowUtility.Pref, shadowUtility.W);
     float du = dot(pointP - shadowUtility.Pref, shadowUtility.U);
@@ -63,15 +60,11 @@ float SoftShadow(float3 position,
     int i = (int) (du / shadowUtility.PixelSize);
     int j = (int) (dw / shadowUtility.PixelSize);
 
-    uint3 id = uint3(i, j, spotIndex);
+    uint3 id = uint3(i, j, MapIndex);
     float4 map = shadowMap[id.xyz];
 
-    if (dis > map.x)
+    if (dis > map.x && map.y != hit.geoIndex)
     {
-        if (map.y == exceptType && map.z == exceptIndex)
-        {
-            return 1;
-        }
         return 0;
     }
 
@@ -88,17 +81,15 @@ float SoftShadow(float3 position,
 //            0 ---> Sphere
 //            1 ---> Triangle
 // ExcepteIndex: index the of object
-float HardShadow(
-    float3 position,
-    int lightType,
-    float3 lightPosition,
-    float3 direction,
-    int exceptType,
-    int exceptIndex,
-    int numOfSphere,
-    StructuredBuffer<RTSphere> spheres,
-    int numOfTriangle,
-    StructuredBuffer<RTTriangle> triangles)
+float HardShadow( float3 position,
+                  int lightType,
+                  float3 lightPosition,
+                  float3 direction,
+                  int ExceptIndex,
+                  int numOfSphere,
+                  StructuredBuffer<RTSphere> spheres,
+                  int numOfTriangle,
+                  StructuredBuffer<RTTriangle> triangles)
 {
     Ray ray;
     float result;
@@ -119,6 +110,6 @@ float HardShadow(
         
     }
 
-    result = ShadowRayCast(ray, exceptType, exceptIndex, numOfSphere, spheres, numOfTriangle, triangles);
+    result = ShadowRayCast(ray, ExceptIndex, numOfSphere, spheres, numOfTriangle, triangles);
     return result;
 }
