@@ -61,6 +61,8 @@ namespace RayTracingRenderer
 
         private void ParseSphere(GameObject[] roots)
         {
+            int counter = 0;
+            
             // TODO: Optimize dynamic array generation
             m_sphereGeom.Clear();
 
@@ -72,7 +74,10 @@ namespace RayTracingRenderer
                 {
                     if (renderer.gameObject.activeSelf)
                     {
-                        m_sphereGeom.Add(renderer.GetGeometry());
+                        RTSphere_t sphereGeomT = renderer.GetGeometry();
+                        sphereGeomT.id = counter;
+                        counter++;
+                        m_sphereGeom.Add(sphereGeomT);
                     }
                 }
             }
@@ -80,6 +85,8 @@ namespace RayTracingRenderer
 
         private void ParseTriangle(GameObject[] roots)
         {
+            int counter = 0;
+            
             // TODO: Optimize dynamic array generation
             if (m_triangleGeom == null)
             {
@@ -96,7 +103,10 @@ namespace RayTracingRenderer
                 {
                     if (renderer.gameObject.activeSelf)
                     {
-                        m_triangleGeom.Add(renderer.GetGeometry());
+                        RTTriangle_t triangleGeomT = renderer.GetGeometry();
+                        triangleGeomT.id = counter;
+                        counter++;
+                        m_triangleGeom.Add(triangleGeomT);
                     }
                 }
             }

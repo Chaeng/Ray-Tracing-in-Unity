@@ -32,12 +32,12 @@ namespace RayTracingRenderer
 
             if (sphereCount > 0)
             {
-                m_sphereBuffer = new ComputeBuffer(sphereCount, sizeof(float)*4);
+                m_sphereBuffer = new ComputeBuffer(sphereCount, RTSphere_t.GetSize());
                 m_sphereBuffer.SetData(sceneParser.GetSpheres());
             }
             else
             {
-                m_sphereBuffer = new ComputeBuffer(1, sizeof(float) * 4);
+                m_sphereBuffer = new ComputeBuffer(1, RTSphere_t.GetSize());
             }
         }
 

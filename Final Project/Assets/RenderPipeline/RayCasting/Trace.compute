@@ -1,0 +1,29 @@
+﻿#include "../Ray.compute"
+#include "../RayHit.compute"
+#include "../RTSphere.compute"
+#include "../Geometry/RTTriangle.compute"
+
+RayHit Trace(Ray ray, int _NumOfSpheres, StructuredBuffer<RTSphere> _Spheres, int _NumOfTriangles, StructuredBuffer<RTTriangle> _Triangles, int excludeSphere, int excludeTriangle)
+{
+    RayHit bestHit = CreateRayHit();
+
+    for(int i = 0; i < _NumOfSpheres; i++)
+    {
+        if(_Spheres[i].id == excludeSphere)
+        {
+            continue;
+        }
+        IntersectSphere(ray, bestHit, _Spheres[i], i);
+    }
+    
+    for(int t = 0; t < _NumOfTriangles; t++)
+    {
+        if(_Triangles[t].id == excludeTriangle)
+        {
+            continue;
+        }
+        IntersectTriangle(ray, bestHit, _Triangles[t], t);
+    }
+
+    return bestHit;
+}
