@@ -68,6 +68,6 @@ public class RTLight : MonoBehaviour
     {
         // Display the explosion radius when selected
         Gizmos.color = Color.yellow;
-        Gizmos.DrawRay(transform.position, Vector3.forward);
+        Gizmos.DrawRay(transform.position, transform.forward);
     }
 }
