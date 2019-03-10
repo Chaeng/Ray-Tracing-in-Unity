@@ -44,15 +44,19 @@ float3 Shade(
     int numOfTriangle,
     StructuredBuffer<RTTriangle> triangles,
     Texture2DArray<float4> shadowMap,
-    StructuredBuffer<RTSpotLight_UW> shadowUtility)
+    StructuredBuffer<RTSpotLight_UW> shadowUtility,
+    float fogFactor,
+    float3 fogColor)
 {
+    float3 color = float3(0, 0, 0);
+    float hitDistance = hit.distance;
 
-    if (hit.distance < 1.#INF)
+    if (hitDistance < 1.#INF)
     {
         float cosNormalToUp = dot(hit.normal, float3(0, 1, 0));
         float upperAmbientRatio = cosNormalToUp / 2 + 0.5f;
         
-        float3 color = (upperAmbientRatio) * ambientLightUpper + (1 - upperAmbientRatio) * ambientLightLower;
+        color = (upperAmbientRatio) * ambientLightUpper + (1 - upperAmbientRatio) * ambientLightLower;
         float3 tempColor;
         float visibility;
         
@@ -62,7 +66,7 @@ float3 Shade(
                          + PhongSpecularShading(dirLights[d].direction, dirLights[d].color, ray.direction, hit.normal, 5);
             
             visibility = HardShadow(hit.position, 0, dirLights[d].direction, dirLights[d].direction, 
-                                              hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
+                                              hit.geoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
             color = color + (tempColor * visibility);
         }
         
@@ -73,7 +77,7 @@ float3 Shade(
                         + PhongSpecularShading(L, pointLights[p].color, ray.direction, hit.normal, 5);
             
             visibility = HardShadow(hit.position, 1, pointLights[p].position, pointLights[p].position,
-                                              hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
+                                              hit.geoIndex, numOfSphere, spheres, numOfTriangle, triangles);
            
             color = color + (tempColor * visibility);
         } 
@@ -84,6 +88,7 @@ float3 Shade(
             float cosLtoLightDir = dot(-1 * L, -1 * spotLights[s].direction);
             float intensity = 0;
             
+
             //TODO: Optimize by get rid of conditional statement
             if(cosLtoLightDir >= spotLights[s].cosFullIlluminous)
             {
@@ -102,32 +107,37 @@ float3 Shade(
                             + PhongSpecularShading(L, spotLights[s].color, ray.direction, hit.normal, 1)
                             );
                 
-                bool useDepthMap = false;
-
-                if (useDepthMap)
+                // check is shadow map is trued on
+                if (spotLights[s].enableShadowMap == 1)
                 {
-                    visibility = SoftShadow(hit.position, hit.GeoType, hit.GeoIndex, s, spotLights[s], shadowMap, shadowUtility[s]);
+                    visibility = SoftShadow(hit, s, spotLights[s], shadowMap, shadowUtility[s]);
     
                 }
                 else
                 {
                     visibility = HardShadow(hit.position, 2, spotLights[s].position, spotLights[s].direction,
-                                                  hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles);
+                                                  hit.geoIndex, numOfSphere, spheres, numOfTriangle, triangles);
                 }
                 
                 color = color + (tempColor * visibility);
             }
         }
-        
-        return color;
     }
     else
     {
         // Sample the skybox and write it
         float theta = acos(ray.direction.y) / -PI;
         float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
-        return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
+        color = skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
+        
+        hitDistance = 1000;   // TODO: Allow config to set the skybox distance for fog calculation
     }
+    
+    float visInFogRatio = 1 / (exp(hitDistance * fogFactor));
+    
+    color = (1 - visInFogRatio) * fogColor + (visInFogRatio) * color;
+    
+    return color;
 }
 
 #endif // PHONG_COMPUTE

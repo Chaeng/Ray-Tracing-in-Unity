@@ -11,9 +11,15 @@ public class RenderPipelineConfigObject : ScriptableObject
 
     public Color lowerAmbitent = Color.white;
 
+    public float globalRefractiveIndex = 1.0f;
+    
     public int secondaryRayGeneration = 0;
 
     public bool enableShadow = false;
+
+    public Color fogColor = Color.white;
+    
+    [Range(0, 0.05f)] public float fogFactor = 0;
 
 
     private void Awake()

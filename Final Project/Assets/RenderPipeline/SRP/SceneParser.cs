@@ -54,14 +54,14 @@ namespace RayTracingRenderer
         {
             GameObject[] roots = scene.GetRootGameObjects();
 
-            int counter = 0;
+            int count = 0;
 
             ParseLight(roots);
-            ParseSphere(roots, counter);
-            ParseTriangle(roots, counter);
+            ParseSphere(roots, ref count);
+            ParseTriangle(roots,ref count);
         }
 
-        private void ParseSphere(GameObject[] roots, int counter)
+        private void ParseSphere(GameObject[] roots, ref int counter)
         {   
             // TODO: Optimize dynamic array generation
             m_sphereGeom.Clear();
@@ -83,7 +83,7 @@ namespace RayTracingRenderer
             }
         }
 
-        private void ParseTriangle(GameObject[] roots, int counter)
+        private void ParseTriangle(GameObject[] roots, ref int counter)
         {
             // TODO: Optimize dynamic array generation
             if (m_triangleGeom == null)

@@ -30,10 +30,15 @@ StructuredBuffer<RTSpotLight_UW> _ShadowUtility;
 Texture2D<float4> _SkyboxTexture;
 SamplerState sampler_SkyboxTexture;
 
-
 // Ambient
 float3 _AmbientLightUpper;
 float3 _AmbientLightLower;
+
+// Refractive Index
+float3 _GlobalRefractiveIndex;
+
+float _FogFactor;
+float3 _FogColor;
 
 // Camera
 float4x4 _CameraToWorld;
@@ -111,7 +116,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                           _NumOfTriangles,
                           _Triangles,
                           _SpotShadowMap,
-                          _ShadowUtility);
+                          _ShadowUtility,
+                          _FogFactor,
+                          _FogColor);
 
      // Result[id.xy] = float4(result, 1);
      // uint3 a = uint3(id.x, id.y, 0);
