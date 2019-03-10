@@ -8,6 +8,9 @@
 #include "RTSphere.compute"
 #include "Geometry/RTTriangle.compute"
 #include "Shading/Phong.compute"
+#include "SecondaryRay/TraceReflection.compute"
+#include "SecondaryRay/Reflection.compute"
+#include "SecondaryRay/Transparent.compute"
 
 
 // Each #kernel tells which function to compile; you can have many kernels
@@ -117,9 +120,64 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                           _FogFactor,
                           _FogColor);
 
-     Result[id.xy] = float4(result, 1);
-     //uint3 a = uint3(id.x, id.y, 0);
-     //Result[id.xy] = _SpotShadowMap[a];
+    bool transparentEffect = true;  // Temporary hard code 
+    
+    // hard code
+    int maxHit = 3;
+    
+    if(transparentEffect) {
+        float3 refl = Transparent(
+                        maxHit,
+                        result,
+                        ray, 
+                        hit, 
+                        _AmbientLightUpper,
+                        _AmbientLightLower,
+                        _NumOfDirectionalLights,
+                        _DirectionalLights,
+                        _NumOfPointLights,
+                        _PointLights,
+                        _NumOfSpotLights,
+                        _SpotLights,
+                        _SkyboxTexture,                         
+                        sampler_SkyboxTexture,
+                        _NumOfSpheres,
+                        _Spheres,
+                        _NumOfTriangles,
+                        _Triangles,
+                        _SpotShadowMap,
+                        _ShadowUtility,
+                        _FogFactor,
+                        _FogColor);
+                        
+        float3 ref2 = Reflection(
+                        maxHit,
+                        result,
+                        ray, 
+                        hit, 
+                        _AmbientLightUpper,
+                        _AmbientLightLower,
+                        _NumOfDirectionalLights,
+                        _DirectionalLights,
+                        _NumOfPointLights,
+                        _PointLights,
+                        _NumOfSpotLights,
+                        _SpotLights,
+                        _SkyboxTexture,                         
+                        sampler_SkyboxTexture,
+                        _NumOfSpheres,
+                        _Spheres,
+                        _NumOfTriangles,
+                        _Triangles,
+                        _SpotShadowMap,
+                        _ShadowUtility,
+                        _FogFactor,
+                        _FogColor);             
+        
+        result = refl;
+    }     
+    
+    Result[id.xy] = float4(result, 1);
 }
 
 
