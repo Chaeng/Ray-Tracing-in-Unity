@@ -97,7 +97,7 @@ float3 Shade(
             else if(cosLtoLightDir >= spotLights[s].cosConeAngle)
             {
                 // Penumbra
-                intensity = (cosLtoLightDir - spotLights[s].cosConeAngle) / (spotLights[s].cosFullIlluminous - spotLights[s].cosConeAngle);
+                intensity = pow((cosLtoLightDir - spotLights[s].cosConeAngle) / (spotLights[s].cosFullIlluminous - spotLights[s].cosConeAngle), spotLights[s].penumbraDecay);
             }
         
             if(intensity > 0)
