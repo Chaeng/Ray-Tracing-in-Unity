@@ -17,6 +17,10 @@ public class RenderPipelineConfigObject : ScriptableObject
 
     public bool enableShadow = false;
 
+    public Color fogColor = Color.white;
+    
+    [Range(0, 0.05f)] public float fogFactor = 0;
+
 
     private void Awake()
     {
