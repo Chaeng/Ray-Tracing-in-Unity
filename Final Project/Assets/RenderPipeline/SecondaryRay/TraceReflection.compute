@@ -1,6 +1,5 @@
 ﻿#include "../RTSphere.compute"
 #include "../RayHit.compute"
-
 void TraceReflection(
                              Ray ray,
                              inout RayHit bestHit,
