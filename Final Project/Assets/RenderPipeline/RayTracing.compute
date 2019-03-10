@@ -120,6 +120,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                           _FogFactor,
                           _FogColor);
 
+<<<<<<< Updated upstream
     bool transparentEffect = true;  // Temporary hard code 
     
     // hard code
@@ -157,6 +158,19 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         hit, 
                         _AmbientLightUpper,
                         _AmbientLightLower,
+=======
+     // Result[id.xy] = float4(result, 1);
+     // uint3 a = uint3(id.x, id.y, 0);
+     // Result[id.xy] = _SpotShadowMap[a];
+    bool transparentEffect = true;  // Temporary hard code 
+    
+    if(transparentEffect) {
+        float3 refl = Transparent(
+                        result,
+                        ray, 
+                        hit, 
+                        _AmbientGlobal,
+>>>>>>> Stashed changes
                         _NumOfDirectionalLights,
                         _DirectionalLights,
                         _NumOfPointLights,
@@ -170,11 +184,16 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _NumOfTriangles,
                         _Triangles,
                         _SpotShadowMap,
+<<<<<<< Updated upstream
                         _ShadowUtility,
                         _FogFactor,
                         _FogColor);             
         
         result = refl;
+=======
+                        _ShadowUtility);
+        result += refl;
+>>>>>>> Stashed changes
     }     
     
     Result[id.xy] = float4(result, 1);

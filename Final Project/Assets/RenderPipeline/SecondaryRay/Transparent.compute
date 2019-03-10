@@ -23,14 +23,21 @@ float3 Transparent(
     int numOfTriangle,
     StructuredBuffer<RTTriangle> triangles,
     Texture2DArray<float4> shadowMap,
+<<<<<<< Updated upstream
     StructuredBuffer<RTSpotLight_UW> shadowUtility,
     float fogFactor,
     float3 fogColor)
 {
+=======
+    StructuredBuffer<RTSpotLight_UW> shadowUtility)
+{
+
+>>>>>>> Stashed changes
     if (hit.distance < 1.#INF)
     {         
          Ray curRay = ray;
          RayHit curHit = hit;
+<<<<<<< Updated upstream
              
          float3 V = -normalize(curRay.direction);//int numHit = 1;
          
@@ -427,6 +434,127 @@ float3 Transparent(
              }
          }
                 
+=======
+         
+         float3 V = -normalize(curRay.direction);
+         
+         // hardcode
+         float refIndex = 1.52; // glass
+         float air_refIndex = 1.0003;
+         // hardcode
+         
+         /*
+         // triangle only
+         
+         float3 useNormal_raw = triangles[0].normal;
+         float3 useNormal = normalize(useNormal_raw);
+         float cosThetaI = dot(V, useNormal);
+         float invN = 1/ refIndex;
+         float cosThetaT = sqrt( 1 - ((invN * invN) * (1 - (cosThetaI * cosThetaI))));
+         float3 transDir = -((invN * V) + ((cosThetaT - (invN * cosThetaI)) * useNormal));
+         Ray transRay = CreateRay(curHit.position, transDir);
+         float3 rayNor = normalize(transRay.direction);
+         RayHit newHit = CreateRayHit();
+         IntersectTriangle(transRay, newHit, triangles[0], 0);
+         float3 triangleColor = Shade(
+                        transRay, 
+                        newHit, 
+                        ambientColor,
+                        numOfDirLight,
+                        dirLights,
+                        numOfPointLight,
+                        pointLights,
+                        numOfSpotLight, 
+                        spotLights,
+                        skybox, 
+                        skyboxSampler,
+                        numOfSpheres,
+                        spheres,
+                        numOfTriangle,
+                        triangles,
+                        shadowMap,
+                        shadowUtility); 
+
+         if(numHit > 0)
+         {
+             float theta = acos(transRay.direction.y) / -PI;
+             float phi = atan2(transRay.direction.x, -transRay.direction.z) / -PI * 0.5f;
+             return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz; 
+         }
+         
+         */
+       
+         float3 useNormal_raw = -hit.normal;
+         float3 useNormal = normalize(useNormal_raw);
+         float cosThetaI = dot(V, useNormal);
+         float invN = 1/ air_refIndex;
+         float cosThetaT = sqrt( 1 - ((invN * invN) * (1 - (cosThetaI * cosThetaI))));
+         float3 transDir = -((invN * V) + ((cosThetaT - (invN * cosThetaI)) * useNormal));
+         
+         Ray transRay = CreateRay(curHit.position, transDir);                
+         RayHit newHit;
+         
+         for(int i = 0; i < numOfSpheres; ++i){
+            newHit = Trace(transRay, numOfSpheres, spheres, numOfTriangle, triangles, i);
+         }
+         /*
+         float3 V = -normalize(transRay.direction);
+         float3 useNormal_raw2 = -newHit.normal;
+         float3 useNormal2 = normalize(useNormal_raw);
+         float cosThetaI2 = dot(V, useNormal);
+         float invN2 = 1/ refIndex;
+         float cosThetaT2 = sqrt( 1 - ((invN * invN) * (1 - (cosThetaI * cosThetaI))));
+         float3 transDir2 = -((invN * V) + ((cosThetaT - (invN * cosThetaI)) * useNormal));
+               */          
+         Ray transRay2 = CreateRay(newHit.position, transDir);
+         RayHit newHit2 = Trace(transRay2, numOfSpheres, spheres, numOfTriangle, triangles, 0);
+         float3 reflecColor = Shade(
+                        transRay2, 
+                        newHit2, 
+                        ambientColor,
+                        numOfDirLight,
+                        dirLights,
+                        numOfPointLight,
+                        pointLights,
+                        numOfSpotLight, 
+                        spotLights,
+                        skybox, 
+                        skyboxSampler,
+                        numOfSpheres,
+                        spheres,
+                        numOfTriangle,
+                        triangles,
+                        shadowMap,
+                        shadowUtility); 
+          return   reflecColor;        
+                  /*      
+                  float3 triangleColor2 = Shade(
+                        transRay2, 
+                        newHit2, 
+                        ambientColor,
+                        numOfDirLight,
+                        dirLights,
+                        numOfPointLight,
+                        pointLights,
+                        numOfSpotLight, 
+                        spotLights,
+                        skybox, 
+                        skyboxSampler,
+                        numOfSpheres,
+                        spheres,
+                        numOfTriangle,
+                        triangles,
+                        shadowMap,
+                        shadowUtility); */
+/*
+         if(numHit > 0)
+         {
+             float theta = acos(transRay2.direction.y) / -PI;
+             float phi = atan2(transRay2.direction.x, -transRay2.direction.z) / -PI * 0.5f;
+             return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz; 
+         }*/
+        
+>>>>>>> Stashed changes
     } else {
     
             // if not a geometry, it must be a skybox
@@ -434,4 +562,8 @@ float3 Transparent(
             float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
             return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;   
     }
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes

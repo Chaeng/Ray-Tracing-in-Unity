@@ -1,4 +1,9 @@
+<<<<<<< Updated upstream
 ﻿#include "../RayCasting/Trace.compute"
+=======
+﻿
+#include "../RayCasting/Trace.compute"
+>>>>>>> Stashed changes
 
 float3 Reflection(
     int maxHit,
@@ -48,7 +53,11 @@ float3 Reflection(
              float3 reflectDir =  reflect(rayNml, hitNml); 
              Ray newRay = CreateRay(curHit.position, reflectDir);
              curRay = newRay;
+<<<<<<< Updated upstream
              RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);
+=======
+             RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, hit.GeoIndex);
+>>>>>>> Stashed changes
              curHit = newHit;
              numHit++;
          }
