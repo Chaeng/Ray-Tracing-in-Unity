@@ -11,10 +11,11 @@ public struct RTLightStructureSpot_t
     public float coneAngle;
     public float cosConeAngle;
     public float cosFullIlluminous;
+    public float penumbraDecay;
     public int enableShadowMap;
 
     public static int GetSize()
     {
-        return sizeof(float) * 3 * 3 + sizeof(float) * 3 + sizeof(int);
+        return sizeof(float) * 3 * 3 + sizeof(float) * 4 + sizeof(int);
     }
 }
