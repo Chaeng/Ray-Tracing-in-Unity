@@ -1,4 +1,7 @@
-﻿#include "../Ray.compute"
+﻿#ifndef TRACE_COMPUTE
+#define TRACE_COMPUTE
+
+#include "../Ray.compute"
 #include "../RayHit.compute"
 #include "../RTSphere.compute"
 #include "../Geometry/RTTriangle.compute"
@@ -27,3 +30,5 @@ RayHit Trace(Ray ray, int _NumOfSpheres, StructuredBuffer<RTSphere> _Spheres, in
 
     return bestHit;
 }
+
+#endif //TRACE_COMPUTE
