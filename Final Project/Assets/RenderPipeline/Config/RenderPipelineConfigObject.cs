@@ -19,7 +19,7 @@ public class RenderPipelineConfigObject : ScriptableObject
 
     public Color fogColor = Color.white;
     
-    public int fogFactor = 0;
+    [Range(0, 0.05f)] public float fogFactor = 0;
 
 
     private void Awake()

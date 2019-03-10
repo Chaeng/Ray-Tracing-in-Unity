@@ -101,7 +101,8 @@ namespace RayTracingRenderer
 
         private void RunSetFogToMainShader(RenderPipelineConfigObject config)
         {
-//            m_mainShader.SetFloat("");
+            m_mainShader.SetFloat("_FogFactor", config.fogFactor);
+            m_mainShader.SetVector("_FogColor", config.fogColor);
         }
 
         private void RunSetSpheresToMainShader(ComputeBuffer buffer, int count)
