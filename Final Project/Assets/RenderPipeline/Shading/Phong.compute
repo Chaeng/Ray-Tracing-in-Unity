@@ -1,4 +1,7 @@
-﻿#include "../Shadow/Shadow.compute"
+﻿#ifndef PHONG_COMPUTE
+#define PHONG_COMPUTE
+
+#include "../Shadow/Shadow.compute"
 
 static const float PI = 3.14159265f;
 
@@ -122,5 +125,7 @@ float3 Shade(
         return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
     }
 }
+
+#endif // PHONG_COMPUTE
 
 
