@@ -99,6 +99,11 @@ namespace RayTracingRenderer
             m_mainShader.SetFloat("_GlobalRefractiveIndex", config.globalRefractiveIndex);
         }
 
+        private void RunSetFogToMainShader(RenderPipelineConfigObject config)
+        {
+//            m_mainShader.SetFloat("");
+        }
+
         private void RunSetSpheresToMainShader(ComputeBuffer buffer, int count)
         {
             m_mainShader.SetInt("_NumOfSpheres", count);

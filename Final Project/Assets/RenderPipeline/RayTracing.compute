@@ -34,6 +34,9 @@ float3 _AmbientLightLower;
 // Refractive Index
 float3 _GlobalRefractiveIndex;
 
+float _FogFactor;
+float4 _FogColor;
+
 // Camera
 float4x4 _CameraToWorld;
 float4x4 _CameraInverseProjection;
