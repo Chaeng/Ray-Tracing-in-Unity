@@ -27,10 +27,12 @@ StructuredBuffer<RTSpotLight_UW> _ShadowUtility;
 Texture2D<float4> _SkyboxTexture;
 SamplerState sampler_SkyboxTexture;
 
-
 // Ambient
 float3 _AmbientLightUpper;
 float3 _AmbientLightLower;
+
+// Refractive Index
+float3 _GlobalRefractiveIndex;
 
 // Camera
 float4x4 _CameraToWorld;

@@ -94,6 +94,11 @@ namespace RayTracingRenderer
             m_mainShader.SetVector("_AmbientLightLower", config.lowerAmbitent);
         }
 
+        private void RunSetGlobalRefractiveIndex(RenderPipelineConfigObject config)
+        {
+            m_mainShader.SetFloat("_GlobalRefractiveIndex", config.globalRefractiveIndex);
+        }
+
         private void RunSetSpheresToMainShader(ComputeBuffer buffer, int count)
         {
             m_mainShader.SetInt("_NumOfSpheres", count);
