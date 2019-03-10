@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 public struct RTTriangle_t
 {
+    public int id;
     public Vector3 vert0;
     public Vector3 vert1;
     public Vector3 vert2;
@@ -16,6 +17,6 @@ public struct RTTriangle_t
     
     public static int GetSize()
     {
-        return sizeof(float) * 14 + sizeof(int);    // (vertices: 3 * 3 = 9) + (normal: 3) + (planeD: 1) + (area: 1)
+        return sizeof(int) + sizeof(float) * 14 + sizeof(int);    // (vertices: 3 * 3 = 9) + (normal: 3) + (planeD: 1) + (area: 1)
     }
 }
