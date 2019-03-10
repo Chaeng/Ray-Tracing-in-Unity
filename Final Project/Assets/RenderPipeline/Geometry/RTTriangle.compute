@@ -74,7 +74,8 @@ void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri)
     bestHit.barycentric = float3(areaABQ / tri.area, areaBCQ / tri.area, areaAQC / tri.area);
     bestHit.position = hit;
     bestHit.distance = t;
-    bestHit.geoId = tri.id;
+    bestHit.geoType = 1;
+    bestHit.geoIndex = tri.id;
 
     if(nDotD > 0)
     {

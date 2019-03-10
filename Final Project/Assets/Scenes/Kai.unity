@@ -310,9 +310,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_lightType: 2
   color: {r: 0.32133323, g: 0.7830189, b: 0.4289661, a: 1}
-  coneAngle: 140
+  coneAngle: 61
   fullIlluminousAngle: 30
-  useShadowMap: 1
+  useShadowMap: 0
 --- !u!4 &1037279010
 Transform:
   m_ObjectHideFlags: 0
@@ -321,7 +321,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1037279008}
   m_LocalRotation: {x: 0.6767652, y: -0.14158724, z: 0.24808438, w: 0.678525}
-  m_LocalPosition: {x: -3.7, y: 17.3, z: 2.5}
+  m_LocalPosition: {x: -12.13, y: 16.66, z: 16.03}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -583,7 +583,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_lightType: 2
   color: {r: 0.08515275, g: 0.03702387, b: 0.6037736, a: 1}
-  coneAngle: 79
+  coneAngle: 47
   fullIlluminousAngle: 30
   useShadowMap: 1
 --- !u!4 &1636530224
@@ -594,7 +594,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636530222}
   m_LocalRotation: {x: 0.6867236, y: -0.15458114, z: 0.23370361, w: 0.6707444}
-  m_LocalPosition: {x: -8.05, y: 24.21, z: 6}
+  m_LocalPosition: {x: -9.8, y: 24, z: 8.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

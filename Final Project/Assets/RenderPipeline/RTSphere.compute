@@ -73,7 +73,8 @@ void IntersectSphere(Ray ray, inout RayHit bestHit, RTSphere sphere)
     if (hitDis > 0 && hitDis < bestHit.distance)
     {
         bestHit.distance = hitDis;
-        bestHit.geoId = sphere.id;
+        bestHit.geoIndex = sphere.id;
+        bestHit.geoType = 0;
         bestHit.position = ray.origin + hitDis * ray.direction;
         bestHit.normal = normalize(bestHit.position - sphere.center);
 

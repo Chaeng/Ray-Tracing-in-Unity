@@ -62,7 +62,7 @@ float3 Shade(
                          + PhongSpecularShading(dirLights[d].direction, dirLights[d].color, ray.direction, hit.normal, 5);
             
             visibility = HardShadow(hit.position, 0, dirLights[d].direction, dirLights[d].direction, 
-                                              hit.geoId, numOfSphere, spheres, numOfTriangle, triangles); 
+                                              hit.geoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
             color = color + (tempColor * visibility);
         }
         
@@ -73,7 +73,7 @@ float3 Shade(
                         + PhongSpecularShading(L, pointLights[p].color, ray.direction, hit.normal, 5);
             
             visibility = HardShadow(hit.position, 1, pointLights[p].position, pointLights[p].position,
-                                              hit.geoId, numOfSphere, spheres, numOfTriangle, triangles);
+                                              hit.geoIndex, numOfSphere, spheres, numOfTriangle, triangles);
            
             color = color + (tempColor * visibility);
         } 
@@ -112,7 +112,7 @@ float3 Shade(
                 else
                 {
                     visibility = HardShadow(hit.position, 2, spotLights[s].position, spotLights[s].direction,
-                                                  hit.geoId, numOfSphere, spheres, numOfTriangle, triangles);
+                                                  hit.geoIndex, numOfSphere, spheres, numOfTriangle, triangles);
                 }
                 
                 color = color + (tempColor * visibility);

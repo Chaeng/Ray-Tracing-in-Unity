@@ -9,7 +9,8 @@ struct RayHit
 {
     float3 barycentric;
     float distance;
-    int geoId;  // the unique id for each geo.
+    int geoIndex;  // the unique id for each geo.
+    int geoType;   // 0 is sphere, 1 is triangle
     float3 position;
     float3 normal;
 };
@@ -21,7 +22,8 @@ RayHit CreateRayHit()
     hit.position = float3(0.0f, 0.0f, 0.0f);
     hit.distance = 1.#INF;
     hit.normal = float3(0.0f, 0.0f, 0.0f);
-    hit.geoId = -1;
+    hit.geoIndex = -1;
+    hit.geoType = -1;
     return hit;
 }
 

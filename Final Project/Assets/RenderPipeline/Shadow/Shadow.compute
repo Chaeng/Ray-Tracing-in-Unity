@@ -16,7 +16,7 @@
             
         IntersectSphere(ray, record, spheres[i]);
         
-        if (record.geoId != -1)
+        if (record.geoIndex != -1)
         {
             return 0;
         }
@@ -31,7 +31,7 @@
 
         IntersectTriangle(ray, record, triangles[t]);
 
-        if (record.geoId != -1)
+        if (record.geoIndex != -1)
         {
             return 0;
         }
@@ -63,7 +63,7 @@ float SoftShadow(RayHit hit,
     uint3 id = uint3(i, j, MapIndex);
     float4 map = shadowMap[id.xyz];
 
-    if (dis > map.x && map.y != hit.geoId)
+    if (dis > map.x && map.y != hit.geoIndex)
     {
         return 0;
     }
