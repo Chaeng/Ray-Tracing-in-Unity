@@ -104,7 +104,7 @@ namespace RayTracingRenderer
 
                 RunSetCameraToMainShader(camera);
                 RunSetSkyboxToMainShader(m_config.skybox);
-                RunSetAmbientToMainShader(m_config.ambitent);
+                RunSetAmbientToMainShader(m_config);
                 RunSetShadowMapToMainShader(m_shadowMapList, m_shadowUtilityBuffer);
                 RunSetSpheresToMainShader(m_sphereBuffer, m_sceneParser.GetSpheres().Count);
                 RunSetTrianglesToMainShader(m_triangleBuffer, m_sceneParser.GetTriangles().Count);

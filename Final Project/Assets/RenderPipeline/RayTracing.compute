@@ -29,7 +29,8 @@ SamplerState sampler_SkyboxTexture;
 
 
 // Ambient
-float3 _AmbientGlobal;
+float3 _AmbientLightUpper;
+float3 _AmbientLightLower;
 
 // Camera
 float4x4 _CameraToWorld;
@@ -92,7 +93,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                        
     float3 result = Shade( ray,
                            hit,
-                          _AmbientGlobal,
+                          _AmbientLightUpper,
+                          _AmbientLightLower,
                           _NumOfDirectionalLights,
                           _DirectionalLights,
                           _NumOfPointLights,
