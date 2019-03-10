@@ -6,6 +6,7 @@
 
 struct RTSphere
 {
+    int id;
     float3 center;
     float radius;
 };

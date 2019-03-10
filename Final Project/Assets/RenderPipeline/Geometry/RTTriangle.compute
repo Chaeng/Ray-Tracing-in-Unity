@@ -1,10 +1,14 @@
-﻿#include "../Ray.compute"
+﻿#ifndef RTTRIANGLE_COMPUTE
+#define RTTRIANGLE_COMPUTE
+
+#include "../Ray.compute"
 #include "../RayHit.compute"
 
 static const float Epsilon = 1.19e-07f;
 
 struct RTTriangle
 {
+    int id;
     float3 vertices[3];
     float3 normal;
     float planeD;
@@ -81,3 +85,5 @@ void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri, int GeoInd
         bestHit.normal = tri.normal;
     }
 }
+
+#endif  // RTTRIANGLE_COMPUTE
