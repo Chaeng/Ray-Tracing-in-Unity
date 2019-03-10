@@ -12,7 +12,7 @@ public class RTLight : MonoBehaviour
     public float coneAngle = 45;
 
     [SerializeField, HideInInspector]
-    public float penumbraAngle = 30;
+    public float fullIlluminousAngle = 30;
 
     [HideInInspector] public bool useShadowMap = false;
     
@@ -63,6 +63,7 @@ public class RTLight : MonoBehaviour
             color = color.ToVector3(),
             coneAngle = coneAngle * Mathf.Deg2Rad,
             cosConeAngle = Mathf.Cos(coneAngle * Mathf.Deg2Rad / 2f),
+            cosFullIlluminous = Mathf.Cos(fullIlluminousAngle * Mathf.Deg2Rad / 2f),
             direction = -1 * Vector3.Normalize(transform.forward),
             position = transform.position,
             shadowMap = check

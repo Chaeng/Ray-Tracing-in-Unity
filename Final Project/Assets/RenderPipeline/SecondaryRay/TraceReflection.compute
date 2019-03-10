@@ -1,0 +1,35 @@
+﻿#include "../RTSphere.compute"
+#include "../RayHit.compute"
+
+void TraceReflection(
+                             Ray ray,
+                             inout RayHit bestHit,
+                             int _NumOfSpheres,
+                             StructuredBuffer<RTSphere> sphere)
+                             //int numOfTriangle,
+                             //StructuredBuffer<RTTriangle> triangles)
+{
+    //RayHit bestHit = CreateRayHit();
+    float3 oriToCtr = sphere[0].center - ray.origin;
+    float d = dot(ray.direction, oriToCtr);
+    
+    float discriminant = d * d - dot(-oriToCtr, -oriToCtr) + sphere[0].radius * sphere[0].radius;
+    if(discriminant < 0)
+    {
+        return;
+    }
+
+    // Step 3: Calculate hit distance
+    float disSqrt = sqrt(discriminant);
+    float hitDis = d - disSqrt > 0 ? d - disSqrt : d + disSqrt;     // If d - disSqrt > 0, then d + disSqrt must be greater than d - disSqrt, we take the least positive value; Otherwise, we take d + disSqrt
+
+    // Step 4: Update best hit distance
+    if (hitDis > 0 && hitDis < bestHit.distance)
+    {
+        bestHit.distance = hitDis;
+        bestHit.GeoType = 0;  // 0 represent sphere
+        bestHit.GeoIndex = 0;   //FIXME: Hard code Geo Index
+        bestHit.position = ray.origin + hitDis * ray.direction;
+        bestHit.normal = normalize(bestHit.position - sphere[0].center);
+    }
+}
