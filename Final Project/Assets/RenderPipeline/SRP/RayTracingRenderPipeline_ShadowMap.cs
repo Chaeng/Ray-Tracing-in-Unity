@@ -24,6 +24,7 @@ namespace RayTracingRenderer
             int spotSize = sceneParser.GetSpotLights().Count;
             int triangleCount = sceneParser.GetTriangles().Count;
             List<RTLightStructureSpot_t> spotLights = sceneParser.GetSpotLights();
+            m_shadowUtility = new List<ShadowUtility_t>();
 
             if (spotSize > 0)
             {
