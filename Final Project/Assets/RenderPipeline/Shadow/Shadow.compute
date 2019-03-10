@@ -15,7 +15,7 @@
             continue;
         }
             
-        IntersectSphere(ray, record, spheres[i], i);
+        IntersectSphere(ray, record, spheres[i]);
         
         if (record.GeoType != -1)
         {
@@ -30,7 +30,7 @@
             continue;
         }
 
-        IntersectTriangle(ray, record, triangles[t], t);
+        IntersectTriangle(ray, record, triangles[t]);
 
         if (record.GeoType != -1)
         {
