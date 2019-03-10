@@ -6,6 +6,12 @@ using UnityEngine;
 /// </summary>
 public struct RTSphere_t
 {
+    public int id;
     public Vector3 center;
     public float radius;
+
+    public static int GetSize()
+    {
+        return sizeof(int) + sizeof(float) * 3 + sizeof(float);
+    }
 }
