@@ -8,6 +8,7 @@ struct RTSpotLight
     float3 direction;
     float coneAngle;
     float cosConeAngle;
+    float cosFullIlluminous;
     float3 U;
     float3 W;
     float3 Pref;
