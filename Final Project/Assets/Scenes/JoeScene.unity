@@ -145,6 +145,7 @@ MonoBehaviour:
   color: {r: 1, g: 0, b: 0, a: 1}
   coneAngle: 45
   fullIlluminousAngle: 30
+  penumbraDecay: 1
   useShadowMap: 0
 --- !u!4 &33009527
 Transform:
@@ -455,6 +456,7 @@ MonoBehaviour:
   color: {r: 0.4716981, g: 0.1980242, b: 0.1980242, a: 1}
   coneAngle: 50.3
   fullIlluminousAngle: 30
+  penumbraDecay: 1
   useShadowMap: 0
 --- !u!4 &1094084971
 Transform:
@@ -486,7 +488,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1271824971
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -503,6 +505,7 @@ MonoBehaviour:
   color: {r: 1, g: 1, b: 1, a: 1}
   coneAngle: 45
   fullIlluminousAngle: 30
+  penumbraDecay: 1
   useShadowMap: 0
 --- !u!4 &1271824972
 Transform:
@@ -551,6 +554,7 @@ MonoBehaviour:
   color: {r: 0, g: 1, b: 0.019607844, a: 1}
   coneAngle: 45
   fullIlluminousAngle: 30
+  penumbraDecay: 1
   useShadowMap: 0
 --- !u!4 &1655238580
 Transform:
