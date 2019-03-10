@@ -99,6 +99,11 @@ namespace RayTracingRenderer
             m_mainShader.SetFloat("_GlobalRefractiveIndex", config.globalRefractiveIndex);
         }
 
+        private void RunSetRayGeneration(RenderPipelineConfigObject config)
+        {
+            m_mainShader.SetInt("_MaxRayGeneration", config.maxRayGeneration);
+        }
+
         private void RunSetFogToMainShader(RenderPipelineConfigObject config)
         {
             m_mainShader.SetFloat("_FogFactor", config.fogFactor);

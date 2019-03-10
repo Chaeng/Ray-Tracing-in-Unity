@@ -22,6 +22,8 @@ RWTexture2D<float4> Result;
 
 // Global Settings
 
+int _MaxRayGeneration;
+
 // ShadowDepth Map
 Texture2DArray<float4> _SpotShadowMap;
 StructuredBuffer<RTSpotLight_UW> _ShadowUtility;
@@ -120,14 +122,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                           _FogFactor,
                           _FogColor);
 
-    bool transparentEffect = true;  // Temporary hard code 
-    
-    // hard code
-    int maxHit = 3;
-    
-    if(transparentEffect) {
+    if(_MaxRayGeneration > 1) {
         float3 refl = Transparent(
-                        maxHit,
+                        _MaxRayGeneration,
                         result,
                         ray, 
                         hit, 
@@ -151,7 +148,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _FogColor);
                         
         float3 ref2 = Reflection(
-                        maxHit,
+                        _MaxRayGeneration,
                         result,
                         ray, 
                         hit, 

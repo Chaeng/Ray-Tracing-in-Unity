@@ -107,6 +107,7 @@ namespace RayTracingRenderer
                 RunSetAmbientToMainShader(m_config);
                 RunSetGlobalRefractiveIndex(m_config);
                 RunSetFogToMainShader(m_config);
+                RunSetRayGeneration(m_config);
                 RunSetShadowMapToMainShader(m_shadowMapList, m_shadowUtilityBuffer);
                 RunSetSpheresToMainShader(m_sphereBuffer, m_sceneParser.GetSpheres().Count);
                 RunSetTrianglesToMainShader(m_triangleBuffer, m_sceneParser.GetTriangles().Count);
