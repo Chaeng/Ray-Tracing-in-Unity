@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 621fbee77a3284945900a7b407d04dda, type: 3}
   m_Name: ChaengRenderPIpelineConfig
   m_EditorClassIdentifier: 
-  skybox: {fileID: 0}
-  ambitent: {r: 1, g: 1, b: 1, a: 1}
+  skybox: {fileID: 2800000, guid: 1153dc89e66880c4eb7adc16ba588855, type: 3}
+  upperAmbitent: {r: 0, g: 0, b: 0, a: 1}
+  lowerAmbitent: {r: 0, g: 0, b: 0, a: 1}
   secondaryRayGeneration: 0
   enableShadow: 0
