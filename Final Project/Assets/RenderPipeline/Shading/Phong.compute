@@ -82,12 +82,10 @@ float3 Shade(
             {
                 tempColor = PhongDiffuseShading(L, spotLights[s].color, hit.normal)
                             + PhongSpecularShading(L, spotLights[s].color, ray.direction, hit.normal, 1);
-                
-                bool useDepthMap = true;
 
-                if (useDepthMap)
+                if (spotLights[s].shadowMap == 1)
                 {
-                    visibility = SoftShadow(hit.position, hit.GeoType, hit.GeoIndex, s, spotLights[s], shadowMap, shadowUtility[s]);
+                    visibility = SoftShadow(hit, s, spotLights[s], shadowMap, shadowUtility[s]);
     
                 }
                 else

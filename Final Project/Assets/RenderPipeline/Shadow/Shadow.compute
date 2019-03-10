@@ -42,20 +42,18 @@
 
 }
 
-float SoftShadow(float3 position,
-                 int exceptType,
-                 int exceptIndex,
-                 int spotIndex,
+float SoftShadow(RayHit hit,
+                 int MapIndex,
                  RTSpotLight spot,
                  Texture2DArray<float4> shadowMap,
                  RTSpotLight_UW shadowUtility)
 {
-    float3 ray = position - spot.position;
+    float3 ray = hit.position - spot.position;
     float dis = length(ray);
     ray = normalize(ray);
 
     float cos = dot(ray, -spot.direction);
-    float3 pointP = spot.position + (50 / cos) * ray;
+    float3 pointP = spot.position + (10 / cos) * ray;
 
     float dw = dot(pointP - shadowUtility.Pref, shadowUtility.W);
     float du = dot(pointP - shadowUtility.Pref, shadowUtility.U);
@@ -63,12 +61,12 @@ float SoftShadow(float3 position,
     int i = (int) (du / shadowUtility.PixelSize);
     int j = (int) (dw / shadowUtility.PixelSize);
 
-    uint3 id = uint3(i, j, spotIndex);
+    uint3 id = uint3(i, j, MapIndex);
     float4 map = shadowMap[id.xyz];
 
     if (dis > map.x)
     {
-        if (map.y == exceptType && map.z == exceptIndex)
+        if (map.y == hit.GeoType && map.z == hit.GeoIndex)
         {
             return 1;
         }
