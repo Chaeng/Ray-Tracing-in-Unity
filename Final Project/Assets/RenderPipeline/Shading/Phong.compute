@@ -29,7 +29,8 @@ float3 PhongSpecularShading(float3 lightDir, float3 lightColor, float3 rayDir, f
 float3 Shade(
     inout Ray ray,
     RayHit hit,
-    float3 ambientColor,
+    float3 ambientLightUpper,
+    float3 ambientLightLower,
     int numOfDirLight,
     StructuredBuffer<RTDirectionalLight> dirLights,
     int numOfPointLight,
@@ -48,7 +49,10 @@ float3 Shade(
 
     if (hit.distance < 1.#INF)
     {
-        float3 color = ambientColor;
+        float cosNormalToUp = dot(hit.normal, float3(0, 1, 0));
+        float upperAmbientRatio = cosNormalToUp / 2 + 0.5f;
+        
+        float3 color = (upperAmbientRatio) * ambientLightUpper + (1 - upperAmbientRatio) * ambientLightLower;
         float3 tempColor;
         float visibility;
         
