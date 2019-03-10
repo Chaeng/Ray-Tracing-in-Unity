@@ -27,8 +27,8 @@ void TraceReflection(
     if (hitDis > 0 && hitDis < bestHit.distance)
     {
         bestHit.distance = hitDis;
-        bestHit.GeoType = 0;  // 0 represent sphere
-        bestHit.GeoIndex = 0;   //FIXME: Hard code Geo Index
+        bestHit.geoType = 0;  // 0 represent sphere
+        bestHit.geoIndex = 0;   //FIXME: Hard code Geo Index
         bestHit.position = ray.origin + hitDis * ray.direction;
         bestHit.normal = normalize(bestHit.position - sphere[0].center);
     }

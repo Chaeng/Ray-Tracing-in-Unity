@@ -6,11 +6,12 @@
 
 struct RTSphere
 {
+    int id;
     float3 center;
     float radius;
 };
 
-void IntersectSphere(Ray ray, inout RayHit bestHit, RTSphere sphere, int GeoIndex)
+void IntersectSphere(Ray ray, inout RayHit bestHit, RTSphere sphere)
 {
     // The ray equation in from of (ray.origin) + (distance travelled, d) * (ray.direction) = (the contact point)   Equ(1)
     // The sphere equation in form of [|(contact point) - (center; sphere.xyz)|]^2 = (radius; sphere.w)^2.0f          Equ(2)
@@ -72,10 +73,11 @@ void IntersectSphere(Ray ray, inout RayHit bestHit, RTSphere sphere, int GeoInde
     if (hitDis > 0 && hitDis < bestHit.distance)
     {
         bestHit.distance = hitDis;
-        bestHit.GeoType = 0;  // 0 represent sphere
-        bestHit.GeoIndex = GeoIndex;
+        bestHit.geoIndex = sphere.id;
+        bestHit.geoType = 0;
         bestHit.position = ray.origin + hitDis * ray.direction;
         bestHit.normal = normalize(bestHit.position - sphere.center);
+
     }
 }
 

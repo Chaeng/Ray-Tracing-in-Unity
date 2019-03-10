@@ -88,9 +88,21 @@ namespace RayTracingRenderer
             m_mainShader.SetTexture(kIndex, "_SkyboxTexture", skybox);
         }
 
-        private void RunSetAmbientToMainShader(Color ambient)
+        private void RunSetAmbientToMainShader(RenderPipelineConfigObject config)
         {
-            m_mainShader.SetVector("_AmbientGlobal", ambient);
+            m_mainShader.SetVector("_AmbientLightUpper", config.upperAmbitent);
+            m_mainShader.SetVector("_AmbientLightLower", config.lowerAmbitent);
+        }
+
+        private void RunSetGlobalRefractiveIndex(RenderPipelineConfigObject config)
+        {
+            m_mainShader.SetFloat("_GlobalRefractiveIndex", config.globalRefractiveIndex);
+        }
+
+        private void RunSetFogToMainShader(RenderPipelineConfigObject config)
+        {
+            m_mainShader.SetFloat("_FogFactor", config.fogFactor);
+            m_mainShader.SetVector("_FogColor", config.fogColor);
         }
 
         private void RunSetSpheresToMainShader(ComputeBuffer buffer, int count)

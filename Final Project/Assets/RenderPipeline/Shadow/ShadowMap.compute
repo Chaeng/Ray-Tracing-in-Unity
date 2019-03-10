@@ -29,16 +29,16 @@ float4 computeDepth(float3 lightPosition, float3 pref, float pixelSize, float3 u
 
     for (int i = 0; i < _NumOfSpheres; i++)
     {           
-        IntersectSphere(ray, record, _Spheres[i], i);
+        IntersectSphere(ray, record, _Spheres[i]);
 
     }
 
     for (int t = 0; t < _NumOfTriangles; t++)
     {
-        IntersectTriangle(ray, record, _Triangles[t], t);
+        IntersectTriangle(ray, record, _Triangles[t]);
     }
 
-    float4 result = float4(record.distance, record.GeoType, record.GeoIndex, 0);
+    float4 result = float4(record.distance, record.geoIndex, 0, 0);
     return result;
 }
 

@@ -9,9 +9,12 @@ public struct RTLightStructureSpot_t
     public Vector3 position;
     public Vector3 direction;
     public float coneAngle;
+    public float cosConeAngle;
+    public float cosFullIlluminous;
+    public int enableShadowMap;
 
     public static int GetSize()
     {
-        return sizeof(float) * 3 * 3 + sizeof(float);
+        return sizeof(float) * 3 * 3 + sizeof(float) * 3 + sizeof(int);
     }
 }

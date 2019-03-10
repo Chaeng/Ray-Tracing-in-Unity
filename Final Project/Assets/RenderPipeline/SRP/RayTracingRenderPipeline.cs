@@ -32,7 +32,7 @@ namespace RayTracingRenderer
         
         
         // Constants
-        private const int ShadowMapSize = 64;    // TODO: Get this dimension from RenderConfig
+        private const int ShadowMapSize = 128;    // TODO: Get this dimension from RenderConfig
         
         
         // Own member fields
@@ -97,14 +97,16 @@ namespace RayTracingRenderer
                 RunClearCanvas(camera);
                 RunCommandBufferBegin();
                 
-                RunLoadGeometryToBuffer(ref m_sphereBuffer, ref m_triangleBuffer, m_sceneParser);
+                RunLoadGeometryToBuffer(m_sceneParser);
                 RunLoadLightsToBuffer(ref m_directionalLightBuffer, ref m_pointLightBuffer, ref m_spotLightBuffer, m_sceneParser);
                 
                 RunShadowMap(ref m_shadowMapList, ref m_shadowUtilityBuffer, m_sceneParser, ShadowMapSize, m_sphereBuffer, m_triangleBuffer);
 
                 RunSetCameraToMainShader(camera);
                 RunSetSkyboxToMainShader(m_config.skybox);
-                RunSetAmbientToMainShader(m_config.ambitent);
+                RunSetAmbientToMainShader(m_config);
+                RunSetGlobalRefractiveIndex(m_config);
+                RunSetFogToMainShader(m_config);
                 RunSetShadowMapToMainShader(m_shadowMapList, m_shadowUtilityBuffer);
                 RunSetSpheresToMainShader(m_sphereBuffer, m_sceneParser.GetSpheres().Count);
                 RunSetTrianglesToMainShader(m_triangleBuffer, m_sceneParser.GetTriangles().Count);

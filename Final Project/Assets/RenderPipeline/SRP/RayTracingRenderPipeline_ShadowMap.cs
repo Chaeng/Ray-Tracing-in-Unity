@@ -23,7 +23,9 @@ namespace RayTracingRenderer
             int sphereCount = sceneParser.GetSpheres().Count;
             int spotSize = sceneParser.GetSpotLights().Count;
             int triangleCount = sceneParser.GetTriangles().Count;
-            
+            List<RTLightStructureSpot_t> spotLights = sceneParser.GetSpotLights();
+            m_shadowUtility = new List<ShadowUtility_t>();
+
             if (spotSize > 0)
             {
                 shadowMapList = new Texture2DArray(shadowMapRes, shadowMapRes, spotSize, TextureFormat.RGBAFloat,
@@ -31,7 +33,7 @@ namespace RayTracingRenderer
 
                 for (int i = 0; i < spotSize; i++)
                 {
-                    ShadowMapPass(sceneParser.GetSpotLights()[i], i, shadowMapRes, sphereCount, sphereBuffer, triangleCount,
+                    ShadowMapPass(spotLights[i], i, shadowMapRes, sphereCount, sphereBuffer, triangleCount,
                         triangleBuffer);
                 }
             }
@@ -71,7 +73,7 @@ namespace RayTracingRenderer
             Vector3 lightPosition = spot.position;
             Vector3 direction = spot.direction;
 
-            Vector3 center = lightPosition + (5 * -direction);
+            Vector3 center = lightPosition + (10 * -direction);
             Vector3 up = new Vector3(0, 1, 0);
             if (Mathf.Abs(Vector3.Dot(up, direction)) > 0.99999)
             {
@@ -83,12 +85,13 @@ namespace RayTracingRenderer
             U.Normalize();
             W.Normalize();
 
-            float imageSize = 5 * Mathf.Tan(spot.coneAngle / 2);
+            float imageSize = 10 * Mathf.Tan(spot.coneAngle / 2);
             imageSize = imageSize * 2;
             float pixelSize = imageSize / shadowMapRes;
 
             Vector3 pref = center - U * (imageSize / 2) - W * (imageSize / 2);
-            
+            pref = pref + (pixelSize / 2) * U + (pixelSize / 2) * W;
+
             ShadowUtility_t temp = new ShadowUtility_t();
 
             temp.U = U;

@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Kai.unity
     guid: 4f1cf62a2226267489ed2b25443beff5
+  - enabled: 1
+    path: Assets/Scenes/ChaengScene.unity
+    guid: e00825d80601f90408424859f7cc92e9
   m_configObjects: {}

@@ -1,10 +1,14 @@
-﻿#include "../Ray.compute"
+﻿#ifndef RTTRIANGLE_COMPUTE
+#define RTTRIANGLE_COMPUTE
+
+#include "../Ray.compute"
 #include "../RayHit.compute"
 
 static const float Epsilon = 1.19e-07f;
 
 struct RTTriangle
 {
+    int id;
     float3 vertices[3];
     float3 normal;
     float planeD;
@@ -12,7 +16,7 @@ struct RTTriangle
     int isDoubleSide;
 };
 
-void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri, int GeoIndex)
+void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri)
 {
     // (1) Here we try to intersect the plane equation of the triangle with the ray and see if there is intersect
     // (2) If there is intersection, calculate the Barycentric coordinates
@@ -70,8 +74,9 @@ void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri, int GeoInd
     bestHit.barycentric = float3(areaABQ / tri.area, areaBCQ / tri.area, areaAQC / tri.area);
     bestHit.position = hit;
     bestHit.distance = t;
-    bestHit.GeoIndex = GeoIndex;
-    bestHit.GeoType = 1; // 1 represent triangle
+    bestHit.geoType = 1;
+    bestHit.geoIndex = tri.id;
+
     if(nDotD > 0)
     {
         bestHit.normal = -tri.normal;
@@ -81,3 +86,5 @@ void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri, int GeoInd
         bestHit.normal = tri.normal;
     }
 }
+
+#endif  // RTTRIANGLE_COMPUTE

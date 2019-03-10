@@ -1,4 +1,7 @@
-﻿#include "../Shadow/Shadow.compute"
+﻿#ifndef PHONG_COMPUTE
+#define PHONG_COMPUTE
+
+#include "../Shadow/Shadow.compute"
 
 static const float PI = 3.14159265f;
 
@@ -26,7 +29,8 @@ float3 PhongSpecularShading(float3 lightDir, float3 lightColor, float3 rayDir, f
 float3 Shade(
     inout Ray ray,
     RayHit hit,
-    float3 ambientColor,
+    float3 ambientLightUpper,
+    float3 ambientLightLower,
     int numOfDirLight,
     StructuredBuffer<RTDirectionalLight> dirLights,
     int numOfPointLight,
@@ -40,12 +44,19 @@ float3 Shade(
     int numOfTriangle,
     StructuredBuffer<RTTriangle> triangles,
     Texture2DArray<float4> shadowMap,
-    StructuredBuffer<RTSpotLight_UW> shadowUtility)
+    StructuredBuffer<RTSpotLight_UW> shadowUtility,
+    float fogFactor,
+    float3 fogColor)
 {
+    float3 color = float3(0, 0, 0);
+    float hitDistance = hit.distance;
 
-    if (hit.distance < 1.#INF)
+    if (hitDistance < 1.#INF)
     {
-        float3 color = ambientColor;
+        float cosNormalToUp = dot(hit.normal, float3(0, 1, 0));
+        float upperAmbientRatio = cosNormalToUp / 2 + 0.5f;
+        
+        color = (upperAmbientRatio) * ambientLightUpper + (1 - upperAmbientRatio) * ambientLightLower;
         float3 tempColor;
         float visibility;
         
@@ -55,51 +66,80 @@ float3 Shade(
                          + PhongSpecularShading(dirLights[d].direction, dirLights[d].color, ray.direction, hit.normal, 5);
             
             visibility = HardShadow(hit.position, 0, dirLights[d].direction, dirLights[d].direction, 
-                                              hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
+                                              hit.geoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
             color = color + (tempColor * visibility);
         }
         
-        for(int s = 0; s < numOfPointLight; s++)
+        for(int p = 0; p < numOfPointLight; p++)
         {
-            float3 L = normalize(pointLights[s].position - hit.position);
-            tempColor =   PhongDiffuseShading(L, pointLights[s].color, hit.normal) 
-                        + PhongSpecularShading(L, pointLights[s].color, ray.direction, hit.normal, 5);
+            float3 L = normalize(pointLights[p].position - hit.position);
+            tempColor =   PhongDiffuseShading(L, pointLights[p].color, hit.normal) 
+                        + PhongSpecularShading(L, pointLights[p].color, ray.direction, hit.normal, 5);
             
-            visibility = HardShadow(hit.position, 1, pointLights[s].position, pointLights[s].position,
-                                              hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
+            visibility = HardShadow(hit.position, 1, pointLights[p].position, pointLights[p].position,
+                                              hit.geoIndex, numOfSphere, spheres, numOfTriangle, triangles);
            
             color = color + (tempColor * visibility);
         } 
         
-        for (int x = 0; x < numOfSpotLight; x++)
+        for (int s = 0; s < numOfSpotLight; s++)
         {
-            tempColor = float3(0,1,1); // result of spot light
+            float3 L = normalize(spotLights[s].position - hit.position);
+            float cosLtoLightDir = dot(-1 * L, -1 * spotLights[s].direction);
+            float intensity = 0;
             
-            bool useDepthMap = true;
 
-            if (useDepthMap)
+            //TODO: Optimize by get rid of conditional statement
+            if(cosLtoLightDir >= spotLights[s].cosFullIlluminous)
             {
-                visibility = SoftShadow(hit.position, hit.GeoType, hit.GeoIndex, x, spotLights[x], shadowMap, shadowUtility[x]);
-
+                // Full illumination
+                intensity = 1;
             }
-            else
+            else if(cosLtoLightDir >= spotLights[s].cosConeAngle)
             {
-                visibility = HardShadow(hit.position, 2, spotLights[x].position, spotLights[x].direction,
-                                              hit.GeoType, hit.GeoIndex, numOfSphere, spheres, numOfTriangle, triangles);
+                // Penumbra
+                intensity = (cosLtoLightDir - spotLights[s].cosConeAngle) / (spotLights[s].cosFullIlluminous - spotLights[s].cosConeAngle);
             }
-           
-            color = color + (tempColor * visibility);
-        }
         
-        return color;
+            if(intensity > 0)
+            {
+                tempColor = intensity * (PhongDiffuseShading(L, spotLights[s].color, hit.normal)
+                            + PhongSpecularShading(L, spotLights[s].color, ray.direction, hit.normal, 1)
+                            );
+                
+                // check is shadow map is trued on
+                if (spotLights[s].enableShadowMap == 1)
+                {
+                    visibility = SoftShadow(hit, s, spotLights[s], shadowMap, shadowUtility[s]);
+    
+                }
+                else
+                {
+                    visibility = HardShadow(hit.position, 2, spotLights[s].position, spotLights[s].direction,
+                                                  hit.geoIndex, numOfSphere, spheres, numOfTriangle, triangles);
+                }
+                
+                color = color + (tempColor * visibility);
+            }
+        }
     }
     else
     {
         // Sample the skybox and write it
         float theta = acos(ray.direction.y) / -PI;
         float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
-        return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
+        color = skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
+        
+        hitDistance = 1000;   // TODO: Allow config to set the skybox distance for fog calculation
     }
+    
+    float visInFogRatio = 1 / (exp(hitDistance * fogFactor));
+    
+    color = (1 - visInFogRatio) * fogColor + (visInFogRatio) * color;
+    
+    return color;
 }
+
+#endif // PHONG_COMPUTE
 
 

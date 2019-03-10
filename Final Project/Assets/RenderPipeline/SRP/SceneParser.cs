@@ -54,13 +54,15 @@ namespace RayTracingRenderer
         {
             GameObject[] roots = scene.GetRootGameObjects();
 
+            int count = 0;
+
             ParseLight(roots);
-            ParseSphere(roots);
-            ParseTriangle(roots);
+            ParseSphere(roots, ref count);
+            ParseTriangle(roots,ref count);
         }
 
-        private void ParseSphere(GameObject[] roots)
-        {
+        private void ParseSphere(GameObject[] roots, ref int counter)
+        {   
             // TODO: Optimize dynamic array generation
             m_sphereGeom.Clear();
 
@@ -72,13 +74,16 @@ namespace RayTracingRenderer
                 {
                     if (renderer.gameObject.activeSelf)
                     {
-                        m_sphereGeom.Add(renderer.GetGeometry());
+                        RTSphere_t sphereGeomT = renderer.GetGeometry();
+                        sphereGeomT.id = counter;
+                        counter++;
+                        m_sphereGeom.Add(sphereGeomT);
                     }
                 }
             }
         }
 
-        private void ParseTriangle(GameObject[] roots)
+        private void ParseTriangle(GameObject[] roots, ref int counter)
         {
             // TODO: Optimize dynamic array generation
             if (m_triangleGeom == null)
@@ -96,7 +101,10 @@ namespace RayTracingRenderer
                 {
                     if (renderer.gameObject.activeSelf)
                     {
-                        m_triangleGeom.Add(renderer.GetGeometry());
+                        RTTriangle_t triangleGeomT = renderer.GetGeometry();
+                        triangleGeomT.id = counter;
+                        counter++;
+                        m_triangleGeom.Add(triangleGeomT);
                     }
                 }
             }
@@ -113,7 +121,7 @@ namespace RayTracingRenderer
 
             foreach (var root in roots)
             {
-                Light[] lights = root.GetComponentsInChildren<Light>();
+                RTLight[] lights = root.GetComponentsInChildren<RTLight>();
 
                 foreach (var light in lights)
                 {
@@ -122,39 +130,25 @@ namespace RayTracingRenderer
                         continue;
                     }
 
-                    switch (light.type)
+                    switch (light.GetLightType())
                     {
-                        case LightType.Directional:
+                        case RTLight.LightType.Directional:
                         {
-                            Color lightColor = light.color;
-
-                            RTLightStructureDirectional_t directional = new RTLightStructureDirectional_t();
-                            directional.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
-                            directional.direction = -1 * Vector3.Normalize(light.transform.forward);
+                            RTLightStructureDirectional_t directional = light.GetDirectionalLight();
                             m_directionalLights.Add(directional);
                         }
                             break;
 
-                        case LightType.Point:
+                        case RTLight.LightType.Point:
                         {
-                            Color lightColor = light.color;
-
-                            RTLightStructurePoint_t point = new RTLightStructurePoint_t();
-                            point.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
-                            point.position = light.transform.position;
+                            RTLightStructurePoint_t point = light.GetPointLight();
                             m_pointLights.Add(point);
                         }
                             break;
 
-                        case LightType.Spot:
+                        case RTLight.LightType.Spot:
                         {
-                            Color lightColor = light.color;
-
-                            RTLightStructureSpot_t spot = new RTLightStructureSpot_t();
-                            spot.color = new Vector3(lightColor.r, lightColor.g, lightColor.b);
-                            spot.position = light.transform.position;
-                            spot.direction = -1 * Vector3.Normalize(light.transform.forward);
-                            spot.coneAngle = light.spotAngle * (Mathf.PI / 180);
+                            RTLightStructureSpot_t spot = light.GetSpotLight();
                             m_spotLights.Add(spot);
                         }
                             break;
