@@ -15,11 +15,10 @@ public class RTMaterialDatabase : MonoBehaviour
     /// This returns material type struct for renderer
     /// </summary>
     /// <returns>material type struct</returns>
-    public RTMaterial[] Materials
+    public List<RTMaterial> GetMaterials()
     {
-        get
-        {
-            return m_materials;
-        }
+        return m_materials == null
+            ? null
+            : new List<RTMaterial>(m_materials);
     }
 }

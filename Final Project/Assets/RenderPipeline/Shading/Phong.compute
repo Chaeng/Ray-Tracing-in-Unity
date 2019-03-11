@@ -46,10 +46,24 @@ float3 Shade(
     Texture2DArray<float4> shadowMap,
     StructuredBuffer<RTSpotLight_UW> shadowUtility,
     float fogFactor,
-    float3 fogColor)
+    float3 fogColor,
+    int numOfMaterials,
+    StructuredBuffer<RTMaterial> materials)
 {
     float3 color = float3(0, 0, 0);
     float hitDistance = hit.distance;
+
+    // Example of how to retrieve material info
+    // TODO - Move into utility func
+    float shininess;
+    if (hit.matIndex >= 0 && hit.matIndex < numOfMaterials)
+    {
+        shininess = materials[hit.matIndex].n;
+    }
+    else
+    {
+        shininess = 5;  // default value
+    }
 
     if (hitDistance < 1.#INF)
     {
@@ -62,8 +76,9 @@ float3 Shade(
         
         for(int d = 0; d < numOfDirLight; d++)
         {
+
             tempColor  =   PhongDiffuseShading(dirLights[d].direction, dirLights[d].color, hit.normal) 
-                         + PhongSpecularShading(dirLights[d].direction, dirLights[d].color, ray.direction, hit.normal, 5);
+                         + PhongSpecularShading(dirLights[d].direction, dirLights[d].color, ray.direction, hit.normal, shininess);
             
             visibility = HardShadow(hit.position, 0, dirLights[d].direction, dirLights[d].direction, 
                                               hit.geoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
@@ -74,7 +89,7 @@ float3 Shade(
         {
             float3 L = normalize(pointLights[p].position - hit.position);
             tempColor =   PhongDiffuseShading(L, pointLights[p].color, hit.normal) 
-                        + PhongSpecularShading(L, pointLights[p].color, ray.direction, hit.normal, 5);
+                        + PhongSpecularShading(L, pointLights[p].color, ray.direction, hit.normal, shininess);
             
             visibility = HardShadow(hit.position, 1, pointLights[p].position, pointLights[p].position,
                                               hit.geoIndex, numOfSphere, spheres, numOfTriangle, triangles);
@@ -104,7 +119,7 @@ float3 Shade(
             if(intensity > 0)
             {
                 tempColor = intensity * (PhongDiffuseShading(L, spotLights[s].color, hit.normal)
-                            + PhongSpecularShading(L, spotLights[s].color, ray.direction, hit.normal, 1)
+                            + PhongSpecularShading(L, spotLights[s].color, ray.direction, hit.normal, shininess)
                             );
                 
                 // check is shadow map is trued on

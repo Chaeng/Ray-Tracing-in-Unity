@@ -1,0 +1,26 @@
+﻿#ifndef RTMATERIAL_COMPUTE
+#define RTMATERIAL_COMPUTE
+
+struct RTMaterial
+{
+    int id;
+
+    // classic Ambient, Diffuse, Specular
+    float3 ka;
+    float3 ks;
+    float3 kd;
+    float3 n;
+
+    // support for transparency and refractiveIndex
+    float transparency;
+    float refractiveIndex; 
+
+    // support for reflection
+    float reflectivity;
+    
+    // support for normal and positional map
+    float3 normal;
+    float3 position;
+};
+
+#endif  // RTMATERIAL_COMPUTE

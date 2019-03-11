@@ -31,6 +31,11 @@ public class RTSphereRenderer : RTRenderer
         }
     }
 
+    public RTSphere GetSphere()
+    {
+        return mySphere;
+    }
+
     /// <summary>
     /// Get RTSphere_t geometry for attached RTSphere component
     /// </summary>

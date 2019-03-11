@@ -25,7 +25,9 @@ float3 Transparent(
     Texture2DArray<float4> shadowMap,
     StructuredBuffer<RTSpotLight_UW> shadowUtility,
     float fogFactor,
-    float3 fogColor)
+    float3 fogColor,
+    int numOfMaterials,
+    StructuredBuffer<RTMaterial> materials)
 {
     if (hit.distance < 1.#INF)
     {         
@@ -169,7 +171,9 @@ float3 Transparent(
                                 shadowMap,
                                 shadowUtility,
                                 fogFactor,
-                                fogColor);
+                                fogColor,
+                                numOfMaterials,
+                                materials);
                  colorArr[0] += color;
                  return colorArr[0] + ((1.0003/refIndex) * colorArr[1]);
                 
@@ -237,7 +241,9 @@ float3 Transparent(
                                 shadowMap,
                                 shadowUtility,
                                 fogFactor,
-                                fogColor);
+                                fogColor,
+                                numOfMaterials,
+                                materials);
                      colorArr[i] += color; 
                      --i;
                  }               
@@ -313,7 +319,9 @@ float3 Transparent(
                                 shadowMap,
                                 shadowUtility,
                                 fogFactor,
-                                fogColor);
+                                fogColor,
+                                numOfMaterials,
+                                materials);
                      colorArr[i] += color; 
                      --i;
                  }               
@@ -390,7 +398,9 @@ float3 Transparent(
                                 shadowMap,
                                 shadowUtility,
                                 fogFactor,
-                                fogColor);
+                                fogColor,
+                                numOfMaterials,
+                                materials);
                      colorArr[i] += color; 
                      --i;
                  }               

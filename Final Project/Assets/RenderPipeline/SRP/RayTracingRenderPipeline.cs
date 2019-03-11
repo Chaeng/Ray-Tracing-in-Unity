@@ -43,6 +43,7 @@ namespace RayTracingRenderer
         private ComputeBuffer m_sphereBuffer;
         private ComputeBuffer m_spotLightBuffer;
         private ComputeBuffer m_triangleBuffer;
+        private ComputeBuffer m_materialBuffer;
         private RenderPipelineConfigObject m_config;
         private RenderTexture m_shadowMap;
         private RenderTexture m_target;
@@ -111,6 +112,7 @@ namespace RayTracingRenderer
                 RunSetShadowMapToMainShader(m_shadowMapList, m_shadowUtilityBuffer);
                 RunSetSpheresToMainShader(m_sphereBuffer, m_sceneParser.GetSpheres().Count);
                 RunSetTrianglesToMainShader(m_triangleBuffer, m_sceneParser.GetTriangles().Count);
+                RunSetMaterialsToMainShader(m_materialBuffer, m_sceneParser.GetMaterials().Count);
                 RunSetDirectionalLightsToMainShader(m_directionalLightBuffer, m_sceneParser.GetDirectionalLights().Count);
                 RunSetPointLightsToMainShader(m_pointLightBuffer, m_sceneParser.GetPointLights().Count);
                 RunSetSpotLightsToMainShader(m_spotLightBuffer, m_sceneParser.GetSpotLights().Count);
