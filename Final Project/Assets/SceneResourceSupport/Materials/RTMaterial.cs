@@ -8,7 +8,7 @@ public class RTMaterial : MonoBehaviour
     
     // classic Ambient, Diffuse, Specular
     [SerializeField] private Vector3 m_ka, m_ks, m_kd;
-    [SerializeField] private Vector3 m_n;
+    [SerializeField] private float m_n;
 
     // support for transparency and refractiveIndex
     [SerializeField] private float m_transparency;

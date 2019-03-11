@@ -54,16 +54,9 @@ float3 Shade(
     float hitDistance = hit.distance;
 
     // Example of how to retrieve material info
-    // TODO - Move into utility func
-    float shininess;
-    if (hit.matIndex >= 0 && hit.matIndex < numOfMaterials)
-    {
-        shininess = materials[hit.matIndex].n;
-    }
-    else
-    {
-        shininess = 5;  // default value
-    }
+    RTMaterial mat = GetIndexedMaterial(hit.matIndex,
+        numOfMaterials, materials);
+    float shininess = mat.n;
 
     if (hitDistance < 1.#INF)
     {

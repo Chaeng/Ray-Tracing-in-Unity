@@ -9,7 +9,7 @@ struct RTMaterial
     float3 ka;
     float3 ks;
     float3 kd;
-    float3 n;
+    float n;
 
     // support for transparency and refractiveIndex
     float transparency;
@@ -22,5 +22,23 @@ struct RTMaterial
     float3 normal;
     float3 position;
 };
+
+RTMaterial GetIndexedMaterial(int index,
+    int numOfMaterials,
+    StructuredBuffer<RTMaterial> materials)
+{
+    RTMaterial mat;
+
+    // If index valid, then retrieve material
+    // Otherwise, return default material
+    if (index >= 0 && index < numOfMaterials)
+    {
+        mat = materials[index];
+    }
+
+    // TODO: Specify properties for default material
+
+    return mat;
+}
 
 #endif  // RTMATERIAL_COMPUTE

@@ -8,7 +8,7 @@ public struct RTMaterial_t
 
     // classic Ambient, Diffuse, Specular
     public Vector3 ka, ks, kd;
-    public Vector3 n;
+    public float n;
 
     // support for transparency and refractiveIndex
     public float transparency;
@@ -23,7 +23,7 @@ public struct RTMaterial_t
     public static int GetSize()
     {
         return sizeof(int)
-            + Vector3Extension.SizeOf() * 6
-            + sizeof(float) * 3;
+            + Vector3Extension.SizeOf() * 5
+            + sizeof(float) * 4;
     }
 }
