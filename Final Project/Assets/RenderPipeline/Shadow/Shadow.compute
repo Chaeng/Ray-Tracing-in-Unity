@@ -41,12 +41,70 @@
 
 }
 
+float ShadowFilter(int mFilterRes,
+                    int mResolution,
+                    int exceptIndex,
+                    float dis,
+                    uint3 id,
+                    Texture2DArray<float4> shadowMap)
+{
+
+    int i = id.x;
+    int j = id.y;
+
+    float len = 1 + 2 * mFilterRes;
+    float count = 0;
+
+    float block = 0;
+    for (int a = i - mFilterRes; a <= i + mFilterRes; a++)
+    {
+        if (a < 0) // out of boundry
+        {
+            a = 0;
+        }
+        if (a > (mResolution - 1))
+        {
+            break;
+        }
+
+        for (int b = j - mFilterRes; b <= j + mFilterRes; b++)
+        {
+            if (b < 0)
+            {
+                b = 0;
+            }
+
+            if (b > mResolution - 1)
+            {
+                break;
+            }
+
+            id.x = a;
+            id.y = b;
+            float4 map = shadowMap[id.xyz];
+
+            if (dis > map.x && map.y != exceptIndex)
+            {
+                block++;
+                count++;
+            }
+            else
+            {
+                count++;
+            }
+        }
+    }
+    float res = block / count;
+    return 1 - res;
+}
+
 float SoftShadow(RayHit hit,
                  int MapIndex,
                  RTSpotLight spot,
                  Texture2DArray<float4> shadowMap,
                  RTSpotLight_UW shadowUtility)
 {
+    float result;
     float3 ray = hit.position - spot.position;
     float dis = length(ray);
     ray = normalize(ray);
@@ -61,14 +119,26 @@ float SoftShadow(RayHit hit,
     int j = (int) (dw / shadowUtility.PixelSize);
 
     uint3 id = uint3(i, j, MapIndex);
+
+    if (spot.ShadowFilterRes > 0)
+    {
+        result = ShadowFilter(spot.ShadowFilterRes, shadowUtility.mapRes, hit.geoIndex, dis, id, shadowMap);
+        return result;
+    }
+
+    // not use ShadowFilter
     float4 map = shadowMap[id.xyz];
 
     if (dis > map.x && map.y != hit.geoIndex)
     {
-        return 0;
+        result = 0;
+    }
+    else
+    {
+        result = 1;
     }
 
-    return 1;
+    return result;
 }
 
 // position: visible point position

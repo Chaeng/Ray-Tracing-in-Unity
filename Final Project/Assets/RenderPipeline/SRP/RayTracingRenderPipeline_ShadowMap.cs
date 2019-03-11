@@ -98,6 +98,7 @@ namespace RayTracingRenderer
             temp.W = W;
             temp.Pref = pref;
             temp.PixelSize = pixelSize;
+            temp.mapRes = shadowMapRes;
             m_shadowUtility.Add(temp);
 
             int kIndex = m_shadowMapShader.FindKernel("ShadowMap");
