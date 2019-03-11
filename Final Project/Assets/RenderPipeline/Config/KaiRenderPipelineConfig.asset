@@ -18,5 +18,5 @@ MonoBehaviour:
   globalRefractiveIndex: 1
   maxRayGeneration: 1
   enableShadow: 0
-  fogColor: {r: 1, g: 1, b: 1, a: 1}
+  fogColor: {r: 0, g: 0, b: 0, a: 1}
   fogFactor: 0
