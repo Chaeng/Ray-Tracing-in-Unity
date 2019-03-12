@@ -54,8 +54,9 @@ float3 Shade(
     float hitDistance = hit.distance;
 
     // Example of how to retrieve material info
-    RTMaterial mat = GetIndexedMaterial(hit.matIndex,
-        numOfMaterials, materials);
+    RTMaterial mat = GetIndexedMaterial(materials,
+        numOfMaterials,
+        hit.matIndex);
     float shininess = mat.n;
 
     if (hitDistance < 1.#INF)

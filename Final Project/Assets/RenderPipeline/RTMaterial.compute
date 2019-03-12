@@ -23,20 +23,54 @@ struct RTMaterial
     float3 position;
 };
 
-RTMaterial GetIndexedMaterial(int index,
+RTMaterial GetIndexedMaterial(StructuredBuffer<RTMaterial> materials,
     int numOfMaterials,
-    StructuredBuffer<RTMaterial> materials)
+    int index)
 {
     RTMaterial mat;
 
     // If index valid, then retrieve material
-    // Otherwise, return default material
     if (index >= 0 && index < numOfMaterials)
     {
         mat = materials[index];
     }
+    // Otherwise, return default material
+    // TODO: Specify custom values for default material
+    else
+    {
+        mat.id = -1;
 
-    // TODO: Specify properties for default material
+        // classic Ambient, Diffuse, Specular
+        mat.ka.x = 0.0f;
+        mat.ka.y = 0.0f;
+        mat.ka.z = 0.0f;
+
+        mat.ks.x = 0.0f;
+        mat.ks.y = 0.0f;
+        mat.ks.z = 0.0f;
+
+        mat.kd.x = 0.0f;
+        mat.kd.y = 0.0f;
+        mat.kd.z = 0.0f;
+
+        mat.n = 1.0f;
+
+        // support for transparency and refractiveIndex
+        mat.transparency = 0.0f;
+        mat.refractiveIndex = 0.0f;
+
+        // support for reflection
+        mat.reflectivity = 0.0f;
+
+        // support for normal and positional map
+        mat.normal.x = 0.0f;
+        mat.normal.y = 0.0f;
+        mat.normal.z = 0.0f;
+
+        mat.position.x = 0.0f;
+        mat.position.y = 0.0f;
+        mat.position.z = 0.0f;
+    }
 
     return mat;
 }
