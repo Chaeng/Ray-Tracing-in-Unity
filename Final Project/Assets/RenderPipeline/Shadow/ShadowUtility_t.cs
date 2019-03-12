@@ -11,9 +11,10 @@ public struct ShadowUtility_t
     public Vector3 W;
     public Vector3 Pref;
     public float PixelSize;
+    public int mapRes;
 
     public static int GetSize()
     {
-        return sizeof(float) * 3 * 3 + sizeof(float);
+        return sizeof(float) * 3 * 3 + sizeof(float) + sizeof(int);
     }
 };
