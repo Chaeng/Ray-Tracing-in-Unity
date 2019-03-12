@@ -104,7 +104,7 @@ float SoftShadow(RayHit hit,
                  Texture2DArray<float4> shadowMap,
                  RTSpotLight_UW shadowUtility)
 {
-    float result;
+    float result = 0;
     float3 ray = hit.position - spot.position;
     float dis = length(ray);
     ray = normalize(ray);
@@ -162,7 +162,7 @@ float HardShadow( float3 position,
                   StructuredBuffer<RTTriangle> triangles)
 {
     Ray ray;
-    float result;
+    float result = 1;
 
     if (lightType == 0) // directional light
     {
@@ -180,6 +180,53 @@ float HardShadow( float3 position,
         
     }
 
-    result = ShadowRayCast(ray, ExceptIndex, numOfSphere, spheres, numOfTriangle, triangles);
+   // result = ShadowRayCast(ray, ExceptIndex, numOfSphere, spheres, numOfTriangle, triangles);
+
+    RayHit record = CreateRayHit();
+
+    for (int i = 0; i < numOfSphere; i++)
+    {
+        if (spheres[i].id == ExceptIndex)
+        {
+            continue;
+        }
+            
+        IntersectSphere(ray, record, spheres[i]);
+        
+        if (record.geoIndex != -1)
+        {
+            result = 0;
+        }
+    }
+
+    for (int t = 0; t < numOfTriangle; t++)
+    {
+        if (triangles[t].id == ExceptIndex)
+        {
+            continue;
+        }
+
+        IntersectTriangle(ray, record, triangles[t]);
+
+        if (record.geoIndex != -1)
+        {
+            result = 0;
+        }
+    }
+
+    if (result == 0 && lightType != 0)
+    {
+        float3 shadowDisVector = position - record.position;
+        float shadowDis = length(shadowDisVector);
+
+        float3 lightDisVector = position - lightPosition;
+        float lightDis = length(lightDisVector);
+        
+        if (shadowDis >= lightDis)
+        {
+            result = 1;
+        }
+    }
+
     return result;
 }
