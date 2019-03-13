@@ -19,4 +19,9 @@ public struct RTTriangle_t
     {
         return sizeof(int) + sizeof(float) * 14 + sizeof(int);    // (vertices: 3 * 3 = 9) + (normal: 3) + (planeD: 1) + (area: 1)
     }
+
+    public void SetId(int idInput)
+    {
+        id = idInput;
+    }
 }
