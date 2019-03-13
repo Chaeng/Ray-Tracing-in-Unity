@@ -12,7 +12,7 @@ namespace RayTracingRenderer
         private List<RTLightStructureDirectional_t> m_directionalLights;
         private List<RTLightStructurePoint_t> m_pointLights;
         private List<RTLightStructureSpot_t> m_spotLights;
-        
+
         public SceneParser()
         {
             m_sphereGeom = new List<RTSphere_t>();
@@ -28,28 +28,28 @@ namespace RayTracingRenderer
         {
             return m_sphereGeom;
         }
-        
+
         public List<RTTriangle_t> GetTriangles()
         {
             return m_triangleGeom;
         }
-        
+
         public List<RTLightStructureDirectional_t> GetDirectionalLights()
         {
             return m_directionalLights;
         }
-        
+
         public List<RTLightStructurePoint_t> GetPointLights()
         {
             return m_pointLights;
         }
-        
+
         public List<RTLightStructureSpot_t> GetSpotLights()
         {
             return m_spotLights;
         }
-        
-        
+
+
         public void ParseScene(Scene scene)
         {
             GameObject[] roots = scene.GetRootGameObjects();
@@ -58,11 +58,12 @@ namespace RayTracingRenderer
 
             ParseLight(roots);
             ParseSphere(roots, ref count);
-            ParseTriangle(roots,ref count);
+            ParseTriangle(roots, ref count);
+            ParseMesh(roots, ref count);
         }
 
         private void ParseSphere(GameObject[] roots, ref int counter)
-        {   
+        {
             // TODO: Optimize dynamic array generation
             m_sphereGeom.Clear();
 
@@ -111,6 +112,41 @@ namespace RayTracingRenderer
         }
 
 
+        private void ParseMesh(GameObject[] roots, ref int counter)
+        {
+            // TODO: Optimize dynamic array generation
+            if (m_triangleGeom == null)
+            {
+                m_triangleGeom = new List<RTTriangle_t>();
+            }
+
+            foreach (var root in roots)
+            {
+                RTMeshRenderer[] meshRenderers = root.GetComponentsInChildren<RTMeshRenderer>();
+
+                foreach (var renderer in meshRenderers)
+                {
+                    if (renderer.gameObject.activeSelf)
+                    {
+                        List<RTTriangle_t> allTrianglesInMesh = renderer.GetGeometry();
+
+                        if(allTrianglesInMesh == null)
+                        {
+                            continue;
+                        }
+
+                        for(int t = 0; t < allTrianglesInMesh.Count; t++)
+                        {
+                            allTrianglesInMesh[t].SetId(counter);
+                            counter++;
+                            m_triangleGeom.Add(allTrianglesInMesh[t]);
+                        }
+                    }
+                }
+            }
+        }
+
+
         private void ParseLight(GameObject[] roots)
         {
             m_directionalLights.Clear();
@@ -133,24 +169,24 @@ namespace RayTracingRenderer
                     switch (light.GetLightType())
                     {
                         case RTLight.LightType.Directional:
-                        {
-                            RTLightStructureDirectional_t directional = light.GetDirectionalLight();
-                            m_directionalLights.Add(directional);
-                        }
+                            {
+                                RTLightStructureDirectional_t directional = light.GetDirectionalLight();
+                                m_directionalLights.Add(directional);
+                            }
                             break;
 
                         case RTLight.LightType.Point:
-                        {
-                            RTLightStructurePoint_t point = light.GetPointLight();
-                            m_pointLights.Add(point);
-                        }
+                            {
+                                RTLightStructurePoint_t point = light.GetPointLight();
+                                m_pointLights.Add(point);
+                            }
                             break;
 
                         case RTLight.LightType.Spot:
-                        {
-                            RTLightStructureSpot_t spot = light.GetSpotLight();
-                            m_spotLights.Add(spot);
-                        }
+                            {
+                                RTLightStructureSpot_t spot = light.GetSpotLight();
+                                m_spotLights.Add(spot);
+                            }
                             break;
                     }
                 }
