@@ -15,11 +15,12 @@ public struct RTTriangle_t
     public float area;
     public int isDoubleSide;
     public int materialIndex;
+    public int textureIndex;
     
     public static int GetSize()
     {
         return Vector3Extension.SizeOf() * 4
-            + sizeof(int) * 3
+            + sizeof(int) * 4
             + sizeof(float) * 2;
     }
 }

@@ -8,6 +8,7 @@
 #include "RTSphere.compute"
 #include "Geometry/RTTriangle.compute"
 #include "RTMaterial.compute"
+#include "RTTexture.compute"
 #include "Shading/Phong.compute"
 #include "SecondaryRay/TraceReflection.compute"
 #include "SecondaryRay/Reflection.compute"
@@ -66,6 +67,10 @@ StructuredBuffer<RTTriangle> _Triangles;
 // material
 int _NumOfMaterials;
 StructuredBuffer<RTMaterial> _Materials;
+
+// material
+int _NumOfTextures;
+StructuredBuffer<RTTexture> _Textures;
 
 
 Ray CreateCameraRay(float2 uv)

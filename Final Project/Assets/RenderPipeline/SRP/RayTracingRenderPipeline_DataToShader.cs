@@ -11,6 +11,7 @@ namespace RayTracingRenderer
             LoadBufferWithSpheres(sceneParser);
             LoadBufferWithTriangles(sceneParser);
             LoadBufferWithMaterials(sceneParser);
+            LoadBufferWithTextures(sceneParser);
         }
 
 
@@ -77,6 +78,23 @@ namespace RayTracingRenderer
             }
         }
 
+        private void LoadBufferWithTextures(SceneParser sceneParser)
+        {
+            int count = sceneParser.GetTextures().Count;
+            
+            m_textureBuffer?.Release();
+            
+            if (count > 0)
+            {
+                m_textureBuffer = new ComputeBuffer(count, RTTexture_t.GetSize());
+                m_textureBuffer.SetData(sceneParser.GetTextures());
+            }
+            else
+            {
+                m_textureBuffer = new ComputeBuffer(1, RTTexture_t.GetSize());
+            }
+        }
+
         private void LoadBufferWithDirectionalLights(ref ComputeBuffer buffer, SceneParser sceneParser)
         {
             int count = sceneParser.GetDirectionalLights().Count;
@@ -127,6 +145,7 @@ namespace RayTracingRenderer
             m_sphereBuffer.Release();
             m_triangleBuffer.Release();
             m_materialBuffer.Release();
+            m_textureBuffer.Release();
             m_directionalLightBuffer.Release();
             m_pointLightBuffer.Release();
             m_spotLightBuffer.Release();

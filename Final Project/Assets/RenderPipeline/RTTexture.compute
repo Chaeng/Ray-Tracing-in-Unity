@@ -1,0 +1,48 @@
+﻿#ifndef RTTEXTURE_COMPUTE
+#define RTTEXTURE_COMPUTE
+
+struct RTTexture
+{
+    int id;
+
+    // support for checker
+    int isChecker;
+    int uRepeat;
+    int vRepeat;
+    float3 color1;
+    float3 color2;
+};
+
+RTTexture GetIndexedTexture(StructuredBuffer<RTTexture> textures,
+    int numOfTextures,
+    int index)
+{
+    RTTexture tex;
+
+    // If index valid, then retrieve texture
+    if (index >= 0 && index < numOfTextures)
+    {
+        tex = textures[index];
+    }
+    // Otherwise, return default texture
+    // TODO: Specify custom values for default texture
+    else
+    {
+        tex.id = -1;
+
+        // support for checker
+        tex.isChecker = 0;
+        tex.uRepeat = 2;
+        tex.vRepeat = 2;
+        tex.color1.x = 0.0f;
+        tex.color1.y = 0.0f;
+        tex.color1.z = 0.0f;
+        tex.color2.x = 1.0f;
+        tex.color2.y = 1.0f;
+        tex.color2.z = 1.0f;
+    }
+
+    return tex;
+}
+
+#endif // RTTEXTURE_COMPUTE

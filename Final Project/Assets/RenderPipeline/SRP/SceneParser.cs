@@ -10,6 +10,7 @@ namespace RayTracingRenderer
         private List<RTSphere_t> m_sphereGeom;
         private List<RTTriangle_t> m_triangleGeom;
         private List<RTMaterial_t> m_materials;
+        private List<RTTexture_t> m_textures;
         private List<RTLightStructureDirectional_t> m_directionalLights;
         private List<RTLightStructurePoint_t> m_pointLights;
         private List<RTLightStructureSpot_t> m_spotLights;
@@ -40,6 +41,11 @@ namespace RayTracingRenderer
             return m_materials;
         }
         
+        public List<RTTexture_t> GetTextures()
+        {
+            return m_textures;
+        }
+        
         public List<RTLightStructureDirectional_t> GetDirectionalLights()
         {
             return m_directionalLights;
@@ -64,6 +70,7 @@ namespace RayTracingRenderer
 
             ParseLight(roots);
             ParseMaterial(roots);
+            ParseTexture(roots);
             ParseSphere(roots, ref count);
             ParseTriangle(roots,ref count);
         }
@@ -161,6 +168,73 @@ namespace RayTracingRenderer
             }
         }
 
+        private void ParseTexture(GameObject[] roots)
+        {
+            int count = 0;
+
+             // TODO: Optimize dynamic array generation
+            if (m_textures == null)
+            {
+                m_textures = new List<RTTexture_t>();
+            }
+
+            m_textures.Clear();
+
+            foreach (var root in roots)
+            {
+                RTTextureDatabase[] textureDatabases 
+                    = root.GetComponentsInChildren<RTTextureDatabase>();
+
+                 foreach (var database in textureDatabases)
+                {
+                    if (database.gameObject.activeSelf)
+                    {
+                        if (database.GetTextures() == null)
+                        {
+                            continue;
+                        }
+
+                         foreach (var tex in database.GetTextures())
+                        {
+                            string name = tex.GetName();
+                            // SetMaterialIndexSpheres(roots, name, count);
+                            SetTextureIndexTriangles(roots, name, count);
+
+                            RTTexture_t texStructure = tex.GetTexture();
+                            texStructure.id = count++;
+                            m_textures.Add(texStructure);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SetTextureIndexTriangles(GameObject[] roots,
+            string name, int index)
+        {
+            foreach (var root in roots)
+            {
+                RTTriangleRenderer[] triangleRenderers 
+                    = root.GetComponentsInChildren<RTTriangleRenderer>();
+
+                 foreach (var renderer in triangleRenderers)
+                {
+                    if (renderer.gameObject.activeSelf)
+                    {
+                        string triangleTextureName
+                            = renderer.GetTriangle().GetTextureName();
+                        if (triangleTextureName != null)
+                        {
+                            if(triangleTextureName == name)
+                            {
+                                renderer.GetTriangle().SetTextureIndex(index);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private void ParseSphere(GameObject[] roots, ref int counter)
         {   
             // Force initialization of dependencies
@@ -194,6 +268,10 @@ namespace RayTracingRenderer
             if (m_materials == null)
             {
                 ParseMaterial(roots);
+            }
+            if (m_textures == null)
+            {
+                ParseTexture(roots);
             }
 
             // TODO: Optimize dynamic array generation

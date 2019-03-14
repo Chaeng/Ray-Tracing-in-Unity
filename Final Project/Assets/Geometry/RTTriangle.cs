@@ -12,8 +12,10 @@ public class RTTriangle : RTGeometry
     [SerializeField] private Vector3 m_vertices2 = Vector3.zero;
     [SerializeField] private bool m_isDoubleSide = true;
     [SerializeField] private string m_materialName;
+    [SerializeField] private string m_textureName;
 
     private int m_materialIndex = -1;
+    private int m_textureIndex = -1;
 
 
     private Vector4 m_worldVert0 = Vector4.zero;
@@ -35,9 +37,19 @@ public class RTTriangle : RTGeometry
         return m_materialName;
     }
 
+    public string GetTextureName()
+    {
+        return m_textureName;
+    }
+
     public void SetMaterialIndex(int index)
     {
         m_materialIndex = index;
+    }
+
+    public void SetTextureIndex(int index)
+    {
+        m_textureIndex = index;
     }
 
     public RTTriangle_t GetGeometry()
