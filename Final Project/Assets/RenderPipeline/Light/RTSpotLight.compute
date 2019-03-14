@@ -11,4 +11,5 @@ struct RTSpotLight
     float cosFullIlluminous;
     float penumbraDecay;
     int enableShadowMap;
+    int ShadowFilterRes;
 };
