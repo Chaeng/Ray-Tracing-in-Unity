@@ -17,8 +17,12 @@ public class RTLight : MonoBehaviour
     [SerializeField, HideInInspector]
     public float penumbraDecay = 1;
     
-    [HideInInspector] public bool useShadowMap = false;
-    
+    [SerializeField, HideInInspector]
+    public bool useShadowMap = false;
+
+    [SerializeField, HideInInspector]
+    public int shadowFilter = 0;
+
     public enum LightType
     {
         Directional = 0,
@@ -70,7 +74,8 @@ public class RTLight : MonoBehaviour
             penumbraDecay = this.penumbraDecay,
             direction = -1 * Vector3.Normalize(transform.forward),
             position = transform.position,
-            enableShadowMap = check
+            enableShadowMap = check,
+            ShadowFilterRes = shadowFilter
         };
     }
     
