@@ -15,6 +15,18 @@ Ray RefractRay(RayHit curHit, float3 V, float3 usenormal, float m_in, float m_ou
      Ray transRay = CreateRay(curHit.position, transDir);
      return transRay;
 }
+
+Ray RefractRaySphere(RayHit curHit, float3 V, float3 usenormal, float m_in, float m_out){
+
+     float3 useNormal = normalize(usenormal);
+     float cosThetaI = dot(V, useNormal);
+     float invN = m_in/ m_out;
+     float cosThetaT = sqrt( 1 - ((invN * invN) * (1 - (cosThetaI * cosThetaI))));
+     float3 transDir = -((invN * V) + ((cosThetaT - (invN * cosThetaI)) * useNormal));
+     Ray transRay = CreateRay(curHit.position, -transDir);
+     return transRay;
+}
+
 #endif
 
 /*
