@@ -6,7 +6,7 @@
 #include "../RayCasting/Trace.compute"
 
 Ray RefractRay(RayHit curHit, float3 V, float3 usenormal, float m_in, float m_out){
-     //float3 useNormal_raw = -curHit.normal;
+
      float3 useNormal = normalize(usenormal);
      float cosThetaI = dot(V, useNormal);
      float invN = m_in/ m_out;

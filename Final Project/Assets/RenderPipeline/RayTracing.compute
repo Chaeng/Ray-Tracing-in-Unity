@@ -9,7 +9,9 @@
 #include "Geometry/RTTriangle.compute"
 #include "Shading/Phong.compute"
 #include "SecondaryRay/TraceReflection.compute"
+#include "SecondaryRay/SphereInternalIntersect.compute"
 #include "SecondaryRay/Reflection.compute"
+#include "SecondaryRay/RefractRay.compute"
 #include "SecondaryRay/Transparent.compute"
 
 
@@ -119,12 +121,10 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                           _ShadowUtility,
                           _FogFactor,
                           _FogColor);
-
-    bool transparentEffect = true;  // Temporary hard code 
     
     // hard code
-    int maxHit = 3;
-    
+    int maxHit = 5;
+    bool transparentEffect = true;
     if(transparentEffect) {
         float3 refl = Transparent(
                         maxHit,
@@ -150,6 +150,12 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _FogFactor,
                         _FogColor);
                         
+        result = refl;
+    }
+    // Hard code
+    // TODO: Need 'bool reflectionEffect' and 'int maxHit' in Parser
+    bool reflectionEffect = false;
+    if(reflectionEffect){                   
         float3 ref2 = Reflection(
                         maxHit,
                         result,
@@ -174,7 +180,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _FogFactor,
                         _FogColor);             
         
-        result = refl;
+        result = ref2;
     }     
     
     Result[id.xy] = float4(result, 1);

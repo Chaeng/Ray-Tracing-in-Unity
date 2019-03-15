@@ -1,0 +1,31 @@
+﻿#ifndef SPHEREINTERNALINTERSECT_COMPUTE
+#define SPHEREINTERNALINTERSECT_COMPUTE
+
+#include "../Ray.compute"
+#include "../RayHit.compute"
+#include "../RTSphere.compute"
+
+RayHit SphereInternalIntersect(RayHit curHit, Ray refrectRay, int numOfSphere,  StructuredBuffer<RTSphere> spheres, int targetId)
+{
+    RayHit hitResult = CreateRayHit();
+    
+    for(int i = 0; i < numOfSphere; ++i){
+    
+       if(spheres[i].id == targetId){
+           float3 curHitToCenter = spheres[i].center - curHit.position;
+           float halfDistance = dot(curHitToCenter, normalize(refrectRay.direction));
+           if (halfDistance > 0)
+           {
+                hitResult.geoIndex = spheres[i].id ;
+                hitResult.geoType = 0;
+                hitResult.distance = 2.0 * halfDistance;
+                hitResult.position = curHit.position + (hitResult.distance * normalize(refrectRay.direction));
+                hitResult.normal = normalize(spheres[i].center - hitResult.position);
+           }
+       }
+    }
+
+    return hitResult;
+}
+
+#endif //SPHEREINTERNALINTERSECT_COMPUTE
