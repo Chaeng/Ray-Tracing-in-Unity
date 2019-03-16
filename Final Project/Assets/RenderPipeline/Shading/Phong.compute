@@ -21,7 +21,7 @@ float3 PhongSpecularShading(float3 lightDir, float3 lightColor, float3 rayDir, f
     float vDotR = dot(-1 * rayDir, R);
     if(vDotR < 0)
     {
-        vDotR = 0;
+        return float3(0, 0, 0);
     }
     return pow(vDotR, shinyness) * lightColor;
 }
