@@ -131,6 +131,8 @@ float3 Transparent(
                 }
                 
                 // if a sphere
+                /*
+                TODO: Chaeng fix this
                 if(curHit.geoType == 0){
                      
                      n2 = crystalIndex;             
@@ -153,6 +155,7 @@ float3 Transparent(
                      hitArr[count] = curHit;
                      count++;
                  } 
+                 */
                  
                  float theta = acos(curRay.direction.y) / -PI;
                  float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
@@ -322,6 +325,8 @@ float3 Transparent(
                  float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
                  colorArr[3] = (skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz) * n2;
               
+              /**
+              TODO: Chaeng fix this
                  for(int k = 0; k < 3; ++k){
                      float3 color = Shade(
                                 rayArr[i], 
@@ -348,7 +353,8 @@ float3 Transparent(
                                 materials);
                      colorArr[i] += color; 
                      --i;
-                 }               
+                 }   
+                 **/           
                    
                 float3 c3 =  colorArr[3] * (refIndex);
                 float3 c2 =  colorArr[2] + (c3 * refIndex);
@@ -361,7 +367,7 @@ float3 Transparent(
              
                  Ray rayArr[4];
                  rayArr[0] = CreateRay(curHit.position, curRay.direction);
-                 for(int i = 1; i < 5; ++i){
+                 for(int i = 1; i < 4; i++){
                      rayArr[i] = CreateRay(hit.position, curRay.direction);
                  }
                  
@@ -417,10 +423,12 @@ float3 Transparent(
                  float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
                  colorArr[4] = (skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz) * n2;
               
+              /*
+              TODO: Chaeng fix this
                  for(int k = 0; k < 4; ++k){
                      float3 color = Shade(
-                                rayArr[i], 
-                                hitArr[i], 
+                                rayArr[k], 
+                                hitArr[k], 
                                 ambientLightUpper,
                                 ambientLightLower,
                                 numOfDirLight,
@@ -441,9 +449,10 @@ float3 Transparent(
                                 fogColor,
                                 numOfMaterials,
                                 materials);
-                     colorArr[i] += color; 
-                     --i;
-                 }               
+                     colorArr[k] += color; 
+                     //--i;
+                 }  
+                 */             
                 float3 c3 =  colorArr[3] * (refIndex);
                 float3 c2 =  colorArr[2] + (c3 * refIndex);
                 float3 c1 =  colorArr[1] + (c2 * refIndex);

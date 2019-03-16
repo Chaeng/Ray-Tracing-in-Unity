@@ -177,11 +177,11 @@ float3 Reflection(
                                 fogColor,
                                 numOfMaterials,
                                 materials);
-                 colorArr[i] += color;    
-             }     
+                 colorArr[0] += color;    
+                  
             return colorArr[1] + (colorArr[0] * k); 
          } else if(numHit == 3){
-             //reset ray and rayhit*/
+             //reset ray and rayhit//
              curRay = ray;
              curHit = hit;
          
