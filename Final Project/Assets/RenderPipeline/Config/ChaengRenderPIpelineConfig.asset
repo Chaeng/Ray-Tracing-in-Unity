@@ -15,5 +15,8 @@ MonoBehaviour:
   skybox: {fileID: 2800000, guid: 1153dc89e66880c4eb7adc16ba588855, type: 3}
   upperAmbitent: {r: 0, g: 0, b: 0, a: 1}
   lowerAmbitent: {r: 0, g: 0, b: 0, a: 1}
-  secondaryRayGeneration: 0
+  globalRefractiveIndex: 0.9
+  maxRayGeneration: 1
   enableShadow: 0
+  fogColor: {r: 1, g: 1, b: 1, a: 1}
+  fogFactor: 0

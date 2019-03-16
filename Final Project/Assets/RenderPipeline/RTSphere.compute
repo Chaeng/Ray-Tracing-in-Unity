@@ -9,6 +9,7 @@ struct RTSphere
     int id;
     float3 center;
     float radius;
+    int matIndex;
 };
 
 void IntersectSphere(Ray ray, inout RayHit bestHit, RTSphere sphere)
@@ -77,7 +78,7 @@ void IntersectSphere(Ray ray, inout RayHit bestHit, RTSphere sphere)
         bestHit.geoType = 0;
         bestHit.position = ray.origin + hitDis * ray.direction;
         bestHit.normal = normalize(bestHit.position - sphere.center);
-
+        bestHit.matIndex = sphere.matIndex;
     }
 }
 

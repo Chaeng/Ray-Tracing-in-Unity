@@ -7,6 +7,7 @@
 #include "Light/RTSpotLight_UW.compute"
 #include "RTSphere.compute"
 #include "Geometry/RTTriangle.compute"
+#include "RTMaterial.compute"
 #include "Shading/Phong.compute"
 #include "SecondaryRay/TraceReflection.compute"
 #include "SecondaryRay/SphereInternalIntersect.compute"
@@ -23,6 +24,8 @@
 RWTexture2D<float4> Result;
 
 // Global Settings
+
+int _MaxRayGeneration;
 
 // ShadowDepth Map
 Texture2DArray<float4> _SpotShadowMap;
@@ -61,6 +64,10 @@ StructuredBuffer<RTSphere> _Spheres;
 // triangle
 int _NumOfTriangles;
 StructuredBuffer<RTTriangle> _Triangles;
+
+// material
+int _NumOfMaterials;
+StructuredBuffer<RTMaterial> _Materials;
 
 
 Ray CreateCameraRay(float2 uv)
@@ -120,14 +127,14 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                           _SpotShadowMap,
                           _ShadowUtility,
                           _FogFactor,
-                          _FogColor);
+                          _FogColor,
+                          _NumOfMaterials,
+                          _Materials);
+
+    if(_MaxRayGeneration >= 1) {
     
-    // hard code
-    int maxHit = 5;
-    bool transparentEffect = true;
-    if(transparentEffect) {
         float3 refl = Transparent(
-                        maxHit,
+                        _MaxRayGeneration,
                         result,
                         ray, 
                         hit, 
@@ -148,16 +155,17 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _SpotShadowMap,
                         _ShadowUtility,
                         _FogFactor,
-                        _FogColor);
+                        _FogColor,
+                        _NumOfMaterials,
+                        _Materials
+                        );
                         
         result = refl;
-    }
-    // Hard code
-    // TODO: Need 'bool reflectionEffect' and 'int maxHit' in Parser
-    bool reflectionEffect = false;
-    if(reflectionEffect){                   
+    } 
+
+    if(_MaxRayGeneration >= 1) {                
         float3 ref2 = Reflection(
-                        maxHit,
+                        _MaxRayGeneration,
                         result,
                         ray, 
                         hit, 
@@ -178,10 +186,12 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _SpotShadowMap,
                         _ShadowUtility,
                         _FogFactor,
-                        _FogColor);             
+                        _FogColor,
+                        _NumOfMaterials,
+                        _Materials);           
         
         result = ref2;
-    }     
+    }  
     
     Result[id.xy] = float4(result, 1);
 }

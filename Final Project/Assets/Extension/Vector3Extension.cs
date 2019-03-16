@@ -11,4 +11,9 @@ public static class Vector3Extension
     {
         return new float[]{v.x, v.y, v.z};
     }
+
+    public static int SizeOf()
+    {
+        return sizeof(float) * 3;
+    }
 }

@@ -24,7 +24,9 @@ float3 Reflection(
     Texture2DArray<float4> shadowMap,
     StructuredBuffer<RTSpotLight_UW> shadowUtility,
     float fogFactor,
-    float3 fogColor)
+    float3 fogColor,
+    int numOfMaterials,
+    StructuredBuffer<RTMaterial> materials)
 {
 	float refl = 0.7; // TODO: debug this
 	float reflArr[6];
@@ -62,7 +64,9 @@ float3 Reflection(
                                 shadowMap,
                                 shadowUtility,
                                 fogFactor,
-                                fogColor);
+                                fogColor,
+                                numOfMaterials,
+                                materials);
                        return color;
            }
 
@@ -105,12 +109,14 @@ float3 Reflection(
                                 shadowMap,
                                 shadowUtility,
                                 fogFactor,
-                                fogColor);
+                                fogColor,
+                                numOfMaterials,
+                                materials);
              float theta = acos(curRay.direction.y) / -PI;
              float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
+             float3 c1 = skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
              
-             // TODO: to add material relf parser
-             return (color * (1 - refl)) + (skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz * refl);
+             return (color * (1 - refl)) + (c1);
  
          } else if(numHit == 2 && numHit <= maxHit){
              //reset ray and rayhit
@@ -168,12 +174,22 @@ float3 Reflection(
                                 shadowMap,
                                 shadowUtility,
                                 fogFactor,
-                                fogColor);
+                            fogColor,
+                                numOfMaterials,
+                                materials);
              colorArr[0] += color;      
             return (colorArr[0] * k) + colorArr[1]; 
             
          } else if(numHit == 3 && numHit <= maxHit){
-             //reset ray and rayhit
+         /*
+                                fogColor,
+                                numOfMaterials,
+                                materials);
+                 colorArr[i] += color;    
+             }     
+            return colorArr[1] + (colorArr[0] * k); 
+         } else if(numHit == 3){
+             //reset ray and rayhit*/
              curRay = ray;
              curHit = hit;
          
@@ -234,7 +250,9 @@ float3 Reflection(
                                 shadowMap,
                                 shadowUtility,
                                 fogFactor,
-                                fogColor);
+                                fogColor,
+                                numOfMaterials,
+                                materials);
                  colorArr[i] = color;    
              }   
              float3 c1 = (colorArr[2] * (1 - refl)) + colorArr[3];
@@ -306,7 +324,9 @@ float3 Reflection(
                                 shadowMap,
                                 shadowUtility,
                                 fogFactor,
-                                fogColor);
+                                fogColor,
+                                numOfMaterials,
+                                materials);
                  colorArr[i] = color;    
              }     
              
@@ -383,7 +403,9 @@ float3 Reflection(
                                 shadowMap,
                                 shadowUtility,
                                 fogFactor,
-                                fogColor);
+                          fogColor,
+                                numOfMaterials,
+                                materials);
                  colorArr[i] = color;    
              }     
              

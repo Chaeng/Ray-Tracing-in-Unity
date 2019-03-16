@@ -26,7 +26,9 @@ float3 Transparent(
     Texture2DArray<float4> shadowMap,
     StructuredBuffer<RTSpotLight_UW> shadowUtility,
     float fogFactor,
-    float3 fogColor)
+    float3 fogColor,
+    int numOfMaterials,
+    StructuredBuffer<RTMaterial> materials)
 {
     if (hit.distance < 1.#INF)
     {                
@@ -101,7 +103,9 @@ float3 Transparent(
                                     shadowMap,
                                     shadowUtility,
                                     fogFactor,
-                                    fogColor);
+                          fogColor,
+                                numOfMaterials,
+                                materials);
                     
                 float theta = acos(curRay.direction.y) / -PI;
                 float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
@@ -175,7 +179,9 @@ float3 Transparent(
                                         shadowMap,
                                         shadowUtility,
                                         fogFactor,
-                                        fogColor);
+                          fogColor,
+                                numOfMaterials,
+                                materials);
                          colorArr[ph2] = color;    
                      } 
                                       
@@ -238,7 +244,9 @@ float3 Transparent(
                                         shadowMap,
                                         shadowUtility,
                                         fogFactor,
-                                        fogColor);
+                          fogColor,
+                                numOfMaterials,
+                                materials);
                          colorArr[ph2] = color;    
                      }  
                      float3 c2 = colorArr[2]; // skybox
@@ -334,7 +342,9 @@ float3 Transparent(
                                     shadowMap,
                                     shadowUtility,
                                     fogFactor,
-                                    fogColor);
+                          fogColor,
+                                numOfMaterials,
+                                materials);
                      colorArr[k] = color;    
                  }  
                  float3 c1 = colorArr[3]; // skybox
@@ -428,7 +438,9 @@ float3 Transparent(
                                     shadowMap,
                                     shadowUtility,
                                     fogFactor,
-                                    fogColor);
+                          fogColor,
+                                numOfMaterials,
+                                materials);
                      colorArr[k] = color;    
                  }  
                  float3 c1 = colorArr[4]; // skybox
@@ -522,7 +534,9 @@ float3 Transparent(
                                     shadowMap,
                                     shadowUtility,
                                     fogFactor,
-                                    fogColor);
+                          fogColor,
+                                numOfMaterials,
+                                materials);
                      colorArr[k] = color;    
                  }  
                  float3 c5 = colorArr[5]; // skybox

@@ -9,5 +9,7 @@ struct RTSpotLight
     float coneAngle;
     float cosConeAngle;
     float cosFullIlluminous;
+    float penumbraDecay;
     int enableShadowMap;
+    int ShadowFilterRes;
 };

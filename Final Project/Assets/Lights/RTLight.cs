@@ -14,8 +14,15 @@ public class RTLight : MonoBehaviour
     [SerializeField, HideInInspector]
     public float fullIlluminousAngle = 30;
 
-    [HideInInspector] public bool useShadowMap = false;
+    [SerializeField, HideInInspector]
+    public float penumbraDecay = 1;
     
+    [SerializeField, HideInInspector]
+    public bool useShadowMap = false;
+
+    [SerializeField, HideInInspector]
+    public int shadowFilter = 0;
+
     public enum LightType
     {
         Directional = 0,
@@ -64,9 +71,11 @@ public class RTLight : MonoBehaviour
             coneAngle = coneAngle * Mathf.Deg2Rad,
             cosConeAngle = Mathf.Cos(coneAngle * Mathf.Deg2Rad / 2f),
             cosFullIlluminous = Mathf.Cos(fullIlluminousAngle * Mathf.Deg2Rad / 2f),
+            penumbraDecay = this.penumbraDecay,
             direction = -1 * Vector3.Normalize(transform.forward),
             position = transform.position,
-            enableShadowMap = check
+            enableShadowMap = check,
+            ShadowFilterRes = shadowFilter
         };
     }
     

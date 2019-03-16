@@ -21,7 +21,7 @@ float3 PhongSpecularShading(float3 lightDir, float3 lightColor, float3 rayDir, f
     float vDotR = dot(-1 * rayDir, R);
     if(vDotR < 0)
     {
-        vDotR = 0;
+        return float3(0, 0, 0);
     }
     return pow(vDotR, shinyness) * lightColor;
 }
@@ -46,10 +46,18 @@ float3 Shade(
     Texture2DArray<float4> shadowMap,
     StructuredBuffer<RTSpotLight_UW> shadowUtility,
     float fogFactor,
-    float3 fogColor)
+    float3 fogColor,
+    int numOfMaterials,
+    StructuredBuffer<RTMaterial> materials)
 {
     float3 color = float3(0, 0, 0);
     float hitDistance = hit.distance;
+
+    // Example of how to retrieve material info
+    RTMaterial mat = GetIndexedMaterial(materials,
+        numOfMaterials,
+        hit.matIndex);
+    float shininess = mat.n;
 
     if (hitDistance < 1.#INF)
     {
@@ -62,8 +70,9 @@ float3 Shade(
         
         for(int d = 0; d < numOfDirLight; d++)
         {
+
             tempColor  =   PhongDiffuseShading(dirLights[d].direction, dirLights[d].color, hit.normal) 
-                         + PhongSpecularShading(dirLights[d].direction, dirLights[d].color, ray.direction, hit.normal, 5);
+                         + PhongSpecularShading(dirLights[d].direction, dirLights[d].color, ray.direction, hit.normal, shininess);
             
             visibility = HardShadow(hit.position, 0, dirLights[d].direction, dirLights[d].direction, 
                                               hit.geoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
@@ -74,7 +83,7 @@ float3 Shade(
         {
             float3 L = normalize(pointLights[p].position - hit.position);
             tempColor =   PhongDiffuseShading(L, pointLights[p].color, hit.normal) 
-                        + PhongSpecularShading(L, pointLights[p].color, ray.direction, hit.normal, 5);
+                        + PhongSpecularShading(L, pointLights[p].color, ray.direction, hit.normal, shininess);
             
             visibility = HardShadow(hit.position, 1, pointLights[p].position, pointLights[p].position,
                                               hit.geoIndex, numOfSphere, spheres, numOfTriangle, triangles);
@@ -98,13 +107,13 @@ float3 Shade(
             else if(cosLtoLightDir >= spotLights[s].cosConeAngle)
             {
                 // Penumbra
-                intensity = (cosLtoLightDir - spotLights[s].cosConeAngle) / (spotLights[s].cosFullIlluminous - spotLights[s].cosConeAngle);
+                intensity = pow(abs((cosLtoLightDir - spotLights[s].cosConeAngle) / (spotLights[s].cosFullIlluminous - spotLights[s].cosConeAngle)), spotLights[s].penumbraDecay);
             }
         
             if(intensity > 0)
             {
                 tempColor = intensity * (PhongDiffuseShading(L, spotLights[s].color, hit.normal)
-                            + PhongSpecularShading(L, spotLights[s].color, ray.direction, hit.normal, 1)
+                            + PhongSpecularShading(L, spotLights[s].color, ray.direction, hit.normal, shininess)
                             );
                 
                 // check is shadow map is trued on

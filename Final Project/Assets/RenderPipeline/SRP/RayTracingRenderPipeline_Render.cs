@@ -99,6 +99,11 @@ namespace RayTracingRenderer
             m_mainShader.SetFloat("_GlobalRefractiveIndex", config.globalRefractiveIndex);
         }
 
+        private void RunSetRayGeneration(RenderPipelineConfigObject config)
+        {
+            m_mainShader.SetInt("_MaxRayGeneration", config.maxRayGeneration);
+        }
+
         private void RunSetFogToMainShader(RenderPipelineConfigObject config)
         {
             m_mainShader.SetFloat("_FogFactor", config.fogFactor);
@@ -109,6 +114,12 @@ namespace RayTracingRenderer
         {
             m_mainShader.SetInt("_NumOfSpheres", count);
             m_mainShader.SetBuffer(kIndex, "_Spheres", buffer);
+        }
+
+        private void RunSetMaterialsToMainShader(ComputeBuffer buffer, int count)
+        {
+            m_mainShader.SetInt("_NumOfMaterials", count);
+            m_mainShader.SetBuffer(kIndex, "_Materials", buffer);
         }
 
         private void RunSetTrianglesToMainShader(ComputeBuffer buffer, int count)
