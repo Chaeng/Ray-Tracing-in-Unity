@@ -67,6 +67,8 @@ namespace RayTracingRenderer
             ParseSphere(roots, ref count);
             ParseTriangle(roots, ref count);
             ParseMesh(roots, ref count);
+            
+            ConstructAccelerateStructure();
         }
 
         private void ParseMaterial(GameObject[] roots)
@@ -214,6 +216,7 @@ namespace RayTracingRenderer
                     if (renderer.gameObject.activeSelf)
                     {
                         RTTriangle_t triangleGeomT = renderer.GetGeometry();
+                        
                         triangleGeomT.id = counter++;
                         m_triangleGeom.Add(triangleGeomT);
                     }
@@ -254,6 +257,34 @@ namespace RayTracingRenderer
                     }
                 }
             }
+        }
+
+
+        private void ConstructAccelerateStructure()
+        {
+            bool isFirstTriangle = true;
+            Vector3 localMin = Vector3.zero;
+            Vector3 localMax = Vector3.zero;
+
+            for (int i = 0; i < m_triangleGeom.Count; i++)
+            {
+                if (isFirstTriangle)
+                {
+                    isFirstTriangle = false;
+                    localMin = m_triangleGeom[i].vert0;
+                    localMax = m_triangleGeom[i].vert0;
+                }
+                        
+                localMin.x = Mathf.Min(localMin.x, m_triangleGeom[i].vert0.x, m_triangleGeom[i].vert1.x, m_triangleGeom[i].vert2.x);
+                localMin.y = Mathf.Min(localMin.y, m_triangleGeom[i].vert0.y, m_triangleGeom[i].vert1.y, m_triangleGeom[i].vert2.y);
+                localMin.z = Mathf.Min(localMin.z, m_triangleGeom[i].vert0.z, m_triangleGeom[i].vert1.z, m_triangleGeom[i].vert2.z);
+                            
+                localMax.x = Mathf.Max(localMax.x, m_triangleGeom[i].vert0.x, m_triangleGeom[i].vert1.x, m_triangleGeom[i].vert2.x);
+                localMax.y = Mathf.Max(localMax.y, m_triangleGeom[i].vert0.y, m_triangleGeom[i].vert1.y, m_triangleGeom[i].vert2.y);
+                localMax.z = Mathf.Max(localMax.z, m_triangleGeom[i].vert0.z, m_triangleGeom[i].vert1.z, m_triangleGeom[i].vert2.z);
+            }
+            
+            AccelerateStructureDebugModel.Instance.SetMaxMin(localMax, localMin);
         }
 
 
