@@ -47,13 +47,14 @@ public class RTTriangle : RTGeometry
     
     private void UpdateTriangle()
     {
-        m_worldVert0 = (transform.localRotation * m_vertices0) + transform.localPosition;
-        m_worldVert1 = (transform.localRotation * m_vertices1) + transform.localPosition;
-        m_worldVert2 = (transform.localRotation * m_vertices2) + transform.localPosition;
+//        m_worldVert0 = (transform.localRotation * m_vertices0) + transform.localPosition;
+//        m_worldVert1 = (transform.localRotation * m_vertices1) + transform.localPosition;
+//        m_worldVert2 = (transform.localRotation * m_vertices2) + transform.localPosition;
 
-        // m_worldVert0 = transform.localToWorldMatrix * m_vertices0;
-        // m_worldVert1 = transform.localToWorldMatrix * m_vertices1;
-        // m_worldVert2 = transform.localToWorldMatrix * m_vertices2;
+        Matrix4x4 localToWorldMat = transform.localToWorldMatrix;
+        m_worldVert0 = localToWorldMat.MultiplyPoint(m_vertices0);
+        m_worldVert1 = localToWorldMat.MultiplyPoint(m_vertices1);
+        m_worldVert2 = localToWorldMat.MultiplyPoint(m_vertices2);
         
         Vector3 cross = Vector3.Cross(m_worldVert1 - m_worldVert0, m_worldVert2 - m_worldVert0);
         m_cachedNormal = Vector3.Normalize(cross);
