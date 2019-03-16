@@ -174,14 +174,6 @@ float3 Reflection(
                                 shadowMap,
                                 shadowUtility,
                                 fogFactor,
-                            fogColor,
-                                numOfMaterials,
-                                materials);
-             colorArr[0] += color;      
-            return (colorArr[0] * k) + colorArr[1]; 
-            
-         } else if(numHit == 3 && numHit <= maxHit){
-         /*
                                 fogColor,
                                 numOfMaterials,
                                 materials);

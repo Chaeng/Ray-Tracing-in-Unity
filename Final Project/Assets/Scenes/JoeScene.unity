@@ -145,6 +145,7 @@ MonoBehaviour:
   color: {r: 1, g: 0, b: 0, a: 1}
   coneAngle: 45
   fullIlluminousAngle: 30
+  penumbraDecay: 1
   useShadowMap: 0
 --- !u!4 &33009527
 Transform:
@@ -154,7 +155,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 33009525}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.82, z: 0.79}
+  m_LocalPosition: {x: -2.02, y: -0.07, z: -4.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -300,6 +301,55 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &612989327
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 612989329}
+  - component: {fileID: 612989328}
+  m_Layer: 0
+  m_Name: Spot Light (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &612989328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 612989327}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60364bcb1ce0143cc80d2b0b6ef48400, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_lightType: 2
+  color: {r: 0.4811321, g: 0.008963994, b: 0, a: 1}
+  coneAngle: 45
+  fullIlluminousAngle: 30
+  penumbraDecay: 1
+  useShadowMap: 0
+--- !u!4 &612989329
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 612989327}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.53, y: -2.06, z: 0.44}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &979759854
 GameObject:
   m_ObjectHideFlags: 0
@@ -438,7 +488,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1094084970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -455,6 +505,7 @@ MonoBehaviour:
   color: {r: 0.4716981, g: 0.1980242, b: 0.1980242, a: 1}
   coneAngle: 50.3
   fullIlluminousAngle: 30
+  penumbraDecay: 1
   useShadowMap: 0
 --- !u!4 &1094084971
 Transform:
@@ -470,6 +521,55 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: -47.04, y: 0, z: 0}
+--- !u!1 &1138800937
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1138800939}
+  - component: {fileID: 1138800938}
+  m_Layer: 0
+  m_Name: Spot Light (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1138800938
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1138800937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60364bcb1ce0143cc80d2b0b6ef48400, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_lightType: 2
+  color: {r: 0.08926833, g: 1, b: 0, a: 1}
+  coneAngle: 50.3
+  fullIlluminousAngle: 30
+  penumbraDecay: 1
+  useShadowMap: 0
+--- !u!4 &1138800939
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1138800937}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.87, y: 0.19, z: -5.3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1271824970
 GameObject:
   m_ObjectHideFlags: 0
@@ -486,7 +586,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1271824971
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -503,6 +603,7 @@ MonoBehaviour:
   color: {r: 1, g: 1, b: 1, a: 1}
   coneAngle: 45
   fullIlluminousAngle: 30
+  penumbraDecay: 1
   useShadowMap: 0
 --- !u!4 &1271824972
 Transform:
@@ -511,13 +612,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1271824970}
-  m_LocalRotation: {x: 0.32985538, y: 0, z: 0, w: 0.94403154}
+  m_LocalRotation: {x: 0.3420201, y: 0, z: 0, w: 0.9396927}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 38.52, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 40, y: 0, z: 0}
 --- !u!1 &1655238578
 GameObject:
   m_ObjectHideFlags: 0
@@ -551,6 +652,7 @@ MonoBehaviour:
   color: {r: 0, g: 1, b: 0.019607844, a: 1}
   coneAngle: 45
   fullIlluminousAngle: 30
+  penumbraDecay: 1
   useShadowMap: 0
 --- !u!4 &1655238580
 Transform:
@@ -618,7 +720,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1917502573}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.56, y: 0, z: 18.21}
+  m_LocalPosition: {x: 0.56, y: 0, z: 28.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
