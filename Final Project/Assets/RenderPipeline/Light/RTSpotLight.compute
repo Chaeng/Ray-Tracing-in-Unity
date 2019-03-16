@@ -12,4 +12,8 @@ struct RTSpotLight
     float penumbraDecay;
     int enableShadowMap;
     int ShadowFilterRes;
+    float range;
+    float baseD;
+    float fogDensity;
+    int enablefog;
 };
