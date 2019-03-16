@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731703, g: 0.13414727, b: 0.12107852, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731725, g: 0.13414752, b: 0.121078566, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -147,6 +147,7 @@ MonoBehaviour:
   fullIlluminousAngle: 30
   penumbraDecay: 1
   useShadowMap: 0
+  shadowFilter: 0
 --- !u!4 &33009527
 Transform:
   m_ObjectHideFlags: 0
@@ -191,7 +192,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16e00fb703e381444a3f4f14dd77e871, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_materialIndex: -1
 --- !u!114 &291046823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,7 +213,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 291046821}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.98, y: 0, z: 0}
+  m_LocalPosition: {x: -2.16, y: 0, z: -3.42}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -331,7 +331,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a707b232e61a247379604c2635881a1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_materialIndex: -1
 --- !u!114 &581235209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -345,6 +344,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_radius: 1
+  m_materialName: 
 --- !u!4 &581235210
 Transform:
   m_ObjectHideFlags: 0
@@ -375,7 +375,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &612989328
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -394,6 +394,7 @@ MonoBehaviour:
   fullIlluminousAngle: 30
   penumbraDecay: 1
   useShadowMap: 0
+  shadowFilter: 0
 --- !u!4 &612989329
 Transform:
   m_ObjectHideFlags: 0
@@ -438,7 +439,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21bc9b1c2c63c46ca82b8320b3f40bf9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_materialIndex: -1
 --- !u!114 &979759856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -455,6 +455,7 @@ MonoBehaviour:
   m_vertices1: {x: 3, y: -3, z: 0}
   m_vertices2: {x: 0, y: 3, z: 0}
   m_isDoubleSide: 1
+  m_materialName: 
 --- !u!4 &979759857
 Transform:
   m_ObjectHideFlags: 0
@@ -499,7 +500,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21bc9b1c2c63c46ca82b8320b3f40bf9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_materialIndex: -1
 --- !u!114 &1034976658
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -516,6 +516,7 @@ MonoBehaviour:
   m_vertices1: {x: 3, y: -3, z: 0}
   m_vertices2: {x: 0, y: 3, z: 0}
   m_isDoubleSide: 1
+  m_materialName: 
 --- !u!4 &1034976659
 Transform:
   m_ObjectHideFlags: 0
@@ -524,7 +525,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1034976656}
   m_LocalRotation: {x: 0, y: 0.09515083, z: 0, w: 0.99546295}
-  m_LocalPosition: {x: 4.59, y: 0, z: 3.21}
+  m_LocalPosition: {x: 4.92, y: 0, z: 3.15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -546,7 +547,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1094084970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -565,6 +566,7 @@ MonoBehaviour:
   fullIlluminousAngle: 30
   penumbraDecay: 1
   useShadowMap: 0
+  shadowFilter: 0
 --- !u!4 &1094084971
 Transform:
   m_ObjectHideFlags: 0
@@ -595,7 +597,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1138800938
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -614,6 +616,7 @@ MonoBehaviour:
   fullIlluminousAngle: 30
   penumbraDecay: 1
   useShadowMap: 0
+  shadowFilter: 0
 --- !u!4 &1138800939
 Transform:
   m_ObjectHideFlags: 0
@@ -644,7 +647,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1271824971
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -663,6 +666,7 @@ MonoBehaviour:
   fullIlluminousAngle: 30
   penumbraDecay: 1
   useShadowMap: 0
+  shadowFilter: 0
 --- !u!4 &1271824972
 Transform:
   m_ObjectHideFlags: 0
@@ -712,6 +716,7 @@ MonoBehaviour:
   fullIlluminousAngle: 30
   penumbraDecay: 1
   useShadowMap: 0
+  shadowFilter: 0
 --- !u!4 &1655238580
 Transform:
   m_ObjectHideFlags: 0
@@ -756,7 +761,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a707b232e61a247379604c2635881a1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_materialIndex: -1
 --- !u!114 &1917502575
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -770,6 +774,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_radius: 5
+  m_materialName: 
 --- !u!4 &1917502576
 Transform:
   m_ObjectHideFlags: 0
