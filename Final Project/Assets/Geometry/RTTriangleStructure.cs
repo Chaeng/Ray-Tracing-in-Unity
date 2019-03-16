@@ -22,4 +22,9 @@ public struct RTTriangle_t
             + sizeof(int) * 3
             + sizeof(float) * 2;
     }
+
+    public void SetId(int idInput)
+    {
+        id = idInput;
+    }
 }
