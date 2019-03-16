@@ -22,6 +22,11 @@ public class RTTriangleRenderer : RTRenderer
             return (RTTriangle)m_geom;
         }
     }
+
+    public RTTriangle GetTriangle()
+    {
+        return myTriangle;
+    }
     
     public RTTriangle_t GetGeometry()
     {

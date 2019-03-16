@@ -7,6 +7,7 @@
 #include "Light/RTSpotLight_UW.compute"
 #include "RTSphere.compute"
 #include "Geometry/RTTriangle.compute"
+#include "RTMaterial.compute"
 #include "Shading/Phong.compute"
 #include "SecondaryRay/TraceReflection.compute"
 #include "SecondaryRay/Reflection.compute"
@@ -61,6 +62,10 @@ StructuredBuffer<RTSphere> _Spheres;
 // triangle
 int _NumOfTriangles;
 StructuredBuffer<RTTriangle> _Triangles;
+
+// material
+int _NumOfMaterials;
+StructuredBuffer<RTMaterial> _Materials;
 
 
 Ray CreateCameraRay(float2 uv)
@@ -120,7 +125,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                           _SpotShadowMap,
                           _ShadowUtility,
                           _FogFactor,
-                          _FogColor);
+                          _FogColor,
+                          _NumOfMaterials,
+                          _Materials);
 
     if(_MaxRayGeneration > 1) {
         float3 refl = Transparent(
@@ -145,7 +152,10 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _SpotShadowMap,
                         _ShadowUtility,
                         _FogFactor,
-                        _FogColor);
+                        _FogColor,
+                        _NumOfMaterials,
+                        _Materials
+                        );
                         
         float3 ref2 = Reflection(
                         _MaxRayGeneration,
@@ -169,7 +179,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _SpotShadowMap,
                         _ShadowUtility,
                         _FogFactor,
-                        _FogColor);             
+                        _FogColor,
+                        _NumOfMaterials,
+                        _Materials);             
         
         result = refl;
     }     
