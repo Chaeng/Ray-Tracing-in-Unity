@@ -2,5 +2,6 @@
 {
     Nothing = 0,
     Sphere = 1,
-    Triangle = 2
+    Mesh = 2,
+    Triangle = 3
 }
