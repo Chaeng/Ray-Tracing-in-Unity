@@ -165,13 +165,13 @@ float3 Transparent(
                    n1 = air_refIndex;
                    n2 = glassIndex;
                    int countT = 0;
-                   while(countT <= numHit){
-                       
+                   
+                   while(countT <= numHit){     
+                              
                         if(countT == numHit){
                              n1 = glassIndex;
                              n2 = air_refIndex;
-                        }  
-                           
+                        }      
                         RayHit rayHitMaxHit3 = CreateRayHit();
                         float3 i2_triangleNormal = float3(0, 0, 0);
                         i2_triangleNormal += GetTriangleNormal(numOfTriangle, triangles, curHit.geoIndex);
@@ -190,34 +190,6 @@ float3 Transparent(
                         countT++;
                      }
                  } 
-                
-                // if a sphere
-                /*
-                TODO: Chaeng fix this
-                if(curHit.geoType == 0){
-                     
-                     n2 = crystalIndex;             
-                     int count = 1;
-                      
-                     // first iteration  
-                     Ray refract = RefractRay(curHit, cur_V, -normalize(curHit.normal), n1, n2);
-                     rayArr[count] = refract;
-                     RayHit internalHit = SphereInternalIntersect(curHit, refract, numOfSpheres, spheres, curHit.geoIndex);
-                     hitArr[count] = internalHit;
-                         
-                     // second iteration
-                     count++;
-                     curRay = RefractRay(internalHit, -normalize(refract.direction), normalize(internalHit.normal), n2, n1);
-                     rayArr[count] = curRay;
-                     cur_V = -normalize(curRay.direction);
-                     
-                     RayHit transRayHit= Trace(transRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);
-                     curHit = transRayHit;
-                     hitArr[count] = curHit;
-                     count++;
-                 } 
-                 */
-   
                  
                  float theta = acos(curRay.direction.y) / -PI;
                  float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
@@ -342,10 +314,11 @@ float3 Transparent(
                  }   
         
                    
-                float3 c3 =  colorArr[3] * (refIndex);
-                float3 c2 =  colorArr[2] + (c3 * refIndex);
-                float3 c1 =  colorArr[1] + (c2 * refIndex);
-                return colorArr[0] + (c1 * refIndex);    
+                float3 c3 =  colorArr[3];
+                float3 c2 =  (colorArr[2] * (1 - tranparency)) + c3;
+                float3 c1 =  (colorArr[1] * (1 - tranparency)) + (c2 * tranparency);
+                return (colorArr[0] * (1 - tranparency)) + (c1 * tranparency);    
+                
              } else if (numHit <= maxHit && numHit == 4){
                  
                  curRay = ray;
