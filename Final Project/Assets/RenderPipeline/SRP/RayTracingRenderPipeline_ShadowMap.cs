@@ -28,6 +28,11 @@ namespace RayTracingRenderer
 
             if (spotSize > 0)
             {
+                if (shadowMapList != null)
+                {
+                    Object.DestroyImmediate(shadowMapList);
+                }
+
                 shadowMapList = new Texture2DArray(shadowMapRes, shadowMapRes, spotSize, TextureFormat.RGBAFloat,
                     false, false);
 
