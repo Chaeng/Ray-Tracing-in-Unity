@@ -163,7 +163,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         
         result = refl;
     } 
-/*
+
     if(_MaxRayGeneration >= 1) {                
         float3 ref2 = Reflection(
                         _MaxRayGeneration,
@@ -193,7 +193,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         
         result = ref2;
     }  
-    */
+    
     result = SpotFog(ray, _NumOfSpotLights, _SpotLights, _SpotShadowMap, _ShadowUtility, hit.distance, result, _FogColor);
 
     Result[id.xy] = float4(result, 1);
