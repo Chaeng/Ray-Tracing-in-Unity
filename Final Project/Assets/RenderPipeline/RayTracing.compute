@@ -12,6 +12,7 @@
 #include "SecondaryRay/TraceReflection.compute"
 #include "SecondaryRay/Reflection.compute"
 #include "SecondaryRay/Transparent.compute"
+#include "Fog/SpotFog.compute"
 
 
 // Each #kernel tells which function to compile; you can have many kernels
@@ -105,8 +106,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                        _NumOfTriangles,
                        _Triangles,
                        -1);    // Exclude nothing
-                       
-    float3 result = Shade( ray,
+
+    float3 result = Shade(ray,
                            hit,
                           _AmbientLightUpper,
                           _AmbientLightLower,
@@ -186,11 +187,10 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         result = refl;
     }     
     
+    result = SpotFog(ray, _NumOfSpotLights, _SpotLights, _SpotShadowMap, _ShadowUtility, hit.distance, result, _FogColor);
+
     Result[id.xy] = float4(result, 1);
 }
-
-
-
 
 
 
