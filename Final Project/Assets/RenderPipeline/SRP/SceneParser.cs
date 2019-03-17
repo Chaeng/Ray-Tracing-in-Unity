@@ -14,6 +14,8 @@ namespace RayTracingRenderer
         private List<RTLightStructurePoint_t> m_pointLights;
         private List<RTLightStructureSpot_t> m_spotLights;
 
+        private AccelGridGroup _accelGrids;
+
         public SceneParser()
         {
             m_sphereGeom = new List<RTSphere_t>();
@@ -283,7 +285,19 @@ namespace RayTracingRenderer
                 localMax.y = Mathf.Max(localMax.y, m_triangleGeom[i].vert0.y, m_triangleGeom[i].vert1.y, m_triangleGeom[i].vert2.y);
                 localMax.z = Mathf.Max(localMax.z, m_triangleGeom[i].vert0.z, m_triangleGeom[i].vert1.z, m_triangleGeom[i].vert2.z);
             }
+
             
+            if (_accelGrids == null)
+            {
+                _accelGrids = new AccelGridGroup();
+            }
+            _accelGrids.UpdateAccelGridGroup(localMin, localMax);
+
+            
+            for (int i = 0; i < m_triangleGeom.Count; i++)
+            {
+                _accelGrids.AddTriangle(m_triangleGeom[i]);
+            }
         }
 
 
