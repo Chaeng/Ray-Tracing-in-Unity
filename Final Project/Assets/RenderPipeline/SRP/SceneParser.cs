@@ -284,7 +284,6 @@ namespace RayTracingRenderer
                 localMax.z = Mathf.Max(localMax.z, m_triangleGeom[i].vert0.z, m_triangleGeom[i].vert1.z, m_triangleGeom[i].vert2.z);
             }
             
-            AccelerateStructureDebugModel.Instance.SetMaxMin(localMax, localMin);
         }
 
 
