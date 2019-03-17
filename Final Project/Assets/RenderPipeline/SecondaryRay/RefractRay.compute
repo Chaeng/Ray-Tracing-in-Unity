@@ -1,0 +1,51 @@
+﻿#ifndef REFRACTRAY_COMPUTE
+#define REFRACTRAY_COMPUTE
+#include "../Ray.compute"
+#include "../RayHit.compute"
+#include "../RTSphere.compute"
+#include "../RayCasting/Trace.compute"
+
+Ray RefractRay(RayHit curHit, float3 V, float3 usenormal, float m_in, float m_out){
+
+     float3 useNormal = normalize(usenormal);
+     float cosThetaI = dot(V, useNormal);
+     float invN = m_in/ m_out;
+     float cosThetaT = sqrt( 1 - ((invN * invN) * (1 - (cosThetaI * cosThetaI))));
+     float3 transDir = -((invN * V) + ((cosThetaT - (invN * cosThetaI)) * useNormal));
+     Ray transRay = CreateRay(curHit.position, transDir);
+     return transRay;
+}
+
+Ray RefractRaySphere(RayHit curHit, float3 V, float3 usenormal, float m_in, float m_out){
+
+     float3 useNormal = normalize(usenormal);
+     float cosThetaI = dot(V, useNormal);
+     float invN = m_in/ m_out;
+     float cosThetaT = sqrt( 1 - ((invN * invN) * (1 - (cosThetaI * cosThetaI))));
+     float3 transDir = -((invN * V) + ((cosThetaT - (invN * cosThetaI)) * useNormal));
+     Ray transRay = CreateRay(curHit.position, -transDir);
+     return transRay;
+}
+
+#endif
+
+/*
+                 while(count <= 2){
+                               
+                     float3 useNormal_raw = -curHit.normal;
+                     float3 useNormal = normalize(useNormal_raw);
+                     float cosThetaI = dot(cur_V, useNormal);
+                     float invN = air_refIndex/ refIndex;
+                     float cosThetaT = sqrt( 1 - ((invN * invN) * (1 - (cosThetaI * cosThetaI))));
+                     float3 transDir = -((invN * cur_V) + ((cosThetaT - (invN * cosThetaI)) * useNormal));
+                     Ray transRay = CreateRay(curHit.position, -transDir);
+                     curRay = transRay;
+                     rayArr[count] = curRay;
+                     cur_V = -normalize(curRay.direction);
+                     
+                     RayHit transRayHit= Trace(transRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);
+                     curHit = transRayHit;
+                     hitArr[count] = curHit;
+                     count++;
+                 }   
+*/
