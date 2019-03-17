@@ -415,13 +415,13 @@ float3 Transparent(
                  }
                 
                  float3 colorArr[5]; 
-                 for(int index = 0; index < 3; ++index){
+                 for(int index = 0; index < 5; ++index){
                      colorArr[index] = float3(0, 0, 0);
                  }
                  
                  float theta = acos(curRay.direction.y) / -PI;
                  float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
-                 colorArr[4] = (skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz) * n2;
+                 colorArr[4] += (skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz) * n2;
               
               /*
               TODO: Chaeng fix this
@@ -478,7 +478,7 @@ float3 Transparent(
                  }
                  
                  int count = 1;
-                 while(count <= numHit){
+                 while(count < 6){
                      
                      if(curHit.geoType == 0){
                          n2 = crystalIndex;            

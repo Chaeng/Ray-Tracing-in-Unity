@@ -29,13 +29,6 @@ float3 Reflection(
     StructuredBuffer<RTMaterial> materials)
 {
 	float refl = 0.7; // TODO: debug this
-	float reflArr[6];
-	reflArr[0] = 0.2;
-	reflArr[1] = 0.4;
-	reflArr[2] = 0.6;
-	reflArr[3] = 0.7;
-	reflArr[4] = 0.9;
-	reflArr[5] = 0.9;
 	float k = 1 - refl;
     float3 final_reflColor = float3(0, 0, 0);
     
