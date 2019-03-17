@@ -1,0 +1,289 @@
+﻿bool coneBaseIntersec(Ray r, float3 norm, float d, inout float dist)
+{
+    float denomenator = dot(norm, r.direction);
+
+    if (abs(denomenator) < 0.01)
+    {
+        return false;
+    }
+
+    float NdotO = dot(norm, r.origin);
+    dist = -(NdotO + d) / denomenator;
+
+    return true;
+}
+
+
+bool InLightCone(float3 visiblePt, RTSpotLight spot)
+{
+    float3 L = normalize(spot.position - visiblePt);
+    float cosLtoLightDir = dot(-1 * L, -1 * spot.direction);
+    return (cosLtoLightDir >= spot.cosConeAngle);
+}
+
+
+bool LookShadowMap(float3 position,
+                   int MapIndex,
+                   RTSpotLight spot,
+                   Texture2DArray<float4> shadowMap,
+                   RTSpotLight_UW shadowUtility)
+{
+    float3 ray = position - spot.position;
+    float dis = length(ray);
+    ray = normalize(ray);
+
+    float cos = dot(ray, -spot.direction);
+    float3 pointP = spot.position + (10 / cos) * ray;
+
+    float dw = dot(pointP - shadowUtility.Pref, shadowUtility.W);
+    float du = dot(pointP - shadowUtility.Pref, shadowUtility.U);
+
+    int i = (int) (du / shadowUtility.PixelSize);
+    int j = (int) (dw / shadowUtility.PixelSize);
+
+    uint3 id = uint3(i, j, MapIndex);
+
+    // not use ShadowFilter
+    float4 map = shadowMap[id.xyz];
+
+    if (dis > map.x)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+
+float3 SpotFogIntensity(int MapIndex,
+                       RTSpotLight spot,
+                       Texture2DArray<float4> shadowMap,
+                       RTSpotLight_UW shadowUtility,
+                       float hitDis,
+                       Ray ray,
+                       float3 startPoint,
+                       float3 endPoint,
+                       float3 pixelColor,
+                       float3 fogColor) 
+{
+    float endDis = length(endPoint - ray.origin);
+    if (hitDis < endDis)
+    {
+        endPoint = ray.origin + ray.direction * hitDis;
+    }
+
+    float3 dir = -spot.direction;
+    float density = spot.fogDensity;
+    float sampleSize = length(endPoint - startPoint) / 64;
+    float b = exp(-density * sampleSize);
+
+    float3 spotColor = spot.color;
+    float3 result = pixelColor;
+
+    for (int i = 1; i < 64; i++)
+    {
+        float3 position = endPoint - ray.direction * sampleSize * i;
+        bool check = LookShadowMap(position, MapIndex, spot, shadowMap, shadowUtility);
+        if (!check)
+        {
+            continue;
+        }
+
+        float lightDis = length(position - spot.position);
+        float lb = exp(-density * lightDis);
+        result = (spotColor * lb) * (1 - b) + b * result;
+    }
+
+     return result;
+}
+
+
+float3 SpotBeam(int MapIndex,
+                RTSpotLight spot,
+                Texture2DArray<float4> shadowMap,
+                RTSpotLight_UW shadowUtility,
+                float hitDis,
+                Ray ray,
+                float3 startPoint,
+                float3 endPoint,
+                float3 pixelColor,
+                float3 fogColor)
+{
+    float endDis = length(endPoint - ray.origin);
+    if (hitDis < endDis)
+    {
+        endPoint = ray.origin + ray.direction * hitDis;
+    }
+
+    float3 dir = -spot.direction;
+    float density = spot.fogDensity;
+    float sampleSize = length(endPoint - startPoint) / 64;
+    float b = exp(-density * sampleSize);
+
+    float3 spotColor = spot.color;
+    float3 result = pixelColor;
+
+    for (int i = 1; i < 64; i++)
+    {
+        float3 position = endPoint - ray.direction * sampleSize * i;
+        bool check = LookShadowMap(position, MapIndex, spot, shadowMap, shadowUtility);
+        if (!check)
+        {
+            continue;
+        }
+
+        float lightDis = length(position - spot.position) * sin(spot.coneAngle / 2);
+        float lb = exp(-density * lightDis);
+        result = (spotColor) * (1 - b) + b * result;
+    }
+
+    return result;
+}
+
+
+bool SpotIntersection(RTSpotLight spot, Ray ray, inout float3 start, inout float3 end)
+{
+    float3 rayDir = ray.direction;
+    float halfAngle = spot.coneAngle / 2;
+    float3 v = -spot.direction;
+    float3 co = ray.origin - spot.position;
+
+
+    float a = dot(rayDir, v) * dot(rayDir, v) - cos(halfAngle) * cos(halfAngle);
+    float b = 2 * (dot(rayDir, v) * dot(co, v) - dot(rayDir, co) * (cos(halfAngle) * cos(halfAngle)));
+    float c = dot(co, v) * dot(co, v) - dot(co, co) * (cos(halfAngle) * cos(halfAngle));
+
+    float det = b * b - 4. * a * c;
+
+    if (det < 0)
+    {
+        return false;
+    }
+    else if (det == 0)
+    {
+        float t3 = (-b) / (2 * a);
+        float3 p3 = ray.origin + t3 * rayDir;
+        float p3Check = dot(p3 - spot.position, v);
+        
+        if (p3Check < 0 || p3Check >spot.range)
+        {
+            return false;
+        }
+
+        start = p3;
+        float dis = 0;
+        bool hit = coneBaseIntersec(ray, spot.direction, spot.baseD, dis);
+        if (hit)
+        {
+            end = ray.origin + dis * rayDir;
+            return true;
+        }
+    }
+
+    det = sqrt(det);
+    float t1 = (-b - det) / (2 * a);
+    float t2 = (-b + det) / (2 * a);
+
+    if (t1 > t2)
+    {
+        float temp = t1;
+        t1 = t2;
+        t2 = temp;
+    }
+
+    float3 p1 = ray.origin + t1 * rayDir;
+    float p1Check = dot(p1 - spot.position, v);
+
+    float3 p2 = ray.origin + t2 * rayDir;
+    float p2Check = dot(p2 - spot.position, v);
+
+    if (p1Check > 0 && p1Check <= spot.range)
+    {
+        if (p2Check > 0 && p2Check <= spot.range)
+        {
+            start = p1;
+            end = p2;
+            return true;
+        }
+        else if (p2Check > 0 && p2Check > spot.range)
+        {
+            start = p1;
+            float dis = 0;
+            bool hit = coneBaseIntersec(ray, spot.direction, spot.baseD, dis);
+            if (hit)
+            {
+                end = ray.origin + dis * rayDir;
+                return true;
+            }
+        }
+        else
+        {
+            start = ray.origin;
+            end = p1;
+            return true;
+        }
+    }
+    else if (p1Check > 0 && p1Check > spot.range)
+    {
+        if (p2Check > 0 && p2Check <= spot.range)
+        {
+            end = p2;
+            float dis = 0;
+            bool hit = coneBaseIntersec(ray, spot.direction, spot.baseD, dis);
+            if (hit)
+            {
+                start = ray.origin + dis * rayDir;
+                return true;
+            }
+        }
+    }
+    else if (p1Check < 0)
+    {
+        if (p2Check > 0 && p2Check <= spot.range)
+        {
+            start = p2;
+            float dis = 0;
+            bool hit = coneBaseIntersec(ray, spot.direction, spot.baseD, dis);
+            if (hit)
+            {
+                end = ray.origin + dis * rayDir;
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+
+float3 SpotFog(Ray ray,
+             int NumOfSpotLights,
+             StructuredBuffer<RTSpotLight> SpotLights,
+             Texture2DArray<float4> shadowMap,
+             StructuredBuffer<RTSpotLight_UW> shadowUtility,
+             float hitDis,
+             float3 pixelColor,
+             float3 fogColor)
+{
+    float3 result = pixelColor;
+
+    for (int t = 0; t < NumOfSpotLights; t++)
+    {
+        if (SpotLights[t].enablefog == 0)
+        {
+            continue;
+        }
+
+        float3 start, end;
+
+        bool hitCheck = SpotIntersection(SpotLights[t], ray, start, end);
+
+        if (hitCheck)
+        {
+           //result = SpotFogIntensity(t, SpotLights[t], shadowMap, shadowUtility[t], hitDis, ray, start, end, result, fogColor);
+          result = SpotBeam(t, SpotLights[t], shadowMap, shadowUtility[t], hitDis, ray, start, end, result, fogColor);
+        }
+    }
+
+    return result;
+}
