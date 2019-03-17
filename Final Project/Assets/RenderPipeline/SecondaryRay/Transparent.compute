@@ -103,9 +103,9 @@ float3 Transparent(
                                     shadowMap,
                                     shadowUtility,
                                     fogFactor,
-                          fogColor,
-                                numOfMaterials,
-                                materials);
+                                    fogColor,
+                                    numOfMaterials,
+                                    materials);
                     
                 float theta = acos(curRay.direction.y) / -PI;
                 float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
