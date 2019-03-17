@@ -3,6 +3,7 @@
 #include "SphereInternalIntersect.compute"
 #include "RTSphere.compute"
 #include "RefractRay.compute"
+#include "GetTriangleNormal.compute"
 
 float3 Transparent(
     int maxHit,
@@ -61,7 +62,7 @@ float3 Transparent(
                  //SphereInternalIntersect(RayHit curHit, Ray refrectRay, int numOfSphere,  StructuredBuffer<RTSphere> spheres, int targetId)
                  if(curHit.geoType == 0){ // sphere
                      n2 = crystalIndex;
-                     Ray refract = RefractRay(curHit, cur_V, -normalize(curHit.normal), n1, n2);
+                     Ray refract = RefractRay(curHit, cur_V, normalize(curHit.normal), n1, n2);
                      RayHit internalHit = SphereInternalIntersect(curHit, refract, numOfSpheres, spheres, curHit.geoIndex);
                      cur_V = -normalize(refract.direction);
                      curRay = RefractRay(internalHit, cur_V, -internalHit.normal, n2, n1);
@@ -70,10 +71,13 @@ float3 Transparent(
                  } else if(curHit.geoType == 1){ // Triangle
                      n2 = glassIndex;              
                      // Compute the out ray
+                     float3 triAngleNormal = float3(0, 0, 0);
+                     triAngleNormal = GetTriangleNormal(numOfTriangle, triangles, curHit.geoIndex);
+                     
                      if(dot(cur_V, curHit.normal) > 0 ){               
-                         curRay = RefractRay(curHit, cur_V, hit.normal, n1, n2);// hit from the back
+                         curRay = RefractRay(curHit, cur_V, hit.normal, n1, n2);// hit from the front
                      } else { // must be a sphere                              
-                         curRay = RefractRay(curHit, cur_V, -hit.normal, n1, n2);// hit from the front
+                         curRay = RefractRay(curHit, cur_V, -hit.normal, n1, n2);// hit from the back
                      }
                      curHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);       
                  } 
@@ -156,6 +160,7 @@ float3 Transparent(
                      count++;
                  } 
                  */
+   
                  
                  float theta = acos(curRay.direction.y) / -PI;
                  float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
@@ -262,7 +267,7 @@ float3 Transparent(
                  colorArr[2] = skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;    
                 // paint   
                 return colorArr[0] + (1.0003/refIndex) * (colorArr[1] + ((1.0003/refIndex) * colorArr[2]));             
-             } else if (numHit == 3) {
+             } else if (numHit <= maxHit && numHit == 3) {
              
                  curRay = ray;
                  curHit = hit;
@@ -360,7 +365,7 @@ float3 Transparent(
                 float3 c2 =  colorArr[2] + (c3 * refIndex);
                 float3 c1 =  colorArr[1] + (c2 * refIndex);
                 return colorArr[0] + (c1 * refIndex);    
-             } else if (numHit == 4){
+             } else if (numHit <= maxHit && numHit == 4){
                  
                  curRay = ray;
                  curHit = hit;
