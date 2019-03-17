@@ -13,7 +13,7 @@ public class RenderPipelineConfigObject : ScriptableObject
 
     public float globalRefractiveIndex = 1.0f;
     
-    [UnityEngine.Range(1, 4)] public int maxRayGeneration = 1;
+    [UnityEngine.Range(1, 8)] public int maxRayGeneration = 1;
 
     public bool enableShadow = false;
 
