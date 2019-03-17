@@ -32,7 +32,7 @@ float3 AddRefractReflect(
 { 
 
 
-        float3 refl = Transparent(
+        float3 reflEffect = Transparent(
                         maxHit,
                         result,
                         ray, 
@@ -58,9 +58,11 @@ float3 AddRefractReflect(
                                     numOfMaterials,
                                     materials);   
                         
-        result = refl;
-
+        result = reflEffect;
+        float refl = 0.7f;
+      
         float3 ref2 = Reflection(
+                        refl,
                         maxHit,
                         result,
                         ray, 

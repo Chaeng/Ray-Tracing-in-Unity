@@ -3,6 +3,7 @@
 #include "../RayCasting/Trace.compute"
 
 float3 Reflection(
+    float refl, 
     int maxHit,
     float3 result,
     inout Ray ray, 
@@ -28,9 +29,9 @@ float3 Reflection(
     int numOfMaterials,
     StructuredBuffer<RTMaterial> materials)
 {
-	float refl = 0.7; 
-	float k = 1 - refl;
-    float3 final_reflColor = float3(0, 0, 0);
+	//float refl = 0.7; 
+	//float k = 1 - refl;
+    //float3 final_reflColor = float3(0, 0, 0);
     
     // if geometry
     if (hit.distance < 1.#INF)
@@ -174,8 +175,8 @@ float3 Reflection(
                  colorArr[0] += color;    
                   
             //return (colorArr[0] * k) + colorArr[1]; 
-            float3 c1 = (colorArr[0] * k) + colorArr[1];
-            return (result * k) + (c1); 
+            float3 c1 = (colorArr[0] * (1 - refl)) + colorArr[1];
+            return (result * (1 - refl)) + (c1); 
             //return (result * (1 - refl)) + (c1 * refl);
          } else if(numHit <= maxHit && numHit == 3){
 
