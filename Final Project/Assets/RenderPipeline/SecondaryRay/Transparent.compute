@@ -419,7 +419,7 @@ float3 Transparent(
                 float3 c1 =  (colorArr[1] * (1 - tranparency)) + (c2 * tranparency);
                 float3 c0 =  (colorArr[0] * (1 - tranparency)) + (c2 * tranparency);
                 return c0;  
-             } else { // maxHit = 6
+             } else if(numHit <= maxHit && numHit == 5){
                 curRay = ray;
                 curHit = hit;
                 n1 = air_refIndex;
@@ -521,6 +521,115 @@ float3 Transparent(
                      colorArr[k] = color;    
                  }  
                  float3 c5 = colorArr[5]; // skybox
+                 float3 c4 = (colorArr[4] *(1 - tranparency)) + (c5 * tranparency);
+                 float3 c3 = (colorArr[3] *(1 - tranparency)) + (c4 * tranparency);
+                 float3 c2 = (colorArr[2] *(1 - tranparency)) + (c3 * tranparency);
+                 float3 c1 = (colorArr[1] *(1 - tranparency)) + (c2 * tranparency);
+                 float3 c0 = (colorArr[0] *(1 - tranparency)) + (c1 * tranparency);
+                 return (result *(1 - tranparency)) + (c0 * tranparency);
+             } else { // maxHit
+             
+                curRay = ray;
+                curHit = hit;
+                n1 = air_refIndex;
+                n2 = air_refIndex;
+                cur_V = -normalize(curRay.direction);
+                
+                 Ray rayArr[7];
+                 for(int i = 0; i < 7; ++i){
+                     rayArr[i] = CreateRay(curHit.position, curRay.direction);
+                 }
+                 
+                 RayHit hitArr[7];
+                 hitArr[0] = curHit;
+                 for(int j = 1; j < 7; ++j){
+                     hitArr[j] = CreateRayHit();
+                 }
+                 
+                 int count = 1;
+                 while(count < 7){
+                     
+                     if(curHit.geoType == 0){
+                         n2 = crystalIndex;            
+                      
+                         // first iteration  
+                         Ray refract = RefractRay(curHit, cur_V, normalize(curHit.normal), n1, n2);
+                         rayArr[count] = refract;
+                         RayHit internalHit = SphereInternalIntersect(curHit, refract, numOfSpheres, spheres, curHit.geoIndex);
+                         hitArr[count] = internalHit;
+                             
+                         // second iteration
+                         count++;
+                         curRay = RefractRay(internalHit, -normalize(refract.direction), normalize(internalHit.normal), n2, n1);
+                         rayArr[count] = curRay;
+                         
+                         curHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);
+                         hitArr[count] = curHit;
+                         
+                     } else if(curHit.geoType == 1){ // triangle
+                         if(n1 == n2){
+                             n1 = air_refIndex;
+                             n2 = glassIndex;
+                         } else {
+                             n2 = glassIndex;
+                         }
+                     
+                         float3 i5_triAngleNormal = GetTriangleNormal(numOfTriangle, triangles, curHit.geoIndex);
+                         
+                         if(dot(cur_V, i5_triAngleNormal) > 0 ){               
+                             curRay = RefractRay(curHit, cur_V, i5_triAngleNormal, n1, n2);// hit from the back
+                         } else { // must be a sphere                              
+                             curRay = RefractRay(curHit, cur_V, -i5_triAngleNormal, n1, n2);// hit from the front
+                         }
+                         cur_V = -normalize(curRay.direction);
+                         rayArr[count] = curRay;
+                         
+                         RayHit rayHitMaxHit3 = CreateRayHit();
+                         rayHitMaxHit3 = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);                         
+                         curHit = rayHitMaxHit3;
+                         hitArr[count] = curHit;             
+                     }
+                     n1 = n2;
+                     count++;
+                 }
+                
+                 float3 colorArr[7]; 
+                 for(int index = 0; index < 6; ++index){
+                     colorArr[index] = float3(0, 0, 0);
+                 }
+                 
+                 float theta = acos(curRay.direction.y) / -PI;
+                 float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
+                 colorArr[6] = (skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz) * n2;
+              
+                 for(int k = 0; k < 6; ++k){
+                     float3 color = Shade(
+                                    rayArr[k], 
+                                    hitArr[k], 
+                                    ambientLightUpper,
+                                    ambientLightLower,
+                                    numOfDirLight,
+                                    dirLights,
+                                    numOfPointLight,
+                                    pointLights,
+                                    numOfSpotLight, 
+                                    spotLights,
+                                    skybox, 
+                                    skyboxSampler,
+                                    numOfSpheres,
+                                    spheres,
+                                    numOfTriangle,
+                                    triangles,
+                                    shadowMap,
+                                    shadowUtility,
+                                    fogFactor,
+                                    fogColor,
+                                    numOfMaterials,
+                                    materials);
+                     colorArr[k] = color;    
+                 }  
+                 float3 c6 = colorArr[6]; // skybox
+                 float3 c5 = (colorArr[5] *(1 - tranparency)) + (c6 * tranparency);
                  float3 c4 = (colorArr[4] *(1 - tranparency)) + (c5 * tranparency);
                  float3 c3 = (colorArr[3] *(1 - tranparency)) + (c4 * tranparency);
                  float3 c2 = (colorArr[2] *(1 - tranparency)) + (c3 * tranparency);

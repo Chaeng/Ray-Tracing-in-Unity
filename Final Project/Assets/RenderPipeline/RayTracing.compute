@@ -135,7 +135,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
     if(_MaxRayGeneration > 1) {
         float3 refl = Transparent(
-                        _MaxRayGeneration,
+                        8, // hard code
                         result,
                         ray, 
                         hit, 
