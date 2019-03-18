@@ -1,6 +1,9 @@
-﻿#include "../RayCasting/Trace.compute"
+﻿#ifndef REFLECTION_COMPUTE
+#define REFLECTION_COMPUTE
+#include "../RayCasting/Trace.compute"
 
 float3 Reflection(
+    float refl, 
     int maxHit,
     float3 result,
     inout Ray ray, 
@@ -26,42 +29,86 @@ float3 Reflection(
     int numOfMaterials,
     StructuredBuffer<RTMaterial> materials)
 {
-    // Hard code
-    // Request parser to add 
-    // - World
-    //    - maxHit
-    // - Material
-    //    - reflective index
-	float refl = 0.2;
-	float k = 1 - refl;
-    float3 final_reflColor = float3(0, 0, 0);
-    
-    // if geometry
     if (hit.distance < 1.#INF)
     {   
+           if(maxHit == 0){
+           float3 color = float3(0, 0, 0);
+                      color += Shade(
+                                ray, 
+                                hit, 
+                                ambientLightUpper,
+                                ambientLightLower,
+                                numOfDirLight,
+                                dirLights,
+                                numOfPointLight,
+                                pointLights,
+                                numOfSpotLight, 
+                                spotLights,
+                                skybox, 
+                                skyboxSampler,
+                                numOfSpheres,
+                                spheres,
+                                numOfTriangle,
+                                triangles,
+                                shadowMap,
+                                shadowUtility,
+                                fogFactor,
+                                fogColor,
+                                numOfMaterials,
+                                materials);
+                       return color;
+           }
+
+          
          int numHit = 0;
          Ray curRay = ray;
          RayHit curHit = hit;
                 
-         while(numHit < maxHit && curHit.distance < 1.#INF){
+         while(numHit <= maxHit && curHit.distance < 1.#INF){
          
              float3 hitNml = normalize(curHit.normal);
              float3 rayNml = normalize(curRay.direction);
              float3 reflectDir =  reflect(rayNml, hitNml); 
              Ray newRay = CreateRay(curHit.position, reflectDir);
              curRay = newRay;
-             RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);
+             RayHit newHit = CreateRayHit();
+             newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);
              curHit = newHit;
              numHit++;
          }
          
-         if(numHit == 1)
+         if(numHit == 1 && numHit <= maxHit)
          {
+           float3 color = Shade(
+                                ray, 
+                                hit, 
+                                ambientLightUpper,
+                                ambientLightLower,
+                                numOfDirLight,
+                                dirLights,
+                                numOfPointLight,
+                                pointLights,
+                                numOfSpotLight, 
+                                spotLights,
+                                skybox, 
+                                skyboxSampler,
+                                numOfSpheres,
+                                spheres,
+                                numOfTriangle,
+                                triangles,
+                                shadowMap,
+                                shadowUtility,
+                                fogFactor,
+                                fogColor,
+                                numOfMaterials,
+                                materials);
              float theta = acos(curRay.direction.y) / -PI;
              float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
-             return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
+             float3 c1 = skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
+             //return (color * (1 - refl)) + (c1);
+             return (result * (1 - refl)) + c1;
  
-         } else if(numHit == 2){
+         } else if(numHit == 2 && numHit <= maxHit){
              //reset ray and rayhit
              curRay = ray;
              curHit = hit;
@@ -77,7 +124,7 @@ float3 Reflection(
              hitArr[2] = CreateRayHit();
                        
              int count = 1;
-             while(count <= 2){
+             while(count < 3){
                            
                   float3 hitNml = normalize(curHit.normal);
                   float3 rayNml = normalize(curRay.direction);
@@ -96,12 +143,10 @@ float3 Reflection(
              
              float3 colorArr[2];
              colorArr[0] = float3(0, 0, 0);
-             colorArr[1] = skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
-             
-             for(int i = 0; i >= 0; --i){
-                 float3 color = Shade(
-                                rayArr[i], 
-                                hitArr[i], 
+             colorArr[1] = (skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz) * refl;
+             float3 color = Shade(
+                                rayArr[0], 
+                                hitArr[0], 
                                 ambientLightUpper,
                                 ambientLightLower,
                                 numOfDirLight,
@@ -122,11 +167,14 @@ float3 Reflection(
                                 fogColor,
                                 numOfMaterials,
                                 materials);
-                 colorArr[i] += color;    
-             }     
-            return colorArr[1] + (colorArr[0] * k); 
-         } else if(numHit == 3){
-             //reset ray and rayhit
+                 colorArr[0] += color;    
+                  
+            //return (colorArr[0] * k) + colorArr[1]; 
+            float3 c1 = (colorArr[0] * (1 - refl)) + colorArr[1];
+            return (result * (1 - refl)) + (c1); 
+            //return (result * (1 - refl)) + (c1 * refl);
+         } else if(numHit <= maxHit && numHit == 3){
+
              curRay = ray;
              curHit = hit;
          
@@ -143,7 +191,7 @@ float3 Reflection(
              hitArr[3] = CreateRayHit();
                        
              int count = 1;
-             while(count <= 3){
+             while(count < 4){
                            
                   float3 hitNml = normalize(curHit.normal);
                   float3 rayNml = normalize(curRay.direction);
@@ -166,7 +214,83 @@ float3 Reflection(
              colorArr[2] = float3(0, 0, 0);
              colorArr[3] = skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
              
-             for(int i = 2; i > 0; --i){
+             for(int i_3 = 0; i_3 < 3; i_3++){
+                 float3 color = Shade(
+                                rayArr[i_3], 
+                                hitArr[i_3], 
+                                ambientLightUpper,
+                                ambientLightLower,
+                                numOfDirLight,
+                                dirLights,
+                                numOfPointLight,
+                                pointLights,
+                                numOfSpotLight, 
+                                spotLights,
+                                skybox, 
+                                skyboxSampler,
+                                numOfSpheres,
+                                spheres,
+                                numOfTriangle,
+                                triangles,
+                                shadowMap,
+                                shadowUtility,
+                                fogFactor,
+                                fogColor,
+                                numOfMaterials,
+                                materials);
+                 colorArr[i_3] = color;    
+             }   
+             float3 c1 = (colorArr[2] * (1 - refl)) + colorArr[3];
+             float3 c2 = (colorArr[1] * (1 - refl)) + (c1 * refl);
+             float3 c3 = (colorArr[0] * (1 - refl)) + (c2 * refl);
+             return (result * (1 - refl)) + (c3 * refl);
+             //return (colorArr[0] * (1 - refl)) + (c2 * refl);
+
+         } else if (numHit == 4 && numHit <= maxHit ){
+             //reset ray and rayhit
+             curRay = ray;
+             curHit = hit;
+         
+             Ray rayArr[5];
+             rayArr[0] = CreateRay(curHit.position, curRay.direction);
+             rayArr[1] = CreateRay(hit.position, curRay.direction);
+             rayArr[2] = CreateRay(hit.position, curRay.direction);
+             rayArr[3] = CreateRay(hit.position, curRay.direction);
+             rayArr[4] = CreateRay(hit.position, curRay.direction);
+             
+             RayHit hitArr[5];
+             hitArr[0] = curHit;
+             hitArr[1] = CreateRayHit();
+             hitArr[2] = CreateRayHit();
+             hitArr[3] = CreateRayHit();
+             hitArr[4] = CreateRayHit();
+                       
+             int count = 1;
+             while(count < 5){
+                           
+                  float3 hitNml = normalize(curHit.normal);
+                  float3 rayNml = normalize(curRay.direction);
+                  float3 reflectDir =  reflect(rayNml, hitNml); 
+                  Ray newRay = CreateRay(curHit.position, reflectDir);
+                  rayArr[count] = newRay;
+                  curRay = newRay;
+                  RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);
+                  hitArr[count] = newHit;
+                  curHit = newHit;
+                  count++;
+             }
+             
+             float theta = acos(curRay.direction.y) / -PI;
+             float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
+             
+             float3 colorArr[5];
+             colorArr[0] = float3(0, 0, 0);
+             colorArr[1] = float3(0, 0, 0);
+             colorArr[2] = float3(0, 0, 0);
+             colorArr[3] = float3(0, 0, 0);
+             colorArr[4] = skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
+             
+             for(int i = 3; i >= 0; --i){
                  float3 color = Shade(
                                 rayArr[i], 
                                 hitArr[i], 
@@ -192,26 +316,35 @@ float3 Reflection(
                                 materials);
                  colorArr[i] = color;    
              }     
-            return colorArr[3] + ((colorArr[2] + (colorArr[1] * k)) * k); 
-         } else if (numHit == 4){
-                          //reset ray and rayhit
+             
+             float3 c1 = (colorArr[3] * (1 - refl)) + colorArr[4];
+             float3 c2 = (colorArr[2] * (1 - refl)) + (c1 * refl);
+             float3 c3 = (colorArr[1] * (1 - refl)) + (c2 * refl);
+             float3 c4 = (colorArr[0] * (1 - refl)) + (c3 * refl);
+             return (result * (1 - refl)) + (c4 * refl);
+             //return (colorArr[0] * (1 - refl)) + (c3 * refl);
+         } else if(numHit <= maxHit && numHit == 5){
              curRay = ray;
              curHit = hit;
          
-             Ray rayArr[4];
+             Ray rayArr[6];
              rayArr[0] = CreateRay(curHit.position, curRay.direction);
              rayArr[1] = CreateRay(hit.position, curRay.direction);
              rayArr[2] = CreateRay(hit.position, curRay.direction);
              rayArr[3] = CreateRay(hit.position, curRay.direction);
+             rayArr[4] = CreateRay(hit.position, curRay.direction);
+             rayArr[5] = CreateRay(hit.position, curRay.direction);
              
-             RayHit hitArr[4];
+             RayHit hitArr[6];
              hitArr[0] = curHit;
              hitArr[1] = CreateRayHit();
              hitArr[2] = CreateRayHit();
              hitArr[3] = CreateRayHit();
+             hitArr[4] = CreateRayHit();
+             hitArr[5] = CreateRayHit();
                        
              int count = 1;
-             while(count <= 3){
+             while(count < 6){
                            
                   float3 hitNml = normalize(curHit.normal);
                   float3 rayNml = normalize(curRay.direction);
@@ -228,13 +361,15 @@ float3 Reflection(
              float theta = acos(curRay.direction.y) / -PI;
              float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
              
-             float3 colorArr[4];
+             float3 colorArr[6];
              colorArr[0] = float3(0, 0, 0);
              colorArr[1] = float3(0, 0, 0);
              colorArr[2] = float3(0, 0, 0);
-             colorArr[3] = skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
+             colorArr[3] = float3(0, 0, 0);
+             colorArr[4] = float3(0, 0, 0);
+             colorArr[5] = skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
              
-             for(int i = 2; i > 0; --i){
+             for(int i = 0 ; i < 5; i++){
                  float3 color = Shade(
                                 rayArr[i], 
                                 hitArr[i], 
@@ -255,33 +390,101 @@ float3 Reflection(
                                 shadowMap,
                                 shadowUtility,
                                 fogFactor,
-                                fogColor,
+                          fogColor,
                                 numOfMaterials,
                                 materials);
                  colorArr[i] = color;    
              }     
-            return colorArr[3] + ((colorArr[2] + (colorArr[1] * k)) * k); 
-         } else {
-             //reset ray and rayhit
+             
+             float3 c1 = (colorArr[4] * (1 - refl)) + colorArr[5];
+             float3 c2 = (colorArr[3] * (1 - refl)) + (c1 * refl);
+             float3 c3 = (colorArr[2] * (1 - refl)) + (c2 * refl);
+             float3 c4 = (colorArr[1] * (1 - refl)) + (c3 * refl);             
+             float3 c5 = (colorArr[0] * (1 - refl)) + (c4 * refl);
+             return (result * (1 - refl)) + (c5 * refl);           
+         } else { // numHit = 6
              curRay = ray;
              curHit = hit;
-             int numHit = 0;
-             while(numHit < maxHit && curHit.distance < 1.#INF){
+         
+             Ray rayArr[7];
+             rayArr[0] = CreateRay(curHit.position, curRay.direction);
+             rayArr[1] = CreateRay(hit.position, curRay.direction);
+             rayArr[2] = CreateRay(hit.position, curRay.direction);
+             rayArr[3] = CreateRay(hit.position, curRay.direction);
+             rayArr[4] = CreateRay(hit.position, curRay.direction);
+             rayArr[5] = CreateRay(hit.position, curRay.direction);
+             rayArr[6] = CreateRay(hit.position, curRay.direction);
              
-                 float3 hitNml = normalize(curHit.normal);
-                 float3 rayNml = normalize(curRay.direction);
-                 float3 reflectDir =  reflect(rayNml, hitNml); 
-                 Ray newRay = CreateRay(curHit.position, reflectDir);
-                 curRay = newRay;
-                 RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);
-                 curHit = newHit;
-                 numHit++;
+             RayHit hitArr[7];
+             hitArr[0] = curHit;
+             hitArr[1] = CreateRayHit();
+             hitArr[2] = CreateRayHit();
+             hitArr[3] = CreateRayHit();
+             hitArr[4] = CreateRayHit();
+             hitArr[5] = CreateRayHit();
+             hitArr[6] = CreateRayHit();
+                       
+             int count = 1;
+             while(count < 7){
+                           
+                  float3 hitNml = normalize(curHit.normal);
+                  float3 rayNml = normalize(curRay.direction);
+                  float3 reflectDir =  reflect(rayNml, hitNml); 
+                  Ray newRay = CreateRay(curHit.position, reflectDir);
+                  rayArr[count] = newRay;
+                  curRay = newRay;
+                  RayHit newHit = Trace(curRay, numOfSpheres, spheres,  numOfTriangle, triangles, curHit.geoIndex);
+                  hitArr[count] = newHit;
+                  curHit = newHit;
+                  count++;
              }
              
              float theta = acos(curRay.direction.y) / -PI;
              float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
-             return skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
-         } 
+             
+             float3 colorArr[7];
+             colorArr[0] = float3(0, 0, 0);
+             colorArr[1] = float3(0, 0, 0);
+             colorArr[2] = float3(0, 0, 0);
+             colorArr[3] = float3(0, 0, 0);
+             colorArr[4] = float3(0, 0, 0);
+             colorArr[5] = float3(0, 0, 0);
+             colorArr[6] = skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
+             
+             for(int i = 0 ; i < 6; i++){
+                 float3 color = Shade(
+                                rayArr[i], 
+                                hitArr[i], 
+                                ambientLightUpper,
+                                ambientLightLower,
+                                numOfDirLight,
+                                dirLights,
+                                numOfPointLight,
+                                pointLights,
+                                numOfSpotLight, 
+                                spotLights,
+                                skybox, 
+                                skyboxSampler,
+                                numOfSpheres,
+                                spheres,
+                                numOfTriangle,
+                                triangles,
+                                shadowMap,
+                                shadowUtility,
+                                fogFactor,
+                          fogColor,
+                                numOfMaterials,
+                                materials);
+                 colorArr[i] = color;    
+             }     
+             float3 c0 = (colorArr[5] * (1 - refl)) + colorArr[6];
+             float3 c1 = (colorArr[4] * (1 - refl)) + (c0 * refl);
+             float3 c2 = (colorArr[3] * (1 - refl)) + (c1 * refl);
+             float3 c3 = (colorArr[2] * (1 - refl)) + (c2 * refl);
+             float3 c4 = (colorArr[1] * (1 - refl)) + (c3 * refl);             
+             float3 c5 = (colorArr[0] * (1 - refl)) + (c4 * refl);
+             return (result * (1 - refl)) + (c5 * refl);           
+         }
     }  
     else {
 
@@ -292,4 +495,4 @@ float3 Reflection(
     }	
 }
 
-
+#endif // REFLECTION_COMPUTE
