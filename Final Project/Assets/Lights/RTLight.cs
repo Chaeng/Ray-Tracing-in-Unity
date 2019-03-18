@@ -23,6 +23,15 @@ public class RTLight : MonoBehaviour
     [SerializeField, HideInInspector]
     public int shadowFilter = 0;
 
+    [SerializeField, HideInInspector]
+    public bool useFog = false;
+
+    [SerializeField, HideInInspector]
+    public float SpotRange = 15;
+
+    [SerializeField, HideInInspector]
+    public float FogDensity = 0.1f;
+
     public enum LightType
     {
         Directional = 0,
@@ -65,6 +74,17 @@ public class RTLight : MonoBehaviour
             check = 0;
         }
 
+        int fog;
+        if (useFog)
+        {
+            fog = 1;
+        } else
+        {
+            fog = 0;
+        }
+
+        Vector3 mPosition = transform.position;
+        Vector3 mNormal = -1 * Vector3.Normalize(transform.forward);
         return new RTLightStructureSpot_t()
         {
             color = color.ToVector3(),
@@ -75,7 +95,11 @@ public class RTLight : MonoBehaviour
             direction = -1 * Vector3.Normalize(transform.forward),
             position = transform.position,
             enableShadowMap = check,
-            ShadowFilterRes = shadowFilter
+            ShadowFilterRes = shadowFilter,
+            range = SpotRange,
+            baseD = -(Vector3.Dot(mNormal, mPosition + -mNormal * SpotRange)),
+            fogDensity = FogDensity,
+            enablefog = fog
         };
     }
     

@@ -14,9 +14,13 @@ public struct RTLightStructureSpot_t
     public float penumbraDecay;
     public int enableShadowMap;
     public int ShadowFilterRes;
+    public float range;
+    public float baseD;
+    public float fogDensity;
+    public int enablefog;
 
     public static int GetSize()
     {
-        return sizeof(float) * 3 * 3 + sizeof(float) * 4 + sizeof(int) * 2;
+        return sizeof(float) * 3 * 3 + sizeof(float) * 7 + sizeof(int) * 3;
     }
 }
