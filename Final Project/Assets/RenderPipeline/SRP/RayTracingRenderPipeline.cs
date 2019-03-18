@@ -43,6 +43,8 @@ namespace RayTracingRenderer
         private ComputeBuffer m_sphereBuffer;
         private ComputeBuffer m_spotLightBuffer;
         private ComputeBuffer m_triangleBuffer;
+        private ComputeBuffer m_gridsBuffer;
+        private ComputeBuffer m_gridsIndexBuffer;
         private ComputeBuffer m_materialBuffer;
         private RenderPipelineConfigObject m_config;
         private RenderTexture m_shadowMap;

@@ -67,7 +67,28 @@ namespace RayTracingRenderer
             List<RTTriangle_t> triangles;
             List<int> gridIndex;
             sceneParser.GetAccelerateGridGeometryIndex(out triangles, out gridIndex);
-            Debug.Log($"Triangle = {triangles.Count} Grid Index = {gridIndex}");
+            
+            m_gridsBuffer?.Release();
+            if (triangles.Count > 0)
+            {
+                m_gridsBuffer = new ComputeBuffer(triangles.Count, RTTriangle_t.GetSize());
+                m_gridsBuffer.SetData(triangles);
+            }
+            else
+            {
+                m_gridsBuffer = new ComputeBuffer(1, RTTriangle_t.GetSize());
+            }
+            
+            m_gridsIndexBuffer?.Release();
+            if (gridIndex.Count > 0)
+            {
+                m_gridsIndexBuffer = new ComputeBuffer(gridIndex.Count, sizeof(int));
+                m_gridsIndexBuffer.SetData(gridIndex);
+            }
+            else
+            {
+                m_gridsIndexBuffer = new ComputeBuffer(1, sizeof(int));
+            }
         }
         
 
