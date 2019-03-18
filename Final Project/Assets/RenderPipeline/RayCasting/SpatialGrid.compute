@@ -3,6 +3,13 @@
 
 #include "RayPlaneIntersection.compute"
 
+static const float3 GridNormalLeft = float3(-1, 0, 0);
+static const float3 GridNormalRight = float3(1, 0, 0);
+static const float3 GridNormalUp = float3(0, 1, 0);
+static const float3 GridNormalDown = float3(0, -1, 0);
+static const float3 GridNormalBack = float3(0, 0, -1);
+static const float3 GridNormalForward = float3(0, 0, 1);
+
 struct SpatialGridIndex
 {
     int x;
@@ -62,7 +69,35 @@ SpatialGridIndex GetGridIndexAtPoint(SpatialGrid grid, float3 pt)
 };
 
 
-
+void InnerDistanceToBoundary(Ray ray, SpatialGrid grids, GridStep steps, float3 min, float3 max, inout RayHit rayHitX, inout RayHit rayHitY, inout RayHit rayHitZ)
+{
+    if(steps.x >= 0)
+    {
+        rayHitX = RayPlaneIntersection(ray, GridNormalLeft, max);
+    }
+    else
+    {
+        rayHitX = RayPlaneIntersection(ray, GridNormalRight, min);
+    }
+    
+    if(steps.y >= 0)
+    {
+        rayHitY = RayPlaneIntersection(ray, GridNormalDown, max);
+    }
+    else
+    {
+        rayHitY = RayPlaneIntersection(ray, GridNormalUp, min);
+    }
+    
+    if(steps.z >= 0)
+    {
+        rayHitZ = RayPlaneIntersection(ray, GridNormalBack, max);
+    }
+    else
+    {
+        rayHitZ = RayPlaneIntersection(ray, GridNormalForward, min);
+    }
+};
 
 
 /*
