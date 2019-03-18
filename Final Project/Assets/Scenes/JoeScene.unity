@@ -148,6 +148,9 @@ MonoBehaviour:
   penumbraDecay: 1
   useShadowMap: 0
   shadowFilter: 0
+  useFog: 0
+  SpotRange: 15
+  FogDensity: 0.1
 --- !u!4 &33009527
 Transform:
   m_ObjectHideFlags: 0
@@ -318,7 +321,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &581235208
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -395,6 +398,9 @@ MonoBehaviour:
   penumbraDecay: 1
   useShadowMap: 0
   shadowFilter: 0
+  useFog: 0
+  SpotRange: 15
+  FogDensity: 0.1
 --- !u!4 &612989329
 Transform:
   m_ObjectHideFlags: 0
@@ -567,6 +573,9 @@ MonoBehaviour:
   penumbraDecay: 1
   useShadowMap: 0
   shadowFilter: 0
+  useFog: 0
+  SpotRange: 15
+  FogDensity: 0.1
 --- !u!4 &1094084971
 Transform:
   m_ObjectHideFlags: 0
@@ -617,6 +626,9 @@ MonoBehaviour:
   penumbraDecay: 1
   useShadowMap: 0
   shadowFilter: 0
+  useFog: 0
+  SpotRange: 15
+  FogDensity: 0.1
 --- !u!4 &1138800939
 Transform:
   m_ObjectHideFlags: 0
@@ -667,6 +679,9 @@ MonoBehaviour:
   penumbraDecay: 1
   useShadowMap: 0
   shadowFilter: 0
+  useFog: 0
+  SpotRange: 15
+  FogDensity: 0.1
 --- !u!4 &1271824972
 Transform:
   m_ObjectHideFlags: 0
@@ -717,6 +732,9 @@ MonoBehaviour:
   penumbraDecay: 1
   useShadowMap: 0
   shadowFilter: 0
+  useFog: 0
+  SpotRange: 15
+  FogDensity: 0.1
 --- !u!4 &1655238580
 Transform:
   m_ObjectHideFlags: 0
@@ -748,7 +766,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1917502574
 MonoBehaviour:
   m_ObjectHideFlags: 0
