@@ -10,6 +10,7 @@ namespace RayTracingRenderer
         {
             LoadBufferWithSpheres(sceneParser);
             LoadBufferWithTriangles(sceneParser);
+            LoadAccelerateStructureToBuffer(sceneParser);
             LoadBufferWithMaterials(sceneParser);
         }
 
@@ -59,6 +60,16 @@ namespace RayTracingRenderer
                 m_triangleBuffer = new ComputeBuffer(1, RTTriangle_t.GetSize());
             }
         }
+
+
+        private void LoadAccelerateStructureToBuffer(SceneParser sceneParser)
+        {
+            List<RTTriangle_t> triangles;
+            List<int> gridIndex;
+            sceneParser.GetAccelerateGridGeometryIndex(out triangles, out gridIndex);
+            Debug.Log($"Triangle = {triangles.Count} Grid Index = {gridIndex}");
+        }
+        
 
         private void LoadBufferWithMaterials(SceneParser sceneParser)
         {

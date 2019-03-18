@@ -36,6 +36,11 @@ namespace RayTracingRenderer
         {
             return m_triangleGeom;
         }
+
+        public void GetAccelerateGridGeometryIndex(out List<RTTriangle_t> triangles, out List<int> gridIndex)
+        {
+            _accelGrids.GetTrianglesInGrids(out triangles, out gridIndex);
+        }
         
         public List<RTMaterial_t> GetMaterials()
         {

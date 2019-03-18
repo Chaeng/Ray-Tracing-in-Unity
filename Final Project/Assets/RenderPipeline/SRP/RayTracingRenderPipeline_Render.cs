@@ -66,7 +66,7 @@ namespace RayTracingRenderer
         private void RunCommandBufferBegin()
         {
             // Begin Unity profiler sample for frame debugger
-            m_buffer.BeginSample(s_bufferName);
+//            m_buffer.BeginSample(s_bufferName);
         }
 
 
@@ -170,7 +170,7 @@ namespace RayTracingRenderer
             buffer.Clear(); // Clear the command buffer
             
             // End Unity profiler sample for frame debugger
-            buffer.EndSample(s_bufferName);
+//            buffer.EndSample(s_bufferName);
             renderContext
                 .ExecuteCommandBuffer(
                     buffer); // We copied all the commands to an internal memory that is ready to send to GPU

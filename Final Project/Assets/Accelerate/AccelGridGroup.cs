@@ -10,6 +10,7 @@ namespace RayTracingRenderer
 
 
         private AccelCell[,,] _grids;
+        private List<int> _geometryGridIndexList;
         private Vector3 _min = Vector3.zero;
         private Vector3 _max = Vector3.zero;
 
@@ -22,6 +23,7 @@ namespace RayTracingRenderer
         public AccelGridGroup()
         {
             _grids = new AccelCell[DIMENSION, DIMENSION, DIMENSION];
+            _geometryGridIndexList = new List<int>(DIMENSION * DIMENSION * DIMENSION);
 
             for (int x = 0; x < DIMENSION; x++)
             {
@@ -30,6 +32,7 @@ namespace RayTracingRenderer
                     for (int z = 0; z < DIMENSION; z++)
                     {
                         _grids[x, y, z] = new AccelCell();
+                        _geometryGridIndexList.Add(0);
                     }
                 }
             }
@@ -87,6 +90,31 @@ namespace RayTracingRenderer
                 }
             }
         }
+
+
+        public void GetTrianglesInGrids(out List<RTTriangle_t> triangles, out List<int> geometryIndex)
+        {
+            triangles = new List<RTTriangle_t>();
+
+            int counter = 0;
+            
+            for (int x = 0; x < DIMENSION; x++)               
+            {                                                  
+                for (int y = 0; y < DIMENSION; y++)           
+                {                                              
+                    for (int z = 0; z < DIMENSION; z++)       
+                    {                                          
+                        List<RTTriangle_t> trianglesInGrid = _grids[x, y, z].GetTriangles();
+                        counter += trianglesInGrid.Count;
+                        _geometryGridIndexList[z + y * DIMENSION + x * (DIMENSION * DIMENSION)] = counter;
+                        triangles.AddRange(trianglesInGrid);
+                    }                                          
+                }                                              
+            }
+
+            geometryIndex = _geometryGridIndexList;
+        }
+        
 
 
         private Vector3 CalculateGridSize(Vector3 min, Vector3 max)

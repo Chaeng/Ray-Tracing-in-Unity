@@ -29,6 +29,12 @@ namespace RayTracingRenderer
         }
 
 
+        public List<RTTriangle_t> GetTriangles()
+        {
+            return _triangles;
+        }
+
+
         public override string ToString()
         {
             return $"Center={_aabb.center} Size={_aabb.size} Triangles={_triangles.Count}";
