@@ -6,12 +6,35 @@
 #include "RayBoxIntersection.compute"
 #include "../Geometry/RTTriangle.compute"
 
+
+struct GridStep
+{
+    int x;
+    int y;
+    int z;
+};
+
+
+GridStep DetermineGridStep(Ray ray)
+{
+    GridStep step;
+    
+    step.x = ray.direction.x >= 0 ? 1 : -1;
+    step.y = ray.direction.y >= 0 ? 1 : -1;
+    step.z = ray.direction.z >= 0 ? 1 : -1;
+    
+    return step;
+}
+
+
 RayHit SpatialGridTrace(Ray ray, float3 boxMin, float3 boxMax, int _NumOfTriangles, StructuredBuffer<RTTriangle> _Triangles, int excludeGeometry)
 {
     RayHit bestHit = CreateRayHit();
     
     float t0 = -1.#INF;
     float t1 = 1.#INF;
+    
+    GridStep step = DetermineGridStep(ray);
     
     if (RayBoxIntersection(ray, boxMin, boxMax, t0, t1))
     {
@@ -28,6 +51,6 @@ RayHit SpatialGridTrace(Ray ray, float3 boxMin, float3 boxMax, int _NumOfTriangl
     }
     
     return bestHit;
-}
+};
 
 #endif //SPATIALGRIDTRACE_COMPUTE
