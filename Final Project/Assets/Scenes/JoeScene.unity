@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731725, g: 0.13414745, b: 0.12107873, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731725, g: 0.13414752, b: 0.121078566, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -147,7 +147,6 @@ MonoBehaviour:
   fullIlluminousAngle: 30
   penumbraDecay: 1
   useShadowMap: 0
-  shadowFilter: 0
 --- !u!4 &33009527
 Transform:
   m_ObjectHideFlags: 0
@@ -274,6 +273,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a707b232e61a247379604c2635881a1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_materialIndex: -1
 --- !u!114 &581235209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -287,7 +287,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_radius: 1
-  m_materialName: 
 --- !u!4 &581235210
 Transform:
   m_ObjectHideFlags: 0
@@ -333,11 +332,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_lightType: 2
   color: {r: 0.4811321, g: 0.008963994, b: 0, a: 1}
-  coneAngle: 179
-  fullIlluminousAngle: 179
+  coneAngle: 45
+  fullIlluminousAngle: 30
   penumbraDecay: 1
   useShadowMap: 0
-  shadowFilter: 0
 --- !u!4 &612989329
 Transform:
   m_ObjectHideFlags: 0
@@ -346,7 +344,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 612989327}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.89, y: -2.06, z: 0.44}
+  m_LocalPosition: {x: 1.53, y: -2.06, z: 0.44}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -382,6 +380,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21bc9b1c2c63c46ca82b8320b3f40bf9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_materialIndex: -1
 --- !u!114 &979759856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -397,11 +396,7 @@ MonoBehaviour:
   m_vertices0: {x: -3, y: -3, z: 0}
   m_vertices1: {x: 3, y: -3, z: 0}
   m_vertices2: {x: 0, y: 3, z: 0}
-  m_verticesUV0: {x: 0, y: 0}
-  m_verticesUV1: {x: 0, y: 1}
-  m_verticesUV2: {x: 1, y: 0}
   m_isDoubleSide: 1
-  m_materialName: MyMaterial1
 --- !u!4 &979759857
 Transform:
   m_ObjectHideFlags: 0
@@ -410,7 +405,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 979759854}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3, y: 0, z: 2.55}
+  m_LocalPosition: {x: -3.18, y: 0, z: 2.55}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -446,6 +441,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21bc9b1c2c63c46ca82b8320b3f40bf9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_materialIndex: -1
 --- !u!114 &1034976658
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -461,11 +457,7 @@ MonoBehaviour:
   m_vertices0: {x: -3, y: -3, z: 0}
   m_vertices1: {x: 3, y: -3, z: 0}
   m_vertices2: {x: 0, y: 3, z: 0}
-  m_verticesUV0: {x: 0, y: 0}
-  m_verticesUV1: {x: 0.5, y: 1}
-  m_verticesUV2: {x: 1, y: 0}
   m_isDoubleSide: 1
-  m_materialName: MyMaterial2
 --- !u!4 &1034976659
 Transform:
   m_ObjectHideFlags: 0
@@ -515,7 +507,6 @@ MonoBehaviour:
   fullIlluminousAngle: 30
   penumbraDecay: 1
   useShadowMap: 0
-  shadowFilter: 0
 --- !u!4 &1094084971
 Transform:
   m_ObjectHideFlags: 0
@@ -561,11 +552,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_lightType: 2
   color: {r: 0.08926833, g: 1, b: 0, a: 1}
-  coneAngle: 50
-  fullIlluminousAngle: 25
+  coneAngle: 50.3
+  fullIlluminousAngle: 30
   penumbraDecay: 1
   useShadowMap: 0
-  shadowFilter: 0
 --- !u!4 &1138800939
 Transform:
   m_ObjectHideFlags: 0
@@ -615,7 +605,6 @@ MonoBehaviour:
   fullIlluminousAngle: 30
   penumbraDecay: 1
   useShadowMap: 0
-  shadowFilter: 0
 --- !u!4 &1271824972
 Transform:
   m_ObjectHideFlags: 0
@@ -630,127 +619,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 40, y: 0, z: 0}
---- !u!1 &1341148845
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1341148848}
-  - component: {fileID: 1341148847}
-  - component: {fileID: 1341148846}
-  - component: {fileID: 1341148849}
-  - component: {fileID: 1341148850}
-  m_Layer: 0
-  m_Name: MyMaterialDatabase
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1341148846
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1341148845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e564d2b8d8eddae4ba52867d45e427e1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1341148847
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1341148845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12715149fa0fd044a9e13e2de7f7ee09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_name: Unused
-  m_ka: {x: 0, y: 0, z: 0}
-  m_ks: {x: 0, y: 0, z: 0}
-  m_kd: {x: 255, y: 0, z: 0}
-  m_n: 0
-  m_transparency: 0
-  m_refractiveIndex: 0
-  m_reflectivity: 0
-  m_normal: {x: 0, y: 0, z: 0}
-  m_position: {x: 0, y: 0, z: 0}
-  m_textureNameKa: 
-  m_textureNameKd: 
-  m_textureNameKs: 
---- !u!4 &1341148848
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1341148845}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.9604392, y: -7.005871, z: 19.077234}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 11
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1341148849
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1341148845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12715149fa0fd044a9e13e2de7f7ee09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_name: MyMaterial1
-  m_ka: {x: 0, y: 1, z: 1}
-  m_ks: {x: 1, y: 1, z: 0}
-  m_kd: {x: 1, y: 1, z: 1}
-  m_n: 1
-  m_transparency: 0
-  m_refractiveIndex: 0
-  m_reflectivity: 0
-  m_normal: {x: 0, y: 0, z: 0}
-  m_position: {x: 0, y: 0, z: 0}
-  m_textureNameKa: 
-  m_textureNameKd: MyTexture1
-  m_textureNameKs: 
---- !u!114 &1341148850
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1341148845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12715149fa0fd044a9e13e2de7f7ee09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_name: MyMaterial2
-  m_ka: {x: 0, y: 1, z: 1}
-  m_ks: {x: 1, y: 1, z: 0}
-  m_kd: {x: 1, y: 1, z: 1}
-  m_n: 1
-  m_transparency: 0
-  m_refractiveIndex: 0
-  m_reflectivity: 0
-  m_normal: {x: 0, y: 0, z: 0}
-  m_position: {x: 0, y: 0, z: 0}
-  m_textureNameKa: 
-  m_textureNameKd: MyTexture2
-  m_textureNameKs: 
 --- !u!1 &1655238578
 GameObject:
   m_ObjectHideFlags: 0
@@ -786,7 +654,6 @@ MonoBehaviour:
   fullIlluminousAngle: 30
   penumbraDecay: 1
   useShadowMap: 0
-  shadowFilter: 0
 --- !u!4 &1655238580
 Transform:
   m_ObjectHideFlags: 0
@@ -801,112 +668,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1833732258
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1833732261}
-  - component: {fileID: 1833732260}
-  - component: {fileID: 1833732259}
-  - component: {fileID: 1833732262}
-  - component: {fileID: 1833732263}
-  m_Layer: 0
-  m_Name: MyTextureDatabase
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1833732259
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1833732258}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2091bc2f3d6c2942905f9109d4e3f13, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1833732260
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1833732258}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4eb909351d31a548990317f48691730, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_name: Unused
-  m_isColor: 0
-  m_texture: {fileID: 0}
-  m_isChecker: 1
-  m_uRepeat: 2
-  m_vRepeat: 2
-  m_color1: {x: 0, y: 0, z: 0}
-  m_color2: {x: 0, y: 0, z: 0}
---- !u!4 &1833732261
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1833732258}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.9604392, y: -7.005871, z: 19.077234}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 12
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1833732262
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1833732258}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4eb909351d31a548990317f48691730, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_name: MyTexture1
-  m_isColor: 0
-  m_texture: {fileID: 0}
-  m_isChecker: 1
-  m_uRepeat: 20
-  m_vRepeat: 21
-  m_color1: {x: 0, y: 0, z: 1}
-  m_color2: {x: 0, y: 1, z: 0}
---- !u!114 &1833732263
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1833732258}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4eb909351d31a548990317f48691730, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_name: MyTexture2
-  m_isColor: 1
-  m_texture: {fileID: 10914, guid: 0000000000000000f000000000000000, type: 0}
-  m_isChecker: 0
-  m_uRepeat: 0
-  m_vRepeat: 0
-  m_color1: {x: 0, y: 0, z: 0}
-  m_color2: {x: 0, y: 0, z: 0}
 --- !u!1 &1917502573
 GameObject:
   m_ObjectHideFlags: 0
@@ -937,6 +698,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a707b232e61a247379604c2635881a1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_materialIndex: -1
 --- !u!114 &1917502575
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -950,7 +712,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_radius: 5
-  m_materialName: 
 --- !u!4 &1917502576
 Transform:
   m_ObjectHideFlags: 0
