@@ -17,7 +17,14 @@ GridStep DetermineGridStep(Ray ray)
     step.z = ray.direction.z >= 0 ? 1 : -1;
     
     return step;
-}
+};
+
+
+int GetNumberOfGeometryInGrid(SpatialGridIndex index, StructuredBuffer<int> geomGridList, int dimension)
+{
+    int i = index.z + index.y * dimension + index.x * dimension * dimension;
+    return geomGridList[i + 1] - geomGridList[i];
+};
 
 
 RayHit SpatialGridTrace(Ray ray, SpatialGrid spatialGrid, int _NumOfTriangles, StructuredBuffer<RTTriangle> _Triangles, int excludeGeometry)

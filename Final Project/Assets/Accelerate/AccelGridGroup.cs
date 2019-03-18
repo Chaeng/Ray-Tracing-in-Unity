@@ -18,8 +18,9 @@ namespace RayTracingRenderer
         public AccelGridGroup()
         {
             _grids = new AccelCell[DIMENSION, DIMENSION, DIMENSION];
-            _geometryGridIndexList = new List<int>(DIMENSION * DIMENSION * DIMENSION);
+            _geometryGridIndexList = new List<int>(DIMENSION * DIMENSION * DIMENSION + 1);    // Add a leading zero field to allow shader get the number of geometry in each grid
 
+            _geometryGridIndexList.Add(0);     // Add a leading zero field to allow shader get the number of geometry in each grid
             for (int x = 0; x < DIMENSION; x++)
             {
                 for (int y = 0; y < DIMENSION; y++)
@@ -119,7 +120,7 @@ namespace RayTracingRenderer
                     {                                          
                         List<RTTriangle_t> trianglesInGrid = _grids[x, y, z].GetTriangles();
                         counter += trianglesInGrid.Count;
-                        _geometryGridIndexList[z + y * DIMENSION + x * (DIMENSION * DIMENSION)] = counter;
+                        _geometryGridIndexList[z + y * DIMENSION + x * (DIMENSION * DIMENSION) + 1] = counter;    // The index is offset by 1 due to leading zero field
                         triangles.AddRange(trianglesInGrid);
                     }                                          
                 }                                              
