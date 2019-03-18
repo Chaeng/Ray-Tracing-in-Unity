@@ -69,8 +69,8 @@ namespace RayTracingRenderer
             int count = 0;
 
             ParseLight(roots);
-            ParseMaterial(roots);
             ParseTexture(roots);
+            ParseMaterial(roots);
             ParseSphere(roots, ref count);
             ParseTriangle(roots,ref count);
         }
@@ -96,20 +96,31 @@ namespace RayTracingRenderer
                 {
                     if (database.gameObject.activeSelf)
                     {
-                        if (database.GetMaterials() == null)
-                        {
-                            continue;
-                        }
-                        
                         foreach (var mat in database.GetMaterials())
                         {
+                            // Search the scene for geometries using this texture
+                            // and update their indices to point back here
                             string name = mat.GetName();
                             SetMaterialIndexSpheres(roots, name, count);
                             SetMaterialIndexTriangles(roots, name, count);
 
+                            // Add this material to static list for output
                             RTMaterial_t matStructure = mat.GetMaterial();
                             matStructure.id = count++;
                             m_materials.Add(matStructure);
+
+                            Debug.Log(string.Format("Add Mat {0} w/ "
+                                + "\n textureIndexKa {1}"
+                                + "\n textureIndexKd {2}"
+                                + "\n textureIndexKs {3}"
+                                + "\n textureIndexR {4}"
+                                + "\n textureIndexT {5}",
+                                mat.GetName(),
+                                matStructure.textureIndexKa,
+                                matStructure.textureIndexKd,
+                                matStructure.textureIndexKs,
+                                matStructure.textureIndexR,
+                                matStructure.textureIndexT));
                         }
                     }
                 }
@@ -128,14 +139,9 @@ namespace RayTracingRenderer
                 {
                     if (renderer.gameObject.activeSelf)
                     {
-                        string sphereMaterialName
-                            = renderer.GetSphere().GetMaterialName();
-                        if (sphereMaterialName != null)
+                        if (renderer.GetSphere().GetMaterialName() == name)
                         {
-                            if (sphereMaterialName == name)
-                            {
-                                renderer.GetSphere().SetMaterialIndex(index);
-                            }
+                            renderer.GetSphere().SetMaterialIndex(index);
                         }
                     }
                 }
@@ -154,14 +160,9 @@ namespace RayTracingRenderer
                 {
                     if (renderer.gameObject.activeSelf)
                     {
-                        string triangleMaterialName
-                            = renderer.GetTriangle().GetMaterialName();
-                        if (triangleMaterialName != null)
+                        if (renderer.GetTriangle().GetMaterialName() == name)
                         {
-                            if(triangleMaterialName == name)
-                            {
-                                renderer.GetTriangle().SetMaterialIndex(index);
-                            }
+                            renderer.GetTriangle().SetMaterialIndex(index);
                         }
                     }
                 }
@@ -189,45 +190,72 @@ namespace RayTracingRenderer
                 {
                     if (database.gameObject.activeSelf)
                     {
-                        if (database.GetTextures() == null)
-                        {
-                            continue;
-                        }
-
                          foreach (var tex in database.GetTextures())
                         {
+                            // Search the scene for materials using this texture
+                            // and update their indices to point back here
                             string name = tex.GetName();
-                            // SetMaterialIndexSpheres(roots, name, count);
-                            SetTextureIndexTriangles(roots, name, count);
+                            SetTextureIndexMaterials(roots, name, count);
 
+                            // Add this texture to static list for output
                             RTTexture_t texStructure = tex.GetTexture();
-                            texStructure.id = count++;
+                            texStructure.id = count++;  // arbitrary, unique
                             m_textures.Add(texStructure);
+
+                            Debug.Log(string.Format("Add Tex {0} w/ "
+                                + "\n isColor {1}"
+                                + "\n isChecker {2}"
+                                + "\n uRepeat {3}"
+                                + "\n vRepeat {4}"
+                                + "\n color1 {5}"
+                                + "\n color2 {6}",
+                                tex.GetName(),
+                                texStructure.isColor,
+                                texStructure.isChecker,
+                                texStructure.uRepeat,
+                                texStructure.vRepeat,
+                                texStructure.color1,
+                                texStructure.color2));
                         }
                     }
                 }
             }
         }
 
-        private void SetTextureIndexTriangles(GameObject[] roots,
-            string name, int index)
+        private void SetTextureIndexMaterials(GameObject[] roots,
+            string name,
+            int index)
         {
             foreach (var root in roots)
             {
-                RTTriangleRenderer[] triangleRenderers 
-                    = root.GetComponentsInChildren<RTTriangleRenderer>();
+                RTMaterialDatabase[] materialDatabases 
+                    = root.GetComponentsInChildren<RTMaterialDatabase>();
 
-                 foreach (var renderer in triangleRenderers)
+                foreach (var database in materialDatabases)
                 {
-                    if (renderer.gameObject.activeSelf)
+                    if (database.gameObject.activeSelf)
                     {
-                        string triangleTextureName
-                            = renderer.GetTriangle().GetTextureName();
-                        if (triangleTextureName != null)
+                        foreach (var mat in database.GetMaterials())
                         {
-                            if(triangleTextureName == name)
+                            if (mat.GetTextureNameKa() == name)
                             {
-                                renderer.GetTriangle().SetTextureIndex(index);
+                                mat.SetTextureIndexKa(index);
+                            }
+                            if (mat.GetTextureNameKd() == name)
+                            {
+                                mat.SetTextureIndexKd(index);
+                            }
+                            if (mat.GetTextureNameKs() == name)
+                            {
+                                mat.SetTextureIndexKs(index);
+                            }
+                            if (mat.GetTextureNameR() == name)
+                            {
+                                mat.SetTextureIndexR(index);
+                            }
+                            if (mat.GetTextureNameT() == name)
+                            {
+                                mat.SetTextureIndexT(index);
                             }
                         }
                     }
@@ -237,12 +265,6 @@ namespace RayTracingRenderer
 
         private void ParseSphere(GameObject[] roots, ref int counter)
         {   
-            // Force initialization of dependencies
-            if (m_materials == null)
-            {
-                ParseMaterial(roots);
-            }
-
             // TODO: Optimize dynamic array generation
             m_sphereGeom.Clear();
 
@@ -264,16 +286,6 @@ namespace RayTracingRenderer
 
         private void ParseTriangle(GameObject[] roots, ref int counter)
         {
-            // Force initialization of dependencies
-            if (m_materials == null)
-            {
-                ParseMaterial(roots);
-            }
-            if (m_textures == null)
-            {
-                ParseTexture(roots);
-            }
-
             // TODO: Optimize dynamic array generation
             if (m_triangleGeom == null)
             {

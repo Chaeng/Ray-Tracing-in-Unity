@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(RTMaterial))]
 public class RTMaterialDatabase : MonoBehaviour
 {
     private RTMaterial[] m_materials = null;

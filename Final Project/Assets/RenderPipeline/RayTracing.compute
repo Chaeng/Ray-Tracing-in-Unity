@@ -68,7 +68,7 @@ StructuredBuffer<RTTriangle> _Triangles;
 int _NumOfMaterials;
 StructuredBuffer<RTMaterial> _Materials;
 
-// material
+// texture
 int _NumOfTextures;
 StructuredBuffer<RTTexture> _Textures;
 
@@ -132,7 +132,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                           _FogFactor,
                           _FogColor,
                           _NumOfMaterials,
-                          _Materials);
+                          _Materials,
+                          _NumOfTextures,
+                          _Textures);
 
     if(_MaxRayGeneration > 1) {
         float3 refl = Transparent(
@@ -159,7 +161,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _FogFactor,
                         _FogColor,
                         _NumOfMaterials,
-                        _Materials
+                        _Materials,
+                        _NumOfTextures,
+                        _Textures
                         );
                         
         float3 ref2 = Reflection(
@@ -186,7 +190,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _FogFactor,
                         _FogColor,
                         _NumOfMaterials,
-                        _Materials);             
+                        _Materials,
+                        _NumOfTextures,
+                        _Textures);             
         
         result = refl;
     }     

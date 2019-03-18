@@ -10,12 +10,13 @@ public class RTTriangle : RTGeometry
     [SerializeField] private Vector3 m_vertices0 = Vector3.zero;
     [SerializeField] private Vector3 m_vertices1 = Vector3.zero;
     [SerializeField] private Vector3 m_vertices2 = Vector3.zero;
+    [SerializeField] private Vector2 m_verticesUV0 = Vector3.zero;
+    [SerializeField] private Vector2 m_verticesUV1 = Vector3.zero;
+    [SerializeField] private Vector2 m_verticesUV2 = Vector3.zero;
     [SerializeField] private bool m_isDoubleSide = true;
-    [SerializeField] private string m_materialName;
-    [SerializeField] private string m_textureName;
+    [SerializeField] private string m_materialName = "";
 
     private int m_materialIndex = -1;
-    private int m_textureIndex = -1;
 
 
     private Vector4 m_worldVert0 = Vector4.zero;
@@ -37,19 +38,9 @@ public class RTTriangle : RTGeometry
         return m_materialName;
     }
 
-    public string GetTextureName()
-    {
-        return m_textureName;
-    }
-
     public void SetMaterialIndex(int index)
     {
         m_materialIndex = index;
-    }
-
-    public void SetTextureIndex(int index)
-    {
-        m_textureIndex = index;
     }
 
     public RTTriangle_t GetGeometry()
@@ -64,7 +55,11 @@ public class RTTriangle : RTGeometry
             normal = m_cachedNormal,
             planeD = m_cachedPlaneD,
             area = m_cachedArea,
-            isDoubleSide = m_isDoubleSide ? 1 : 0
+            isDoubleSide = m_isDoubleSide ? 1 : 0,
+            materialIndex = m_materialIndex,
+            vertUV0 = m_verticesUV0,
+            vertUV1 = m_verticesUV1,
+            vertUV2 = m_verticesUV2
         };
     }
 

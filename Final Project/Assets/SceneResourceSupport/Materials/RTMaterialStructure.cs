@@ -20,9 +20,16 @@ public struct RTMaterial_t
     // support for normal and positional map
     public Vector3 normal, position;
 
+    // support for textures
+    public int textureIndexKa;
+    public int textureIndexKd;
+    public int textureIndexKs;
+    public int textureIndexR;
+    public int textureIndexT;
+
     public static int GetSize()
     {
-        return sizeof(int)
+        return sizeof(int) * 6
             + Vector3Extension.SizeOf() * 5
             + sizeof(float) * 4;
     }

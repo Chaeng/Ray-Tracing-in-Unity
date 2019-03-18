@@ -24,7 +24,9 @@ float3 Reflection(
     float fogFactor,
     float3 fogColor,
     int numOfMaterials,
-    StructuredBuffer<RTMaterial> materials)
+    StructuredBuffer<RTMaterial> materials,
+    int numOfTextures,
+    StructuredBuffer<RTTexture> textures)
 {
     // Hard code
     // Request parser to add 
@@ -121,7 +123,9 @@ float3 Reflection(
                                 fogFactor,
                                 fogColor,
                                 numOfMaterials,
-                                materials);
+                                materials,
+                                numOfTextures,
+                                textures);
                  colorArr[i] += color;    
              }     
             return colorArr[1] + (colorArr[0] * k); 
@@ -189,7 +193,9 @@ float3 Reflection(
                                 fogFactor,
                                 fogColor,
                                 numOfMaterials,
-                                materials);
+                                materials,
+                                numOfTextures,
+                                textures);
                  colorArr[i] = color;    
              }     
             return colorArr[3] + ((colorArr[2] + (colorArr[1] * k)) * k); 
@@ -257,7 +263,9 @@ float3 Reflection(
                                 fogFactor,
                                 fogColor,
                                 numOfMaterials,
-                                materials);
+                                materials,
+                                numOfTextures,
+                                textures);
                  colorArr[i] = color;    
              }     
             return colorArr[3] + ((colorArr[2] + (colorArr[1] * k)) * k); 

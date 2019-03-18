@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(RTTexture))]
 public class RTTextureDatabase : MonoBehaviour
 {
     private RTTexture[] m_textures = null;

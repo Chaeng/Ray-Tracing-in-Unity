@@ -6,9 +6,6 @@ using UnityEngine;
 
 public class RTRenderer : MonoBehaviour
 {
-    //[SerializeField] protected int m_materialIndex = -1;
-    // [SerializeField] protected int m_materialName = -1;  // TODO
-
     protected RTGeometry m_geom = null;
     private RTMaterialDatabase m_materialDatabase = null;
 

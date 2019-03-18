@@ -1,0 +1,109 @@
+﻿#ifndef RTMATERIAL_UTILS_COMPUTE
+#define RTMATERIAL_UTILS_COMPUTE
+
+#include "RTMaterial.compute"
+#include "RTTexture.compute"
+
+float3 GetAmbient(
+    int numOfSpheres,
+    StructuredBuffer<RTSphere> spheres,
+    int numOfTriangles,
+    StructuredBuffer<RTTriangle> triangles,
+    int numOfTextures,
+    StructuredBuffer<RTTexture> textures,
+    RTMaterial mat,
+    RayHit hit)
+{
+    float3 ka = mat.ka;
+
+    if (mat.texIndexKa != -1)
+    {
+        RTTexture tex = GetIndexedTexture(textures,
+            numOfTextures,
+            mat.texIndexKa);
+
+        if (hit.geoType == 0)  // Sphere
+        {
+            // TODO
+        }
+        else if (hit.geoType == 1)  // Triangle
+        {
+            RTTriangle tri = GetIndexedGeom_Triangle(triangles,
+                numOfTriangles,
+                hit.geoIndex);
+            ka = ka * GetTexturedAttr_Triangle(tex, hit, tri);
+        }
+    }
+
+    return ka;
+}
+
+float3 GetDiffuse(
+    int numOfSpheres,
+    StructuredBuffer<RTSphere> spheres,
+    int numOfTriangles,
+    StructuredBuffer<RTTriangle> triangles,
+    int numOfTextures,
+    StructuredBuffer<RTTexture> textures,
+    RTMaterial mat,
+    RayHit hit)
+{
+    float3 kd = mat.kd;
+
+    if (mat.texIndexKd != -1)
+    {
+        RTTexture tex = GetIndexedTexture(textures,
+            numOfTextures,
+            mat.texIndexKd);
+
+        if (hit.geoType == 0)  // Sphere
+        {
+            // TODO
+        }
+        else if (hit.geoType == 1)  // Triangle
+        {
+            RTTriangle tri = GetIndexedGeom_Triangle(triangles,
+                numOfTriangles,
+                hit.geoIndex);
+            kd = kd * GetTexturedAttr_Triangle(tex, hit, tri);
+        }
+    }
+
+    return kd;
+}
+
+float3 GetSpecular(
+    int numOfSpheres,
+    StructuredBuffer<RTSphere> spheres,
+    int numOfTriangles,
+    StructuredBuffer<RTTriangle> triangles,
+    int numOfTextures,
+    StructuredBuffer<RTTexture> textures,
+    RTMaterial mat,
+    RayHit hit)
+{
+    float3 ks = mat.ks;
+
+    if (mat.texIndexKs != -1)
+    {
+        RTTexture tex = GetIndexedTexture(textures,
+            numOfTextures,
+            mat.texIndexKs);
+
+        if (hit.geoType == 0)  // Sphere
+        {
+            // TODO
+        }
+        else if (hit.geoType == 1)  // Triangle
+        {
+            RTTriangle tri = GetIndexedGeom_Triangle(triangles,
+                numOfTriangles,
+                hit.geoIndex);
+            ks = ks * GetTexturedAttr_Triangle(tex, hit, tri);
+        }
+    }
+
+    return ks;
+}
+
+#endif  // RTMATERIAL_UTILS_COMPUTE
