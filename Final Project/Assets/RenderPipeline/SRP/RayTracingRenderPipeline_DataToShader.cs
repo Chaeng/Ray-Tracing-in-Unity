@@ -128,6 +128,8 @@ namespace RayTracingRenderer
         {
             int count = sceneParser.GetPointLights().Count;
             
+            buffer?.Release();
+            
             if (count > 0)
             {
                 buffer = new ComputeBuffer(count, RTLightStructurePoint_t.GetSize());
@@ -158,6 +160,8 @@ namespace RayTracingRenderer
         {
             m_sphereBuffer.Release();
             m_triangleBuffer.Release();
+            m_gridsBuffer.Release();
+            m_gridsIndexBuffer.Release();
             m_materialBuffer.Release();
             m_directionalLightBuffer.Release();
             m_pointLightBuffer.Release();
