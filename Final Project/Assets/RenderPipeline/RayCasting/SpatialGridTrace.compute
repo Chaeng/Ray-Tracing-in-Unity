@@ -1,0 +1,31 @@
+﻿#ifndef SPATIAL_GRID_TRACE_COMPUTE
+#define SPATIAL_GRID_TRACE_COMPUTE
+
+#include "../Ray.compute"
+#include "../RayHit.compute"
+#include "RayBoxIntersection.compute"
+#include "../Geometry/RTTriangle.compute"
+
+RayHit SpatialGridTrace(Ray ray, float3 boxMin, float3 boxMax, int _NumOfTriangles, StructuredBuffer<RTTriangle> _Triangles, int excludeGeometry)
+{
+    RayHit bestHit = CreateRayHit();
+    
+    float t0 = -1.#INF;
+    float t1 = 1.#INF;
+    
+    if (RayBoxIntersection(ray, boxMin, boxMax, t0, t1))
+    {
+        for(int t = 0; t < _NumOfTriangles; t++)
+        {
+            if(_Triangles[t].id == excludeGeometry)
+            {
+                continue;
+            }
+            IntersectTriangle(ray, bestHit, _Triangles[t]);
+        }
+    }
+    
+    return bestHit;
+}
+
+#endif //SPATIALGRIDTRACE_COMPUTE
