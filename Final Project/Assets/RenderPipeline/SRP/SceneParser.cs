@@ -41,6 +41,16 @@ namespace RayTracingRenderer
         {
             _accelGrids.GetTrianglesInGrids(out triangles, out gridIndex);
         }
+
+        public Vector3 GetSpatialGridBoxMin()
+        {
+            return _accelGrids.GetGridBoxMin();
+        }
+
+        public Vector3 GetSpatialGridBoxMax()
+        {
+            return _accelGrids.GetGridBoxMax();
+        }
         
         public List<RTMaterial_t> GetMaterials()
         {

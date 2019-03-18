@@ -128,6 +128,12 @@ namespace RayTracingRenderer
             m_mainShader.SetBuffer(kIndex, "_Triangles", buffer);
         }
 
+        private void RunSetSpatialGridToMainShader(Vector3 boxMin, Vector3 boxMax)
+        {
+            m_mainShader.SetVector("_GridBoxMin", boxMin);
+            m_mainShader.SetVector("_GridBoxMax", boxMax);
+        }
+
         private void RunSetDirectionalLightsToMainShader(ComputeBuffer buffer, int count)
         {
             m_mainShader.SetInt("_NumOfDirectionalLights", count);

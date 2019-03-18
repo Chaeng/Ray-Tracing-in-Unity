@@ -64,6 +64,10 @@ StructuredBuffer<RTSphere> _Spheres;
 int _NumOfTriangles;
 StructuredBuffer<RTTriangle> _Triangles;
 
+// Spatial Grid
+float3 _GridBoxMin;
+float3 _GridBoxMax;
+
 // material
 int _NumOfMaterials;
 StructuredBuffer<RTMaterial> _Materials;
