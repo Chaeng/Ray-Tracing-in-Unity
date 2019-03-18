@@ -20,10 +20,11 @@ GridStep DetermineGridStep(Ray ray)
 };
 
 
-int GetNumberOfGeometryInGrid(SpatialGridIndex index, StructuredBuffer<int> geomGridList, int dimension)
+void GetNumberOfGeometryInGrid(SpatialGridIndex index, StructuredBuffer<int> geomGridList, int dimension, inout int start, inout int count)
 {
     int i = index.z + index.y * dimension + index.x * dimension * dimension;
-    return geomGridList[i + 1] - geomGridList[i];
+    start = geomGridList[i];
+    count = geomGridList[i + 1] - geomGridList[i];   // The index is offset by 1 due to leading zero field
 };
 
 
