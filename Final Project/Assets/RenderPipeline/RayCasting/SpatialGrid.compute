@@ -69,7 +69,26 @@ SpatialGridIndex GetGridIndexAtPoint(SpatialGrid grid, float3 pt)
 };
 
 
-void InnerDistanceToBoundary(Ray ray, SpatialGrid grids, GridStep steps, float3 min, float3 max, inout RayHit rayHitX, inout RayHit rayHitY, inout RayHit rayHitZ)
+float3 GetGridLocalMin(SpatialGrid grids, SpatialGridIndex index)
+{
+    float3 localMin = float3(0, 0, 0);
+    localMin.x = grids.min.x + grids.w * index.x;
+    localMin.y = grids.min.y + grids.h * index.y;
+    localMin.z = grids.min.z + grids.d * index.z;
+    return localMin;
+};
+
+float3 GetGridLocalMax(SpatialGrid grids, SpatialGridIndex index)
+{
+    float3 localMax = float3(0, 0, 0);
+    localMax.x = grids.min.x + grids.w * (index.x + 1);
+    localMax.y = grids.min.y + grids.h * (index.y + 1);
+    localMax.z = grids.min.z + grids.d * (index.z + 1);
+    return localMax;
+};
+
+
+void InnerDistanceToBoundary(Ray ray, GridStep steps, float3 min, float3 max, inout RayHit rayHitX, inout RayHit rayHitY, inout RayHit rayHitZ)
 {
     if(steps.x >= 0)
     {
@@ -100,11 +119,56 @@ void InnerDistanceToBoundary(Ray ray, SpatialGrid grids, GridStep steps, float3 
 };
 
 
-/*
-float3 GetDeltaToBoundary(SpatialGridIndex entryGridIndex, Ray entryToBoundaryRay, GridStep steps)
+void DistanceBetweenBoundary(Ray ray, GridStep steps, SpatialGridIndex entryGridIndex, SpatialGrid grids, float3 firstHitX, float3 firstHitY, float3 firstHitZ, inout RayHit rayHitX, inout RayHit rayHitY, inout RayHit rayHitZ)
 {
+    float3 min = GetGridLocalMin(grids, entryGridIndex);
+    float3 max = GetGridLocalMax(grids, entryGridIndex);
+
+    Ray rX = CreateRay(firstHitX, ray.direction);
+    Ray rY = CreateRay(firstHitY, ray.direction);
+    Ray rZ = CreateRay(firstHitZ, ray.direction);
     
+    if(steps.x >= 0)
+    {
+        rayHitX = RayPlaneIntersection(ray, GridNormalLeft, max + GridNormalRight);
+    }
+    else
+    {
+        rayHitX = RayPlaneIntersection(ray, GridNormalRight, min + GridNormalLeft);
+    }
+    
+    if(steps.y >= 0)
+    {
+        rayHitY = RayPlaneIntersection(ray, GridNormalDown, max + GridNormalUp);
+    }
+    else
+    {
+        rayHitY = RayPlaneIntersection(ray, GridNormalUp, min + GridNormalDown);
+    }
+    
+    if(steps.z >= 0)
+    {
+        rayHitZ = RayPlaneIntersection(ray, GridNormalBack, max + GridNormalForward);
+    }
+    else
+    {
+        rayHitZ = RayPlaneIntersection(ray, GridNormalForward, min + GridNormalBack);
+    }
 };
-*/
+
+
+
+void GetDeltaToBoundary(SpatialGridIndex entryGridIndex, SpatialGrid grids, Ray entryToBoundaryRay, GridStep steps, inout RayHit rayHitX, inout RayHit rayHitY, inout RayHit rayHitZ)
+{
+    InnerDistanceToBoundary(
+        entryToBoundaryRay, 
+        steps, 
+        GetGridLocalMin(grids, entryGridIndex),
+        GetGridLocalMax(grids, entryGridIndex),
+        rayHitX,
+        rayHitY,
+        rayHitZ);
+};
+
 
 #endif  // Spatial_Grid_Compute
