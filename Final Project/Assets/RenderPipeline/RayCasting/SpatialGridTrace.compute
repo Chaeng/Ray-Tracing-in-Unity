@@ -71,15 +71,45 @@ RayHit SpatialGridTrace(Ray ray, SpatialGrid spatialGrid, StructuredBuffer<int> 
         
         GridStep step = DetermineGridStep(ray);
         
-    
-        for(int t = 0; t < _NumOfTriangles; t++)
+        Ray entryToBoundaryRay = CreateRay(entry, ray.direction);
+        SpatialGridIndex entryGridIndex = GetGridIndexAtPoint(spatialGrid, entry);
+        RayHit firstVoxelDeltaX, firstVoxelDeltaY, firstVoxelDeltaZ;
+        GetDeltaToBoundary(
+            entryGridIndex, 
+            spatialGrid,
+            entryToBoundaryRay,
+            step,
+            firstVoxelDeltaX,
+            firstVoxelDeltaY,
+            firstVoxelDeltaZ);
+        
+        RayHit distToNextX, distToNextY, distToNextZ;
+        DistanceBetweenBoundary(
+            ray, 
+            step, 
+            entryGridIndex,
+            spatialGrid,
+            firstVoxelDeltaX.position,
+            firstVoxelDeltaY.position,
+            firstVoxelDeltaZ.position,
+            distToNextX,
+            distToNextY,
+            distToNextZ
+        );
+        
+        
+        SpatialGridIndex current = entryGridIndex;
+        do
         {
-            if(_Triangles[t].id == excludeGeometry)
-            {
-                continue;
-            }
-            IntersectTriangle(ray, bestHit, _Triangles[t]);
+            bestHit = LocalGridTrace(
+                                    ray,
+                                    current,
+                                    geomGridList,
+                                    triangles,
+                                    spatialGrid,
+                                    -1);
         }
+        while(false);
     }
     
     return bestHit;
