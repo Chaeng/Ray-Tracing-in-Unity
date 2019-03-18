@@ -4,6 +4,7 @@
 #include "../Ray.compute"
 #include "../RayHit.compute"
 #include "RayBoxIntersection.compute"
+#include "SpatialGrid.compute"
 #include "../Geometry/RTTriangle.compute"
 
 
@@ -27,14 +28,15 @@ GridStep DetermineGridStep(Ray ray)
 }
 
 
-RayHit SpatialGridTrace(Ray ray, float3 boxMin, float3 boxMax, int _NumOfTriangles, StructuredBuffer<RTTriangle> _Triangles, int excludeGeometry)
+RayHit SpatialGridTrace(Ray ray, SpatialGrid spatialGrid, int _NumOfTriangles, StructuredBuffer<RTTriangle> _Triangles, int excludeGeometry)
 {
     RayHit bestHit = CreateRayHit();
     
     float t0 = -1.#INF;
     float t1 = 1.#INF;
+
     
-    if (RayBoxIntersection(ray, boxMin, boxMax, t0, t1))
+    if (RayBoxIntersection(ray, spatialGrid.min, spatialGrid.max, t0, t1))
     {
         float3 entry = GetPoint(ray, t1);
         
