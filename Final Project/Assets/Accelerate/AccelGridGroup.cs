@@ -6,7 +6,7 @@ namespace RayTracingRenderer
 {
     public class AccelGridGroup
     {
-        private const int DIMENSION = 3;
+        private const int DIMENSION = 5;
 
 
         private AccelCell[,,] _grids;
@@ -15,11 +15,6 @@ namespace RayTracingRenderer
         private Vector3 _max = Vector3.zero;
 
 
-        /// <summary>
-        /// This will create a grid array, from min (lower left front) to max (upper right back)
-        /// </summary>
-        /// <param name="min"></param>
-        /// <param name="max"></param>
         public AccelGridGroup()
         {
             _grids = new AccelCell[DIMENSION, DIMENSION, DIMENSION];
@@ -60,6 +55,18 @@ namespace RayTracingRenderer
                     }
                 }
             }
+        }
+
+
+        public Vector3 GetGridBoxMin()
+        {
+            return _min;
+        }
+
+
+        public Vector3 GetGridBoxMax()
+        {
+            return _max;
         }
 
 
