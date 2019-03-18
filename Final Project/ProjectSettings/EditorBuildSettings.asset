@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ChaengScene.unity
     guid: e00825d80601f90408424859f7cc92e9
+  - enabled: 1
+    path: Assets/Scenes/AndrewScene.unity
+    guid: f32e302e8de0adf4e88caa914da1a229
   m_configObjects: {}

@@ -12,6 +12,46 @@ struct RTSphere
     int matIndex;
 };
 
+RTSphere GetDefaultGeom_Sphere()
+{
+    RTSphere sph;
+
+    sph.id = -1;
+
+    sph.center = float3(0, 0, 0);
+    sph.radius = 0;
+    sph.matIndex = -1;
+
+    return sph;
+}
+
+RTSphere GetIndexedGeom_Sphere(StructuredBuffer<RTSphere> spheres,
+    int numOfSpheres,
+    int index)
+{
+    RTSphere sph;
+    int isMatched = 0;
+
+    // If index valid, then retrieve element
+    for (int i = 0; i < numOfSpheres; i++)
+    {
+        if (spheres[i].id == index)
+        {
+            sph = spheres[i];
+            isMatched = 1;
+            break;
+        }
+    }
+
+    // Otherwise, return default element
+    if (!isMatched)
+    {
+        sph = GetDefaultGeom_Sphere();
+    }
+
+    return sph;
+}
+
 void IntersectSphere(Ray ray, inout RayHit bestHit, RTSphere sphere)
 {
     // The ray equation in from of (ray.origin) + (distance travelled, d) * (ray.direction) = (the contact point)   Equ(1)

@@ -34,7 +34,7 @@ namespace RayTracingRenderer
         // Constants
         private const int ShadowMapSize = 512;    // TODO: Get this dimension from RenderConfig
         
-        private const int TextureImageSize = 64;    // TODO: Get this dimension from RenderConfig
+        private const int TextureImageSize = 64;    // TODO: Get this dimension from Utility
         
         
         // Own member fields

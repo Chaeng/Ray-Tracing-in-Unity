@@ -105,6 +105,8 @@ namespace RayTracingRenderer
             int count = textureImages == null
                 ? 0
                 : textureImages.Count;
+            Debug.Log(string.Format("LoadBufferWithTextureImages: count={0}, textureImages null?={1}", count, textureImages == null));
+
 
             if (count > 0)
             {
@@ -114,6 +116,7 @@ namespace RayTracingRenderer
 
                 for (int i = 0; i < count; i++)
                 {
+                    Debug.Log(string.Format("LoadBufferWithTextureImages: Copying Tex id={0}, null?={1}", i, textureImages[i] == null));
                     Graphics.CopyTexture(textureImages[i], 0, 0, m_textureImageList, i, 0); // index is the index of the texture
                 }
             }

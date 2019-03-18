@@ -1,4 +1,4 @@
-﻿//#define DEBUG_VERBOSE
+﻿#define DEBUG_VERBOSE
 
 using System.Collections;
 using System.Collections.Generic;
@@ -123,15 +123,11 @@ namespace RayTracingRenderer
                             Debug.Log(string.Format("Add Mat {0} w/ "
                                 + "\n textureIndexKa {1}"
                                 + "\n textureIndexKd {2}"
-                                + "\n textureIndexKs {3}"
-                                + "\n textureIndexR {4}"
-                                + "\n textureIndexT {5}",
+                                + "\n textureIndexKs {3}",
                                 mat.GetName(),
                                 matStructure.textureIndexKa,
                                 matStructure.textureIndexKd,
-                                matStructure.textureIndexKs,
-                                matStructure.textureIndexR,
-                                matStructure.textureIndexT));
+                                matStructure.textureIndexKs));
 #endif
                         }
                     }
@@ -198,6 +194,7 @@ namespace RayTracingRenderer
             }
 
             m_textures.Clear();
+            m_textureImages.Clear();
 
             foreach (var root in roots)
             {
@@ -277,14 +274,6 @@ namespace RayTracingRenderer
                             {
                                 mat.SetTextureIndexKs(index);
                             }
-                            // if (mat.GetTextureNameR() == name)
-                            // {
-                            //     mat.SetTextureIndexR(index);
-                            // }
-                            // if (mat.GetTextureNameT() == name)
-                            // {
-                            //     mat.SetTextureIndexT(index);
-                            // }
                         }
                     }
                 }

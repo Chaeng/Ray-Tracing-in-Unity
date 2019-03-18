@@ -25,7 +25,10 @@ float3 GetAmbient(
 
         if (hit.geoType == 0)  // Sphere
         {
-            // TODO
+            RTSphere sph = GetIndexedGeom_Sphere(spheres,
+                numOfSpheres,
+                hit.geoIndex);
+            ka = ka * GetTexturedAttr_Sphere(tex, hit, sph, textureImages);
         }
         else if (hit.geoType == 1)  // Triangle
         {
@@ -60,7 +63,10 @@ float3 GetDiffuse(
 
         if (hit.geoType == 0)  // Sphere
         {
-            // TODO
+            RTSphere sph = GetIndexedGeom_Sphere(spheres,
+                numOfSpheres,
+                hit.geoIndex);
+            kd = kd * GetTexturedAttr_Sphere(tex, hit, sph, textureImages);
         }
         else if (hit.geoType == 1)  // Triangle
         {
@@ -95,7 +101,10 @@ float3 GetSpecular(
 
         if (hit.geoType == 0)  // Sphere
         {
-            // TODO
+            RTSphere sph = GetIndexedGeom_Sphere(spheres,
+                numOfSpheres,
+                hit.geoIndex);
+            ks = ks * GetTexturedAttr_Sphere(tex, hit, sph, textureImages);
         }
         else if (hit.geoType == 1)  // Triangle
         {
