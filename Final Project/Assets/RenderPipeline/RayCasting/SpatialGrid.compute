@@ -1,0 +1,47 @@
+﻿#ifndef Spatial_Grid_Compute
+#define Spatial_Grid_Compute
+
+struct SpatialGridIndex
+{
+    int x;
+    int y;
+    int z;
+};
+
+struct SpatialGrid
+{
+    float3 min;
+    float3 max;
+    float dimension;
+};
+
+SpatialGrid CreateSpatialGrid(float3 min, float3 max, float dimension)
+{
+    SpatialGrid grids;
+    
+    grids.min = min;
+    grids.max = max;
+    grids.dimension = dimension;
+    
+    return grids;
+};
+
+
+SpatialGridIndex GetGridIndexAtPoint(SpatialGrid grid, float3 pt)
+{
+    int d = grid.dimension;
+
+    SpatialGridIndex index;
+    
+    index.x = floor((pt.x - grid.min.x) / (grid.max.x - grid.min.x) * d);
+    index.x = clamp(index.x, 0, d - 1);
+    index.y = floor((pt.y - grid.min.y) / (grid.max.y - grid.min.y) * d);
+    index.y = clamp(index.y, 0, d - 1);
+    index.z = floor((pt.z - grid.min.z) / (grid.max.z - grid.min.z) * d);
+    index.z = clamp(index.z, 0, d - 1);
+    
+    return index;
+};
+
+
+#endif  // Spatial_Grid_Compute

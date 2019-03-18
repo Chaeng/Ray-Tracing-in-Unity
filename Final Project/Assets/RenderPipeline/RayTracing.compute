@@ -1,6 +1,7 @@
 ﻿#include "Ray.compute"
 #include "RayHit.compute"
 #include "RayCasting/Trace.compute"
+#include "RayCasting/SpatialGrid.compute"
 #include "RayCasting/SpatialGridTrace.compute"
 #include "Light/RTDirectionalLight.compute"
 #include "Light/RTPointLight.compute"
@@ -114,6 +115,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                        _Triangles,
                        -1);    // Exclude nothing
                        */
+                       
+    SpatialGrid spatialGrid = CreateSpatialGrid(_GridBoxMin, _GridBoxMax, _GridDimension);
 
     RayHit hit = SpatialGridTrace(ray,
                                   _GridBoxMin,
