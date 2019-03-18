@@ -73,15 +73,15 @@ RayHit SpatialGridTrace(Ray ray, SpatialGrid spatialGrid, StructuredBuffer<int> 
         
         Ray entryToBoundaryRay = CreateRay(entry, ray.direction);
         SpatialGridIndex entryGridIndex = GetGridIndexAtPoint(spatialGrid, entry);
-        RayHit firstVoxelDeltaX, firstVoxelDeltaY, firstVoxelDeltaZ;
+        RayHit deltaX, deltaY, deltaZ;
         GetDeltaToBoundary(
             entryGridIndex, 
             spatialGrid,
             entryToBoundaryRay,
             step,
-            firstVoxelDeltaX,
-            firstVoxelDeltaY,
-            firstVoxelDeltaZ);
+            deltaX,
+            deltaY,
+            deltaZ);
         
         RayHit distToNextX, distToNextY, distToNextZ;
         DistanceBetweenBoundary(
@@ -89,16 +89,20 @@ RayHit SpatialGridTrace(Ray ray, SpatialGrid spatialGrid, StructuredBuffer<int> 
             step, 
             entryGridIndex,
             spatialGrid,
-            firstVoxelDeltaX.position,
-            firstVoxelDeltaY.position,
-            firstVoxelDeltaZ.position,
+            deltaX.position,
+            deltaY.position,
+            deltaZ.position,
             distToNextX,
             distToNextY,
             distToNextZ
         );
         
+        float tx = deltaX.distance;
+        float ty = deltaY.distance;
+        float tz = deltaZ.distance;
         
         SpatialGridIndex current = entryGridIndex;
+
         do
         {
             bestHit = LocalGridTrace(
@@ -108,8 +112,41 @@ RayHit SpatialGridTrace(Ray ray, SpatialGrid spatialGrid, StructuredBuffer<int> 
                                     triangles,
                                     spatialGrid,
                                     -1);
+                                    
+            if (tx < ty)
+            {
+                if (tx < tz)
+                {
+                    // Move On X
+                    current.x = current.x + step.x;
+                    tx += distToNextX.distance;
+                }
+                else
+                {
+                    // Move On Z
+                    current.z = current.z + step.z;
+                    tz += distToNextZ.distance;
+                }
+            }
+            else
+            {
+                if (ty < tz)
+                {
+                    // Move On Y
+                    current.y = current.y + step.y;
+                    ty += distToNextY.distance;
+                }
+                else
+                {
+                    // Move On Z
+                    current.z = current.z + step.z;
+                    tz += distToNextZ.distance;
+                }
+            }
+            
         }
-        while(false);
+        while(!(bestHit.distance < 1.#INF) && !IsGridIndexOutsideGrid(spatialGrid, current));
+        
     }
     
     return bestHit;

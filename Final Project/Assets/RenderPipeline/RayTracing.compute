@@ -116,8 +116,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                        _NumOfTriangles,
                        _Triangles,
                        -1);    // Exclude nothing
-                       */
-                       
+                      */ 
+                     
     SpatialGrid spatialGrid = CreateSpatialGrid(_GridBoxMin, _GridBoxMax, _GridDimension);
 
     RayHit hit = SpatialGridTrace(ray,

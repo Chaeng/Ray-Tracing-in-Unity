@@ -69,6 +69,14 @@ SpatialGridIndex GetGridIndexAtPoint(SpatialGrid grid, float3 pt)
 };
 
 
+bool IsGridIndexOutsideGrid(SpatialGrid grid, SpatialGridIndex index)
+{
+    return  (index.x >= grid.dimension || index.x < 0) || 
+            (index.y >= grid.dimension || index.y < 0) || 
+            (index.z >= grid.dimension || index.z < 0);
+}
+
+
 float3 GetGridLocalMin(SpatialGrid grids, SpatialGridIndex index)
 {
     float3 localMin = float3(0, 0, 0);
