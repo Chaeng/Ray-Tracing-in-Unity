@@ -1,0 +1,39 @@
+﻿#ifndef RayPlaneIntersection_Compute
+#define RayPlaneIntersection_Compute
+
+#include "../Ray.compute"
+#include "../RayHit.compute"
+
+RayHit RayPlaneIntersection(Ray ray, float3 pNormal, float3 pPoint)
+{
+    // From the distance formula of ray plane intersection
+    float divisor = dot(pNormal, ray.direction);
+    float dividend = dot(pPoint - ray.origin, pNormal);
+    
+    RayHit rayHit = CreateRayHit();
+    
+    float Epsilon = 1.19e-07f;
+    
+    if(abs(divisor) <= Epsilon)
+    {
+        // The line and plane is parallel, check if the line lies on the plane
+        if (abs(dividend) <= Epsilon)
+        {
+            rayHit.distance = 0;
+            rayHit.position = float3(0, 0, 0);
+            return rayHit;
+        }
+        else
+        {
+            rayHit.distance = 1.#INF;
+            rayHit.position = float3(1.#INF, 1.#INF, 1.#INF);
+            return rayHit;
+        }
+    }
+    
+    rayHit.distance = dividend / divisor;
+    rayHit.position = GetPoint(ray, rayHit.distance);
+    return rayHit;
+}   
+
+#endif  //RayPlaneIntersection_Compute

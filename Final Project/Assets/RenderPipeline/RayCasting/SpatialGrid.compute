@@ -1,6 +1,8 @@
 ﻿#ifndef Spatial_Grid_Compute
 #define Spatial_Grid_Compute
 
+#include "RayPlaneIntersection.compute"
+
 struct SpatialGridIndex
 {
     int x;
@@ -58,6 +60,8 @@ SpatialGridIndex GetGridIndexAtPoint(SpatialGrid grid, float3 pt)
     
     return index;
 };
+
+
 
 
 
