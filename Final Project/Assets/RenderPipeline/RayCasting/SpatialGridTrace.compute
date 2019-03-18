@@ -31,6 +31,7 @@ void GetNumberOfGeometryInGrid(SpatialGridIndex index, StructuredBuffer<int> geo
 RayHit LocalGridTrace(Ray ray, SpatialGridIndex index, StructuredBuffer<int> geomGridList, StructuredBuffer<RTTriangle> triangles, SpatialGrid grids, int excludeGeometry)
 {
     RayHit bestHit = CreateRayHit();
+    RayHit currentHit = CreateRayHit();
 
     int start = 0;
     int count = 0;
@@ -42,13 +43,37 @@ RayHit LocalGridTrace(Ray ray, SpatialGridIndex index, StructuredBuffer<int> geo
         return bestHit;
     }
     
+    float3 localMin = GetGridLocalMin(grids, index);
+    float3 localMax = GetGridLocalMax(grids, index);
+    
     for(int t = start; t < count; t++)
     {
         if(triangles[t].id == excludeGeometry)
         {
             continue;
         }
-        IntersectTriangle(ray, bestHit, triangles[t]);
+        IntersectTriangle(ray, currentHit, triangles[t]);
+        /*
+        if(!(localMin.x <= currentHit.position.x && currentHit.position.x <= localMax.x))
+        {
+            currentHit = bestHit;   // Reset currentHit
+            continue;
+        }
+        
+        if(!(localMin.y <= currentHit.position.y && currentHit.position.y <= localMax.y))
+        {
+            currentHit = bestHit;   // Reset currentHit
+            continue;
+        }
+        
+        if(!(localMin.z <= currentHit.position.z && currentHit.position.z <= localMax.z))
+        {
+            currentHit = bestHit;   // Reset currentHit
+            continue;
+        }
+        */
+        bestHit = currentHit;
+        
     }
     
     return bestHit;
