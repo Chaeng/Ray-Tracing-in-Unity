@@ -70,6 +70,8 @@ StructuredBuffer<RTTriangle> _Triangles;
 float3 _GridBoxMin;
 float3 _GridBoxMax;
 int _GridDimension;
+StructuredBuffer<int> _GeometryCountList;
+StructuredBuffer<RTTriangle> _GeometryGridList;
 
 // material
 int _NumOfMaterials;
