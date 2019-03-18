@@ -114,7 +114,7 @@ namespace RayTracingRenderer
                 RunSetShadowMapToMainShader(m_shadowMapList, m_shadowUtilityBuffer);
                 RunSetSpheresToMainShader(m_sphereBuffer, m_sceneParser.GetSpheres().Count);
                 RunSetTrianglesToMainShader(m_triangleBuffer, m_sceneParser.GetTriangles().Count);
-                RunSetSpatialGridToMainShader(m_sceneParser.GetSpatialGridBoxMin(), m_sceneParser.GetSpatialGridBoxMax());
+                RunSetSpatialGridToMainShader(m_sceneParser.GetSpatialGridBoxMin(), m_sceneParser.GetSpatialGridBoxMax(), m_sceneParser.GetSpatialGridDimension());
                 RunSetMaterialsToMainShader(m_materialBuffer, m_sceneParser.GetMaterials().Count);
                 RunSetDirectionalLightsToMainShader(m_directionalLightBuffer, m_sceneParser.GetDirectionalLights().Count);
                 RunSetPointLightsToMainShader(m_pointLightBuffer, m_sceneParser.GetPointLights().Count);

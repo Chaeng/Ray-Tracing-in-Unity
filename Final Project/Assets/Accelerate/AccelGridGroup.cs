@@ -58,6 +58,12 @@ namespace RayTracingRenderer
         }
 
 
+        public int GetGridBoxDimension()
+        {
+            return DIMENSION;
+        }
+        
+
         public Vector3 GetGridBoxMin()
         {
             return _min;

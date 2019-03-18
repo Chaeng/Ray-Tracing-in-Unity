@@ -51,6 +51,11 @@ namespace RayTracingRenderer
         {
             return _accelGrids.GetGridBoxMax();
         }
+
+        public int GetSpatialGridDimension()
+        {
+            return _accelGrids.GetGridBoxDimension();
+        }
         
         public List<RTMaterial_t> GetMaterials()
         {

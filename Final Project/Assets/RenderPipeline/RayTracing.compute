@@ -68,6 +68,7 @@ StructuredBuffer<RTTriangle> _Triangles;
 // Spatial Grid
 float3 _GridBoxMin;
 float3 _GridBoxMax;
+int _GridDimension;
 
 // material
 int _NumOfMaterials;
