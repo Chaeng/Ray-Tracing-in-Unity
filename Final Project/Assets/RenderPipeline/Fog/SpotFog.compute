@@ -197,7 +197,7 @@ bool SpotIntersection(RTSpotLight spot, Ray ray, inout float3 start, inout float
     float3 p2 = ray.origin + t2 * rayDir;
     float p2Check = dot(p2 - spot.position, v);
 
-    if (p1Check > 0 && p1Check <= spot.range)
+    if (p1Check > 0 && p1Check <= spot.range &&  t1 >= 0)
     {
         if (p2Check > 0 && p2Check <= spot.range)
         {
@@ -223,7 +223,7 @@ bool SpotIntersection(RTSpotLight spot, Ray ray, inout float3 start, inout float
             return true;
         }
     }
-    else if (p1Check > 0 && p1Check > spot.range)
+    else if (p1Check > 0 && p1Check > spot.range && t1 >=0)
     {
         if (p2Check > 0 && p2Check <= spot.range)
         {
@@ -237,7 +237,7 @@ bool SpotIntersection(RTSpotLight spot, Ray ray, inout float3 start, inout float
             }
         }
     }
-    else if (p1Check < 0)
+    else if (p1Check < 0 && t1 >= 0)
     {
         if (p2Check > 0 && p2Check <= spot.range)
         {
