@@ -939,8 +939,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_name: MyMaterial2
-  m_ka: {x: 0, y: 1, z: 1}
-  m_ks: {x: 1, y: 1, z: 0}
+  m_ka: {x: 0, y: 0, z: 0}
+  m_ks: {x: 0, y: 0, z: 0}
   m_kd: {x: 1, y: 1, z: 1}
   m_n: 1
   m_transparency: 0
