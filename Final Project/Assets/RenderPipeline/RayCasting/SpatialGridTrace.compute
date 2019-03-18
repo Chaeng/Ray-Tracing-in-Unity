@@ -28,7 +28,36 @@ void GetNumberOfGeometryInGrid(SpatialGridIndex index, StructuredBuffer<int> geo
 };
 
 
-RayHit SpatialGridTrace(Ray ray, SpatialGrid spatialGrid, int _NumOfTriangles, StructuredBuffer<RTTriangle> _Triangles, int excludeGeometry)
+RayHit LocalGridTrace(Ray ray, SpatialGridIndex index, StructuredBuffer<int> geomGridList, StructuredBuffer<RTTriangle> triangles, SpatialGrid grids, int excludeGeometry)
+{
+    RayHit bestHit = CreateRayHit();
+
+    int start = 0;
+    int count = 0;
+    
+    GetNumberOfGeometryInGrid(index, geomGridList, grids.dimension, start, count);
+    
+    if(count == 0)
+    {
+        return bestHit;
+    }
+    
+    for(int t = start; t < count; t++)
+    {
+        if(triangles[t].id == excludeGeometry)
+        {
+            continue;
+        }
+        IntersectTriangle(ray, bestHit, triangles[t]);
+    }
+    
+    return bestHit;
+};
+
+
+
+
+RayHit SpatialGridTrace(Ray ray, SpatialGrid spatialGrid, StructuredBuffer<int> geomGridList, StructuredBuffer<RTTriangle> triangles, int excludeGeometry)
 {
     RayHit bestHit = CreateRayHit();
     
