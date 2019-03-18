@@ -13,7 +13,19 @@ struct SpatialGrid
     float3 min;
     float3 max;
     float dimension;
+    
+    float w;    // Grid Width
+    float h;    // Grid Height
+    float d;    // Grid Depth
 };
+
+struct GridStep
+{
+    int x;
+    int y;
+    int z;
+};
+
 
 SpatialGrid CreateSpatialGrid(float3 min, float3 max, float dimension)
 {
@@ -22,6 +34,10 @@ SpatialGrid CreateSpatialGrid(float3 min, float3 max, float dimension)
     grids.min = min;
     grids.max = max;
     grids.dimension = dimension;
+    
+    grids.w = (grids.max.x - grids.min.x) / dimension;
+    grids.h = (grids.max.y - grids.min.y) / dimension;
+    grids.d = (grids.max.z - grids.min.z) / dimension;
     
     return grids;
 };
@@ -43,5 +59,13 @@ SpatialGridIndex GetGridIndexAtPoint(SpatialGrid grid, float3 pt)
     return index;
 };
 
+
+
+/*
+float3 GetDeltaToBoundary(SpatialGridIndex entryGridIndex, Ray entryToBoundaryRay, GridStep steps)
+{
+    
+};
+*/
 
 #endif  // Spatial_Grid_Compute

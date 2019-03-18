@@ -8,14 +8,6 @@
 #include "../Geometry/RTTriangle.compute"
 
 
-struct GridStep
-{
-    int x;
-    int y;
-    int z;
-};
-
-
 GridStep DetermineGridStep(Ray ray)
 {
     GridStep step;
