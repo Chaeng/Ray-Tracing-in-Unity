@@ -34,11 +34,12 @@ RayHit SpatialGridTrace(Ray ray, float3 boxMin, float3 boxMax, int _NumOfTriangl
     float t0 = -1.#INF;
     float t1 = 1.#INF;
     
-    GridStep step = DetermineGridStep(ray);
-    
     if (RayBoxIntersection(ray, boxMin, boxMax, t0, t1))
     {
         float3 entry = GetPoint(ray, t1);
+        
+        GridStep step = DetermineGridStep(ray);
+        
     
         for(int t = 0; t < _NumOfTriangles; t++)
         {
