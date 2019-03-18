@@ -19,4 +19,9 @@ Ray CreateRay(float3 origin, float3 direction)
     return ray;
 }
 
+float3 GetPoint(Ray ray, float distance)
+{
+    return ray.origin + ray.direction * distance;
+}
+
 #endif  // RAY_COMPUTE
