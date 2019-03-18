@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿//#define DEBUG_VERBOSE
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -11,6 +13,7 @@ namespace RayTracingRenderer
         private List<RTTriangle_t> m_triangleGeom;
         private List<RTMaterial_t> m_materials;
         private List<RTTexture_t> m_textures;
+        private List<Texture> m_textureImages;
         private List<RTLightStructureDirectional_t> m_directionalLights;
         private List<RTLightStructurePoint_t> m_pointLights;
         private List<RTLightStructureSpot_t> m_spotLights;
@@ -45,6 +48,11 @@ namespace RayTracingRenderer
         {
             return m_textures;
         }
+
+        public List<Texture> GetTextureImages()
+        {
+            return m_textureImages;
+        }
         
         public List<RTLightStructureDirectional_t> GetDirectionalLights()
         {
@@ -67,9 +75,10 @@ namespace RayTracingRenderer
             GameObject[] roots = scene.GetRootGameObjects();
 
             int count = 0;
+            int imageCount = 0;
 
             ParseLight(roots);
-            ParseTexture(roots);
+            ParseTexture(roots, ref imageCount);
             ParseMaterial(roots);
             ParseSphere(roots, ref count);
             ParseTriangle(roots,ref count);
@@ -109,6 +118,7 @@ namespace RayTracingRenderer
                             matStructure.id = count++;
                             m_materials.Add(matStructure);
 
+#if DEBUG_VERBOSE
                             Debug.Log(string.Format("Add Mat {0} w/ "
                                 + "\n textureIndexKa {1}"
                                 + "\n textureIndexKd {2}"
@@ -121,6 +131,7 @@ namespace RayTracingRenderer
                                 matStructure.textureIndexKs,
                                 matStructure.textureIndexR,
                                 matStructure.textureIndexT));
+#endif
                         }
                     }
                 }
@@ -169,7 +180,7 @@ namespace RayTracingRenderer
             }
         }
 
-        private void ParseTexture(GameObject[] roots)
+        private void ParseTexture(GameObject[] roots, ref int imageCount)
         {
             int count = 0;
 
@@ -179,6 +190,12 @@ namespace RayTracingRenderer
                 m_textures = new List<RTTexture_t>();
             }
 
+             // TODO: Optimize dynamic array generation
+            if (m_textureImages == null)
+            {
+                m_textureImages = new List<Texture>();
+            }
+
             m_textures.Clear();
 
             foreach (var root in roots)
@@ -186,7 +203,7 @@ namespace RayTracingRenderer
                 RTTextureDatabase[] textureDatabases 
                     = root.GetComponentsInChildren<RTTextureDatabase>();
 
-                 foreach (var database in textureDatabases)
+                foreach (var database in textureDatabases)
                 {
                     if (database.gameObject.activeSelf)
                     {
@@ -199,23 +216,33 @@ namespace RayTracingRenderer
 
                             // Add this texture to static list for output
                             RTTexture_t texStructure = tex.GetTexture();
+                            if (tex.GetTexture().isColor != 0)
+                            {
+                                Texture texImage = tex.GetImage();
+                                texStructure.imageIndex = imageCount++;
+                                m_textureImages.Add(texImage);
+                            }
                             texStructure.id = count++;  // arbitrary, unique
                             m_textures.Add(texStructure);
 
+#if DEBUG_VERBOSE
                             Debug.Log(string.Format("Add Tex {0} w/ "
                                 + "\n isColor {1}"
-                                + "\n isChecker {2}"
-                                + "\n uRepeat {3}"
-                                + "\n vRepeat {4}"
-                                + "\n color1 {5}"
-                                + "\n color2 {6}",
+                                + "\n imageIndex {2}"
+                                + "\n isChecker {3}"
+                                + "\n uRepeat {4}"
+                                + "\n vRepeat {5}"
+                                + "\n color1 {6}"
+                                + "\n color2 {7}",
                                 tex.GetName(),
                                 texStructure.isColor,
+                                texStructure.imageIndex,
                                 texStructure.isChecker,
                                 texStructure.uRepeat,
                                 texStructure.vRepeat,
                                 texStructure.color1,
                                 texStructure.color2));
+#endif
                         }
                     }
                 }
@@ -249,14 +276,14 @@ namespace RayTracingRenderer
                             {
                                 mat.SetTextureIndexKs(index);
                             }
-                            if (mat.GetTextureNameR() == name)
-                            {
-                                mat.SetTextureIndexR(index);
-                            }
-                            if (mat.GetTextureNameT() == name)
-                            {
-                                mat.SetTextureIndexT(index);
-                            }
+                            // if (mat.GetTextureNameR() == name)
+                            // {
+                            //     mat.SetTextureIndexR(index);
+                            // }
+                            // if (mat.GetTextureNameT() == name)
+                            // {
+                            //     mat.SetTextureIndexT(index);
+                            // }
                         }
                     }
                 }

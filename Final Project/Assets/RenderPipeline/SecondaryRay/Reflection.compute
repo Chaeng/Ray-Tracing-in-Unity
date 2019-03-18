@@ -26,7 +26,8 @@ float3 Reflection(
     int numOfMaterials,
     StructuredBuffer<RTMaterial> materials,
     int numOfTextures,
-    StructuredBuffer<RTTexture> textures)
+    StructuredBuffer<RTTexture> textures,
+    Texture2DArray<float4> textureImages)
 {
     // Hard code
     // Request parser to add 
@@ -125,7 +126,8 @@ float3 Reflection(
                                 numOfMaterials,
                                 materials,
                                 numOfTextures,
-                                textures);
+                                textures,
+                                textureImages);
                  colorArr[i] += color;    
              }     
             return colorArr[1] + (colorArr[0] * k); 
@@ -195,7 +197,8 @@ float3 Reflection(
                                 numOfMaterials,
                                 materials,
                                 numOfTextures,
-                                textures);
+                                textures,
+                                textureImages);
                  colorArr[i] = color;    
              }     
             return colorArr[3] + ((colorArr[2] + (colorArr[1] * k)) * k); 
@@ -265,7 +268,8 @@ float3 Reflection(
                                 numOfMaterials,
                                 materials,
                                 numOfTextures,
-                                textures);
+                                textures,
+                                textureImages);
                  colorArr[i] = color;    
              }     
             return colorArr[3] + ((colorArr[2] + (colorArr[1] * k)) * k); 

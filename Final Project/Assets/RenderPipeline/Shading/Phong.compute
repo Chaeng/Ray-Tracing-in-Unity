@@ -51,7 +51,8 @@ float3 Shade(
     int numOfMaterials,
     StructuredBuffer<RTMaterial> materials,
     int numOfTextures,
-    StructuredBuffer<RTTexture> textures)
+    StructuredBuffer<RTTexture> textures,
+    Texture2DArray<float4> textureImages)
 {
     float3 color = float3(0, 0, 0);
     float hitDistance = hit.distance;
@@ -68,6 +69,7 @@ float3 Shade(
         triangles,
         numOfTextures,
         textures,
+        textureImages,
         mat,
         hit);
     float3 kd = GetDiffuse(
@@ -77,6 +79,7 @@ float3 Shade(
         triangles,
         numOfTextures,
         textures,
+        textureImages,
         mat,
         hit);
     float3 ks = GetSpecular(
@@ -86,6 +89,7 @@ float3 Shade(
         triangles,
         numOfTextures,
         textures,
+        textureImages,
         mat,
         hit);
     

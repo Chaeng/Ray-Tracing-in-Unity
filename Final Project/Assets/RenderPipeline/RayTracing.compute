@@ -71,6 +71,7 @@ StructuredBuffer<RTMaterial> _Materials;
 // texture
 int _NumOfTextures;
 StructuredBuffer<RTTexture> _Textures;
+Texture2DArray<float4> _TextureImages;
 
 
 Ray CreateCameraRay(float2 uv)
@@ -134,7 +135,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                           _NumOfMaterials,
                           _Materials,
                           _NumOfTextures,
-                          _Textures);
+                          _Textures,
+                          _TextureImages);
 
     if(_MaxRayGeneration > 1) {
         float3 refl = Transparent(
@@ -163,7 +165,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _NumOfMaterials,
                         _Materials,
                         _NumOfTextures,
-                        _Textures
+                        _Textures,
+                        _TextureImages
                         );
                         
         float3 ref2 = Reflection(
@@ -192,7 +195,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _NumOfMaterials,
                         _Materials,
                         _NumOfTextures,
-                        _Textures);             
+                        _Textures,
+                        _TextureImages);             
         
         result = refl;
     }     

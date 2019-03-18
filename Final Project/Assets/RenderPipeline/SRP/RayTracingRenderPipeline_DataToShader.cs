@@ -12,6 +12,7 @@ namespace RayTracingRenderer
             LoadBufferWithTriangles(sceneParser);
             LoadBufferWithMaterials(sceneParser);
             LoadBufferWithTextures(sceneParser);
+            LoadBufferWithTextureImages(sceneParser);
         }
 
 
@@ -92,6 +93,35 @@ namespace RayTracingRenderer
             else
             {
                 m_textureBuffer = new ComputeBuffer(1, RTTexture_t.GetSize());
+            }
+        }
+
+        private void LoadBufferWithTextureImages(SceneParser sceneParser)
+        {
+            // TODO: Support more image types, not just 64x64 RGBA32
+            // by creating TextureImageUtility and passing it to compute shader
+
+            List<Texture> textureImages = sceneParser.GetTextureImages();
+            int count = textureImages == null
+                ? 0
+                : textureImages.Count;
+
+            if (count > 0)
+            {
+                m_textureImageList = new Texture2DArray(TextureImageSize,
+                    TextureImageSize, count, TextureFormat.RGBA32,
+                    false, false);
+
+                for (int i = 0; i < count; i++)
+                {
+                    Graphics.CopyTexture(textureImages[i], 0, 0, m_textureImageList, i, 0); // index is the index of the texture
+                }
+            }
+            else
+            {
+                m_textureImageList = new Texture2DArray(TextureImageSize,
+                    TextureImageSize, 1, TextureFormat.RGBAFloat,
+                    false, false);
             }
         }
 

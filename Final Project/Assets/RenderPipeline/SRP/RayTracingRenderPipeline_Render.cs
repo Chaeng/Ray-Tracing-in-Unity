@@ -128,6 +128,11 @@ namespace RayTracingRenderer
             m_mainShader.SetBuffer(kIndex, "_Textures", buffer);
         }
 
+        private void RunSetTextureImagesToMainShader(Texture2DArray textureImageList)
+        {
+            m_mainShader.SetTexture(kIndex, "_TextureImages", textureImageList);
+        }
+
         private void RunSetTrianglesToMainShader(ComputeBuffer buffer, int count)
         {
             m_mainShader.SetInt("_NumOfTriangles", count);

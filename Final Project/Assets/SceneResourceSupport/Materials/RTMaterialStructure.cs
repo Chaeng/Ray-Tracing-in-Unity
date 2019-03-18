@@ -24,12 +24,10 @@ public struct RTMaterial_t
     public int textureIndexKa;
     public int textureIndexKd;
     public int textureIndexKs;
-    public int textureIndexR;
-    public int textureIndexT;
 
     public static int GetSize()
     {
-        return sizeof(int) * 6
+        return sizeof(int) * 4
             + Vector3Extension.SizeOf() * 5
             + sizeof(float) * 4;
     }

@@ -8,6 +8,7 @@ public struct RTTexture_t
 
     // support for image
     public int isColor;
+    public int imageIndex;
 
     // support for checker pattern
     public int isChecker;
@@ -17,7 +18,7 @@ public struct RTTexture_t
     // functions
     public static int GetSize()
     {
-        return sizeof(int) * 5
+        return sizeof(int) * 6
             + Vector3Extension.SizeOf() * 2;
     }
 }

@@ -29,7 +29,8 @@ float3 Transparent(
     int numOfMaterials,
     StructuredBuffer<RTMaterial> materials,
     int numOfTextures,
-    StructuredBuffer<RTTexture> textures)
+    StructuredBuffer<RTTexture> textures,
+    Texture2DArray<float4> textureImages)
 {
     if (hit.distance < 1.#INF)
     {         
@@ -177,7 +178,8 @@ float3 Transparent(
                                 numOfMaterials,
                                 materials,
                                 numOfTextures,
-                                textures);
+                                textures,
+                                textureImages);
                  colorArr[0] += color;
                  return colorArr[0] + ((1.0003/refIndex) * colorArr[1]);
                 
@@ -249,7 +251,8 @@ float3 Transparent(
                                 numOfMaterials,
                                 materials,
                                 numOfTextures,
-                                textures);
+                                textures,
+                                textureImages);
                      colorArr[i] += color; 
                      --i;
                  }               
@@ -329,7 +332,8 @@ float3 Transparent(
                                 numOfMaterials,
                                 materials,
                                 numOfTextures,
-                                textures);
+                                textures,
+                                textureImages);
                      colorArr[i] += color; 
                      --i;
                  }               
@@ -410,7 +414,8 @@ float3 Transparent(
                                 numOfMaterials,
                                 materials,
                                 numOfTextures,
-                                textures);
+                                textures,
+                                textureImages);
                      colorArr[i] += color; 
                      --i;
                  }               

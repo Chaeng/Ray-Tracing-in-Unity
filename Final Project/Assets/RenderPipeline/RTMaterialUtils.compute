@@ -11,6 +11,7 @@ float3 GetAmbient(
     StructuredBuffer<RTTriangle> triangles,
     int numOfTextures,
     StructuredBuffer<RTTexture> textures,
+    Texture2DArray<float4> textureImages,
     RTMaterial mat,
     RayHit hit)
 {
@@ -31,7 +32,7 @@ float3 GetAmbient(
             RTTriangle tri = GetIndexedGeom_Triangle(triangles,
                 numOfTriangles,
                 hit.geoIndex);
-            ka = ka * GetTexturedAttr_Triangle(tex, hit, tri);
+            ka = ka * GetTexturedAttr_Triangle(tex, hit, tri, textureImages);
         }
     }
 
@@ -45,6 +46,7 @@ float3 GetDiffuse(
     StructuredBuffer<RTTriangle> triangles,
     int numOfTextures,
     StructuredBuffer<RTTexture> textures,
+    Texture2DArray<float4> textureImages,
     RTMaterial mat,
     RayHit hit)
 {
@@ -65,7 +67,7 @@ float3 GetDiffuse(
             RTTriangle tri = GetIndexedGeom_Triangle(triangles,
                 numOfTriangles,
                 hit.geoIndex);
-            kd = kd * GetTexturedAttr_Triangle(tex, hit, tri);
+            kd = kd * GetTexturedAttr_Triangle(tex, hit, tri, textureImages);
         }
     }
 
@@ -79,6 +81,7 @@ float3 GetSpecular(
     StructuredBuffer<RTTriangle> triangles,
     int numOfTextures,
     StructuredBuffer<RTTexture> textures,
+    Texture2DArray<float4> textureImages,
     RTMaterial mat,
     RayHit hit)
 {
@@ -99,7 +102,7 @@ float3 GetSpecular(
             RTTriangle tri = GetIndexedGeom_Triangle(triangles,
                 numOfTriangles,
                 hit.geoIndex);
-            ks = ks * GetTexturedAttr_Triangle(tex, hit, tri);
+            ks = ks * GetTexturedAttr_Triangle(tex, hit, tri, textureImages);
         }
     }
 

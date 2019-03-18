@@ -34,6 +34,8 @@ namespace RayTracingRenderer
         // Constants
         private const int ShadowMapSize = 512;    // TODO: Get this dimension from RenderConfig
         
+        private const int TextureImageSize = 64;    // TODO: Get this dimension from RenderConfig
+        
         
         // Own member fields
         private CommandBuffer m_buffer;
@@ -51,6 +53,8 @@ namespace RayTracingRenderer
         private SceneParser m_sceneParser;
         private Texture2DArray m_shadowMapList;
         private List<ShadowUtility_t> m_shadowUtility;
+        private Texture2DArray m_textureImageList;
+
 
 
         /// <summary>
@@ -103,7 +107,7 @@ namespace RayTracingRenderer
                 RunLoadLightsToBuffer(ref m_directionalLightBuffer, ref m_pointLightBuffer, ref m_spotLightBuffer, m_sceneParser);
                 
                 RunShadowMap(ref m_shadowMapList, ref m_shadowUtilityBuffer, m_sceneParser, ShadowMapSize, m_sphereBuffer, m_triangleBuffer);
-
+                
                 RunSetCameraToMainShader(camera);
                 RunSetSkyboxToMainShader(m_config.skybox);
                 RunSetAmbientToMainShader(m_config);
@@ -115,9 +119,11 @@ namespace RayTracingRenderer
                 RunSetTrianglesToMainShader(m_triangleBuffer, m_sceneParser.GetTriangles().Count);
                 RunSetMaterialsToMainShader(m_materialBuffer, m_sceneParser.GetMaterials().Count);
                 RunSetTexturesToMainShader(m_textureBuffer, m_sceneParser.GetTextures().Count);
+                RunSetTextureImagesToMainShader(m_textureImageList);
                 RunSetDirectionalLightsToMainShader(m_directionalLightBuffer, m_sceneParser.GetDirectionalLights().Count);
                 RunSetPointLightsToMainShader(m_pointLightBuffer, m_sceneParser.GetPointLights().Count);
                 RunSetSpotLightsToMainShader(m_spotLightBuffer, m_sceneParser.GetSpotLights().Count);
+                
                 RunRayTracing(m_target);
                 RunBufferCleanUp();
                 RunSendTextureToUnity(m_buffer, m_target, renderContext, camera);

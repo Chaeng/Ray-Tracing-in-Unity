@@ -27,14 +27,10 @@ public class RTMaterial : MonoBehaviour
     [SerializeField] private string m_textureNameKa = "";
     [SerializeField] private string m_textureNameKd = "";
     [SerializeField] private string m_textureNameKs = "";
-    [SerializeField] private string m_textureNameR = "";
-    [SerializeField] private string m_textureNameT = "";
 
     private int m_textureIndexKa = -1;
     private int m_textureIndexKs = -1;
     private int m_textureIndexKd = -1;
-    private int m_textureIndexR = -1;
-    private int m_textureIndexT = -1;
 
     public string GetName()
     {
@@ -63,8 +59,6 @@ public class RTMaterial : MonoBehaviour
             textureIndexKa =  m_textureIndexKa,
             textureIndexKd = m_textureIndexKd,
             textureIndexKs = m_textureIndexKs,
-            textureIndexR = m_textureIndexR,
-            textureIndexT = m_textureIndexT
         };
     }
 
@@ -83,16 +77,6 @@ public class RTMaterial : MonoBehaviour
         return m_textureNameKs;
     }
 
-    public string GetTextureNameR()
-    {
-        return m_textureNameR;
-    }
-
-    public string GetTextureNameT()
-    {
-        return m_textureNameT;
-    }
-
     public void SetTextureIndexKa(int index)
     {
         m_textureIndexKa = index;
@@ -106,15 +90,5 @@ public class RTMaterial : MonoBehaviour
     public void SetTextureIndexKs(int index)
     {
         m_textureIndexKs = index;
-    }
-
-    public void SetTextureIndexR(int index)
-    {
-        m_textureIndexR = index;
-    }
-
-    public void SetTextureIndexT(int index)
-    {
-        m_textureIndexT = index;
     }
 }

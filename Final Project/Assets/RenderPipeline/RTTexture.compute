@@ -7,7 +7,7 @@ struct RTTexture
 
     // support for image
     int isColor;
-    //Texture2DArray<float3> image;
+    int imageIndex;
 
     // support for checker pattern
     int isChecker;
@@ -25,12 +25,12 @@ RTTexture GetDefaultTexture()
 
     // support for image
     tex.isColor = 0;
-    //tex.image = 0; // TODO: How to initialize this???
+    tex.imageIndex = -1;
 
     // support for checker pattern
     tex.isChecker = 0;
-    tex.uRepeat = 2;
-    tex.vRepeat = 2;
+    tex.uRepeat = 0;
+    tex.vRepeat = 0;
     tex.color1 = float3(0, 0, 0);
     tex.color2 = float3(0, 0, 0);
 
@@ -80,19 +80,18 @@ void CalcUvCoords_Triangle(float3 pt,
 float3 GetUvTexile_Triangle_Color(float u,
     float v,
     RayHit hit,
-    RTTriangle tri)
+    Texture2DArray<float4> textureImages)
 {
-    float3 ret;
-    ret.x = 0;
-    ret.y = 0;
-    ret.z = 0;
-    return ret;  // TODO: Replace stub with impl
+    int i = (int) (u * 64);
+    int j = (int) (v * 64);
+    uint3 id = uint3(i, j, mTex.imageIndex);
+    float4 map = textureImages[id.xyz];
+    return map.xyz;
 }
 
 float3 GetUvTexile_Triangle_Checker(float u,
     float v,
-    RayHit hit,
-    RTTriangle tri)
+    RayHit hit)
 {
     if((uint)(u * mTex.uRepeat) % 2 == (uint)(v * mTex.vRepeat) % 2)
     {
@@ -106,18 +105,19 @@ float3 GetUvTexile_Triangle_Checker(float u,
 
 float3 GetTexturedAttr_Triangle(RTTexture tex,
     RayHit hit,
-    RTTriangle tri)
+    RTTriangle tri,
+    Texture2DArray<float4> textureImages)
 {
     float u, v;
     InitUv_Triangle(tri, tex);
     CalcUvCoords_Triangle(hit.position, hit.barycentric, u, v);
     if (tex.isColor)
     {
-        return GetUvTexile_Triangle_Color(u, v, hit, tri);
+        return GetUvTexile_Triangle_Color(u, v, hit, textureImages);
     }
     else if (tex.isChecker)
     {
-        return GetUvTexile_Triangle_Checker(u, v, hit, tri);
+        return GetUvTexile_Triangle_Checker(u, v, hit);
     }
     else
     {
