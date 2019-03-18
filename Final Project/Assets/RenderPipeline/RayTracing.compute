@@ -1,6 +1,7 @@
 ﻿#include "Ray.compute"
 #include "RayHit.compute"
 #include "RayCasting/Trace.compute"
+#include "RayCasting/SpatialGridTrace.compute"
 #include "Light/RTDirectionalLight.compute"
 #include "Light/RTPointLight.compute"
 #include "Light/RTSpotLight.compute"
@@ -104,12 +105,22 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
     
     // Trace and shade
+    /*
     RayHit hit = Trace(ray, 
                        _NumOfSpheres,
                        _Spheres,
                        _NumOfTriangles,
                        _Triangles,
                        -1);    // Exclude nothing
+                       */
+
+    RayHit hit = SpatialGridTrace(ray,
+                                  _GridBoxMin,
+                                  _GridBoxMax,
+                                  _NumOfTriangles,
+                                  _Triangles,
+                                  -1);    // Exclude nothing
+
 
     float3 result = Shade(ray,
                            hit,
