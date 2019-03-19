@@ -91,9 +91,22 @@ float3 GetUvTexile_Triangle_Color(float u,
     // return float3(v, v, v); // TODO: Remove -- TROUBLESHOOT HERE ... WHY IS IMG NOT SHOWING UP
     // return float3(mTex1.imageIndex, mTex1.imageIndex, mTex1.imageIndex); // TODO: Remove -- TROUBLESHOOT HERE ... WHY IS IMG NOT SHOWING UP
 
+    // float f = 0;
+    // if (u + v > 0.5)
+    // {
+    //     f = 1;
+    // }
+    // return float3(f, f, f);  // black corner top half, white bottom
+
+    // float f = abs(u - v);
+    // return float3(f, f, f);  // line down middle, white side corners
+
     int i = (int) (u * TextureImageSize);
+    // i = (2 * i) % TextureImageSize;  // stretch 2x for demo
     int j = (int) (v * TextureImageSize);
+    // j = (2 * j) % TextureImageSize;  // stretch 2x for demo
     uint3 id = uint3(i, j, mTex1.imageIndex);
+    // uint3 id = uint3(32, 32, mTex1.imageIndex);
     //float f = textureImages[id.xyz].x;
     // float f = textureImages[id.xyz].y;
     // return float3(f, f, f);

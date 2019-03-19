@@ -28,7 +28,10 @@ float3 AddRefractReflect(
     float fogFactor,
     float3 fogColor,
     int numOfMaterials,
-    StructuredBuffer<RTMaterial> materials)
+    StructuredBuffer<RTMaterial> materials,
+    int numOfTextures,
+    StructuredBuffer<RTTexture> textures,
+    Texture2DArray<float4> textureImages)
 { 
 
 
@@ -56,7 +59,10 @@ float3 AddRefractReflect(
                                     fogFactor,
                                     fogColor,
                                     numOfMaterials,
-                                    materials);   
+                                    materials,
+                                    numOfTextures,
+                                    textures,
+                                    textureImages);   
                         
         result = reflEffect;
         float refl = 0.7f;
@@ -86,7 +92,10 @@ float3 AddRefractReflect(
                                     fogFactor,
                                     fogColor,
                                     numOfMaterials,
-                                    materials);  
+                                    materials,
+    numOfTextures,
+    textures,
+    textureImages);  
                                     
         result = ref2;          
         
