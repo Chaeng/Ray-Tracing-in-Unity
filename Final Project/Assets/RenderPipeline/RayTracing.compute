@@ -135,7 +135,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                           _Materials);
 
     if(_MaxRayGeneration >= 1) {
-        float3 addEffect = AddRefractReflect(
+        float3 RR_Effect = AddRefractReflect(
                         _MaxRayGeneration,
                         result,
                         ray, 
@@ -161,7 +161,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _NumOfMaterials,
                         _Materials);             
         
-        result = addEffect;
+        result = RR_Effect;
     } 
     
     result = SpotFog(ray, _NumOfSpotLights, _SpotLights, _SpotShadowMap, _ShadowUtility, hit.distance, result, _FogColor);
