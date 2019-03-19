@@ -211,7 +211,7 @@ MonoBehaviour:
   m_vertices1: {x: 3, y: -3, z: 0}
   m_vertices2: {x: 0, y: 3, z: 0}
   m_verticesUV0: {x: 0, y: 0}
-  m_verticesUV1: {x: 0.5, y: 1}
+  m_verticesUV1: {x: 0, y: 1}
   m_verticesUV2: {x: 1, y: 0}
   m_isDoubleSide: 1
   m_materialName: MyMaterial2
