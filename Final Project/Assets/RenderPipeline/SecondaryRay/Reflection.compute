@@ -408,21 +408,16 @@ float3 Reflection(
          
              Ray rayArr[7];
              rayArr[0] = CreateRay(curHit.position, curRay.direction);
-             rayArr[1] = CreateRay(hit.position, curRay.direction);
-             rayArr[2] = CreateRay(hit.position, curRay.direction);
-             rayArr[3] = CreateRay(hit.position, curRay.direction);
-             rayArr[4] = CreateRay(hit.position, curRay.direction);
-             rayArr[5] = CreateRay(hit.position, curRay.direction);
-             rayArr[6] = CreateRay(hit.position, curRay.direction);
+             for(int rayIndex = 1; rayIndex < 7; rayIndex++){
+                rayArr[rayIndex] = CreateRay(curHit.position, curRay.direction);
+             } 
              
              RayHit hitArr[7];
              hitArr[0] = curHit;
-             hitArr[1] = CreateRayHit();
-             hitArr[2] = CreateRayHit();
-             hitArr[3] = CreateRayHit();
-             hitArr[4] = CreateRayHit();
-             hitArr[5] = CreateRayHit();
-             hitArr[6] = CreateRayHit();
+             
+             for(int hitIndexMaxHit6 = 1; hitIndexMaxHit6 < 7; hitIndexMaxHit6++){
+                 hitArr[hitIndexMaxHit6] = CreateRayHit();
+             }
                        
              int count = 1;
              while(count < 7){
@@ -443,12 +438,9 @@ float3 Reflection(
              float phi = atan2(curRay.direction.x, -curRay.direction.z) / -PI * 0.5f;
              
              float3 colorArr[7];
-             colorArr[0] = float3(0, 0, 0);
-             colorArr[1] = float3(0, 0, 0);
-             colorArr[2] = float3(0, 0, 0);
-             colorArr[3] = float3(0, 0, 0);
-             colorArr[4] = float3(0, 0, 0);
-             colorArr[5] = float3(0, 0, 0);
+             for(int indexMax6 = 0; indexMax6 < 7; indexMax6++){
+                colorArr[indexMax6] = float3(0, 0, 0);
+             }
              colorArr[6] = skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
              
              for(int i = 0 ; i < 6; i++){
