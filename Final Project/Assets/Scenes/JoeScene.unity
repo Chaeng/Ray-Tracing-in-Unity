@@ -681,7 +681,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_name: MyTexture2
   m_isColor: 1
-  m_texture: {fileID: 10914, guid: 0000000000000000f000000000000000, type: 0}
+  m_texture: {fileID: 2800000, guid: e2eb47a7aa4fa814295aea5af77c2593, type: 3}
   m_isChecker: 0
   m_uRepeat: 20
   m_vRepeat: 20
@@ -787,7 +787,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_name: MyTexture4
   m_isColor: 1
-  m_texture: {fileID: 10914, guid: 0000000000000000f000000000000000, type: 0}
+  m_texture: {fileID: 2800000, guid: e2eb47a7aa4fa814295aea5af77c2593, type: 3}
   m_isChecker: 0
   m_uRepeat: 20
   m_vRepeat: 20

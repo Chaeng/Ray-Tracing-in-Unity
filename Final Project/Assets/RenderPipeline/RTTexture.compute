@@ -87,9 +87,18 @@ float3 GetUvTexile_Triangle_Color(float u,
     RayHit hit,
     Texture2DArray<float4> textureImages)
 {
+    // return float3(u, u, u); // TODO: Remove -- TROUBLESHOOT HERE ... WHY IS IMG NOT SHOWING UP
+    // return float3(v, v, v); // TODO: Remove -- TROUBLESHOOT HERE ... WHY IS IMG NOT SHOWING UP
+    // return float3(mTex1.imageIndex, mTex1.imageIndex, mTex1.imageIndex); // TODO: Remove -- TROUBLESHOOT HERE ... WHY IS IMG NOT SHOWING UP
+
     int i = (int) (u * TextureImageSize);
     int j = (int) (v * TextureImageSize);
     uint3 id = uint3(i, j, mTex1.imageIndex);
+    //float f = textureImages[id.xyz].x;
+    // float f = textureImages[id.xyz].y;
+    // return float3(f, f, f);
+    //return textureImages[id.xyz].xyz / 256;
+
     float4 map = textureImages[id.xyz];
     return map.xyz;
 }
@@ -118,7 +127,6 @@ float3 GetTexturedAttr_Triangle(RTTexture tex,
     CalcUvCoords_Triangle(hit.position, hit.barycentric, u, v);
     if (tex.isColor)
     {
-    return float3(0, 0, 0); // TODO: Remove -- TROUBLESHOOT HERE ... WHY IS IMG NOT SHOWING UP
         return GetUvTexile_Triangle_Color(u, v, hit, textureImages);
     }
     else if (tex.isChecker)

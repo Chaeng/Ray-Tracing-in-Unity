@@ -1,0 +1,97 @@
+﻿#ifndef ADDREFRACTREFLECT_COMPUTE
+#define ADDREFRACTREFLECT_COMPUTE
+
+#include "Reflection.compute"
+#include "Transparent.compute"
+
+float3 AddRefractReflect(
+    int maxHit,
+    float3 result,
+    inout Ray ray, 
+    RayHit hit, 
+    float3 ambientLightUpper,
+    float3 ambientLightLower,
+    int numOfDirLight,
+    StructuredBuffer<RTDirectionalLight> dirLights,
+    int numOfPointLight,
+    StructuredBuffer<RTPointLight> pointLights,
+    int numOfSpotLight,
+    StructuredBuffer<RTSpotLight> spotLights,
+    Texture2D<float4> skybox, 
+    SamplerState skyboxSampler,
+    int numOfSpheres,
+    StructuredBuffer<RTSphere> spheres,
+    int numOfTriangle,
+    StructuredBuffer<RTTriangle> triangles,
+    RWTexture2DArray<float4> shadowMap,
+    StructuredBuffer<RTSpotLight_UW> shadowUtility,
+    float fogFactor,
+    float3 fogColor,
+    int numOfMaterials,
+    StructuredBuffer<RTMaterial> materials)
+{ 
+
+
+        float3 reflEffect = Transparent(
+                        maxHit,
+                        result,
+                        ray, 
+                        hit, 
+                                 ambientLightUpper,
+                                    ambientLightLower,
+                                    numOfDirLight,
+                                    dirLights,
+                                    numOfPointLight,
+                                    pointLights,
+                                    numOfSpotLight, 
+                                    spotLights,
+                                    skybox, 
+                                    skyboxSampler,
+                                    numOfSpheres,
+                                    spheres,
+                                    numOfTriangle,
+                                    triangles,
+                                    shadowMap,
+                                    shadowUtility,
+                                    fogFactor,
+                                    fogColor,
+                                    numOfMaterials,
+                                    materials);   
+                        
+        result = reflEffect;
+        float refl = 0.7f;
+      
+        float3 ref2 = Reflection(
+                        refl,
+                        maxHit,
+                        result,
+                        ray, 
+                        hit, 
+                                    ambientLightUpper,
+                                    ambientLightLower,
+                                    numOfDirLight,
+                                    dirLights,
+                                    numOfPointLight,
+                                    pointLights,
+                                    numOfSpotLight, 
+                                    spotLights,
+                                    skybox, 
+                                    skyboxSampler,
+                                    numOfSpheres,
+                                    spheres,
+                                    numOfTriangle,
+                                    triangles,
+                                    shadowMap,
+                                    shadowUtility,
+                                    fogFactor,
+                                    fogColor,
+                                    numOfMaterials,
+                                    materials);  
+                                    
+        result = ref2;          
+        
+        return result;
+
+}
+
+#endif // ADDREFRACTREFLECT_COMPUTE
