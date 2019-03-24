@@ -1,0 +1,15 @@
+﻿#ifndef GETTRIANGLENORMAL_COMPUTE
+#define GETTRIANGLENORMAL_COMPUTE
+
+
+float3 GetTriangleNormal(int _NumOfTriangles, StructuredBuffer<RTTriangle> _Triangles, int theID){
+     float3 normal = float3(0, 0, 0);
+     
+     for(int triangleIndex = 0; triangleIndex < _NumOfTriangles; ++triangleIndex){
+          if(_Triangles[triangleIndex].id == theID){
+             normal = _Triangles[triangleIndex].normal;
+          }
+     }
+    return normal;
+}
+#endif //GETTRIANGLENORMAL_COMPUTE

@@ -12,8 +12,12 @@
 #include "RTMaterial.compute"
 #include "Shading/Phong.compute"
 #include "SecondaryRay/TraceReflection.compute"
+#include "SecondaryRay/SphereInternalIntersect.compute"
 #include "SecondaryRay/Reflection.compute"
+#include "SecondaryRay/RefractRay.compute"
+#include "SecondaryRay/GetTriangleNormal.compute"
 #include "SecondaryRay/Transparent.compute"
+#include "SecondaryRay/AddRefractReflect.compute"
 #include "Fog/SpotFog.compute"
 
 
@@ -150,35 +154,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                           _NumOfMaterials,
                           _Materials);
 
-    if(_MaxRayGeneration > 1) {
-        float3 refl = Transparent(
-                        _MaxRayGeneration,
-                        result,
-                        ray, 
-                        hit, 
-                        _AmbientLightUpper,
-                        _AmbientLightLower,
-                        _NumOfDirectionalLights,
-                        _DirectionalLights,
-                        _NumOfPointLights,
-                        _PointLights,
-                        _NumOfSpotLights,
-                        _SpotLights,
-                        _SkyboxTexture,                         
-                        sampler_SkyboxTexture,
-                        _NumOfSpheres,
-                        _Spheres,
-                        _NumOfTriangles,
-                        _Triangles,
-                        _SpotShadowMap,
-                        _ShadowUtility,
-                        _FogFactor,
-                        _FogColor,
-                        _NumOfMaterials,
-                        _Materials
-                        );
-                        
-        float3 ref2 = Reflection(
+    if(_MaxRayGeneration >= 1) {
+        float3 RR_Effect = AddRefractReflect(
                         _MaxRayGeneration,
                         result,
                         ray, 
@@ -204,13 +181,14 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                         _NumOfMaterials,
                         _Materials);             
         
-        result = refl;
-    }     
+        result = RR_Effect;
+    } 
     
     result = SpotFog(ray, _NumOfSpotLights, _SpotLights, _SpotShadowMap, _ShadowUtility, hit.distance, result, _FogColor);
 
     Result[id.xy] = float4(result, 1);
 }
+
 
 
 
