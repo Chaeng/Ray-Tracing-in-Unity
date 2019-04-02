@@ -46,15 +46,17 @@ RayHit LocalGridTrace(Ray ray, SpatialGridIndex index, StructuredBuffer<int> geo
     float3 localMin = GetGridLocalMin(grids, index);
     float3 localMax = GetGridLocalMax(grids, index);
     
-    for(int t = start; t < count; t++)
+    for(int t = 0; t < count; t++)
     {
-        if(triangles[t].id == excludeGeometry)
+        int c = start + t;
+        
+        if(triangles[c].id == excludeGeometry)
         {
             continue;
         }
-        IntersectTriangle(ray, currentHit, triangles[t]);
-        /*
-        if(!(localMin.x <= currentHit.position.x && currentHit.position.x <= localMax.x))
+        IntersectTriangle(ray, currentHit, triangles[c]);
+        
+        if(localMin.x > currentHit.position.x || currentHit.position.x > localMax.x)
         {
             currentHit = bestHit;   // Reset currentHit
             continue;
@@ -71,7 +73,7 @@ RayHit LocalGridTrace(Ray ray, SpatialGridIndex index, StructuredBuffer<int> geo
             currentHit = bestHit;   // Reset currentHit
             continue;
         }
-        */
+        
         bestHit = currentHit;
         
     }
@@ -98,7 +100,9 @@ RayHit SpatialGridTrace(Ray ray, SpatialGrid spatialGrid, StructuredBuffer<int> 
         
         Ray entryToBoundaryRay = CreateRay(entry, ray.direction);
         SpatialGridIndex entryGridIndex = GetGridIndexAtPoint(spatialGrid, entry);
-        RayHit deltaX, deltaY, deltaZ;
+        RayHit deltaX;
+        RayHit deltaY; 
+        RayHit deltaZ;
         GetDeltaToBoundary(
             entryGridIndex, 
             spatialGrid,

@@ -60,8 +60,10 @@ SpatialGridIndex GetGridIndexAtPoint(SpatialGrid grid, float3 pt)
     
     index.x = floor((pt.x - grid.min.x) / (grid.max.x - grid.min.x) * d);
     index.x = clamp(index.x, 0, d - 1);
+    
     index.y = floor((pt.y - grid.min.y) / (grid.max.y - grid.min.y) * d);
     index.y = clamp(index.y, 0, d - 1);
+    
     index.z = floor((pt.z - grid.min.z) / (grid.max.z - grid.min.z) * d);
     index.z = clamp(index.z, 0, d - 1);
     
@@ -138,29 +140,29 @@ void DistanceBetweenBoundary(Ray ray, GridStep steps, SpatialGridIndex entryGrid
     
     if(steps.x >= 0)
     {
-        rayHitX = RayPlaneIntersection(ray, GridNormalLeft, max + GridNormalRight);
+        rayHitX = RayPlaneIntersection(rX, GridNormalLeft, max + GridNormalRight);
     }
     else
     {
-        rayHitX = RayPlaneIntersection(ray, GridNormalRight, min + GridNormalLeft);
+        rayHitX = RayPlaneIntersection(rX, GridNormalRight, min + GridNormalLeft);
     }
     
     if(steps.y >= 0)
     {
-        rayHitY = RayPlaneIntersection(ray, GridNormalDown, max + GridNormalUp);
+        rayHitY = RayPlaneIntersection(rY, GridNormalDown, max + GridNormalUp);
     }
     else
     {
-        rayHitY = RayPlaneIntersection(ray, GridNormalUp, min + GridNormalDown);
+        rayHitY = RayPlaneIntersection(rY, GridNormalUp, min + GridNormalDown);
     }
     
     if(steps.z >= 0)
     {
-        rayHitZ = RayPlaneIntersection(ray, GridNormalBack, max + GridNormalForward);
+        rayHitZ = RayPlaneIntersection(rZ, GridNormalBack, max + GridNormalForward);
     }
     else
     {
-        rayHitZ = RayPlaneIntersection(ray, GridNormalForward, min + GridNormalBack);
+        rayHitZ = RayPlaneIntersection(rZ, GridNormalForward, min + GridNormalBack);
     }
 };
 

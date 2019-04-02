@@ -6,7 +6,7 @@ namespace RayTracingRenderer
 {
     public class AccelGridGroup
     {
-        private const int DIMENSION = 2;
+        private const int DIMENSION = 11;
 
 
         private AccelCell[,,] _grids;

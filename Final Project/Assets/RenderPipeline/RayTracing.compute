@@ -20,6 +20,8 @@
 #include "SecondaryRay/AddRefractReflect.compute"
 #include "Fog/SpotFog.compute"
 
+#include "Shading/JoeShade.compute"
+
 
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
@@ -130,7 +132,20 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                                   _GeometryGridList,
                                   -1);    // Exclude nothing
 
-
+    float3 result = JoeShade(ray,
+                             hit,
+                             _AmbientLightUpper,
+                             _AmbientLightLower,
+                             _NumOfDirectionalLights,
+                             _DirectionalLights,
+                             _NumOfPointLights,
+                             _PointLights,
+                             _NumOfSpotLights,
+                             _SpotLights,
+                             _SkyboxTexture,
+                             sampler_SkyboxTexture
+    );
+/*
     float3 result = Shade(ray,
                            hit,
                           _AmbientLightUpper,
@@ -154,7 +169,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                           _NumOfMaterials,
                           _Materials);
 
-    if(_MaxRayGeneration >= 1) {
+    if(_MaxRayGeneration > 1) {
         float3 RR_Effect = AddRefractReflect(
                         _MaxRayGeneration,
                         result,
@@ -185,7 +200,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     } 
     
     result = SpotFog(ray, _NumOfSpotLights, _SpotLights, _SpotShadowMap, _ShadowUtility, hit.distance, result, _FogColor);
-
+*/
     Result[id.xy] = float4(result, 1);
 }
 

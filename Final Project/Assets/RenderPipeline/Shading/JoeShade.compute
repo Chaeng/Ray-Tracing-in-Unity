@@ -1,0 +1,87 @@
+﻿#ifndef Joe_Shade_Compute
+#define Joe_Shade_Compute
+
+#include "Phong.compute"
+
+float3 JoeShade(
+    Ray ray,
+    RayHit hit,
+    float3 ambientLightUpper,
+    float3 ambientLightLower,
+    int numOfDirLight,
+    StructuredBuffer<RTDirectionalLight> dirLights,
+    int numOfPointLight,
+    StructuredBuffer<RTPointLight> pointLights,
+    int numOfSpotLight,
+    StructuredBuffer<RTSpotLight> spotLights,
+    Texture2D<float4> skybox,
+    SamplerState skyboxSampler
+)
+{
+    float3 color = float3(0, 0, 0);
+    float hitDistance = hit.distance;
+    
+    if (hitDistance < 1.#INF)
+    {
+        float cosNormalToUp = dot(hit.normal, float3(0, 1, 0));
+        float upperAmbientRatio = cosNormalToUp / 2 + 0.5f;
+        
+        color = (upperAmbientRatio) * ambientLightUpper + (1 - upperAmbientRatio) * ambientLightLower;
+        
+        for(int d = 0; d < numOfDirLight; d++)
+        {
+
+            color +=   PhongDiffuseShading(dirLights[d].direction, dirLights[d].color, hit.normal) 
+                         + PhongSpecularShading(dirLights[d].direction, dirLights[d].color, ray.direction, hit.normal, 5);
+           
+        }
+        
+        for(int p = 0; p < numOfPointLight; p++)
+        {
+            float3 L = normalize(pointLights[p].position - hit.position);
+            color +=   PhongDiffuseShading(L, pointLights[p].color, hit.normal) 
+                        + PhongSpecularShading(L, pointLights[p].color, ray.direction, hit.normal, 5);
+        } 
+        
+        for (int s = 0; s < numOfSpotLight; s++)
+        {
+            float3 L = normalize(spotLights[s].position - hit.position);
+            float cosLtoLightDir = dot(-1 * L, -1 * spotLights[s].direction);
+            float intensity = 0;
+            
+
+            //TODO: Optimize by get rid of conditional statement
+            if(cosLtoLightDir >= spotLights[s].cosFullIlluminous)
+            {
+                // Full illumination
+                intensity = 1;
+            }
+            else if(cosLtoLightDir >= spotLights[s].cosConeAngle)
+            {
+                // Penumbra
+                intensity = pow(abs((cosLtoLightDir - spotLights[s].cosConeAngle) / (spotLights[s].cosFullIlluminous - spotLights[s].cosConeAngle)), spotLights[s].penumbraDecay);
+            }
+        
+            if(intensity > 0)
+            {
+                color += intensity * (PhongDiffuseShading(L, spotLights[s].color, hit.normal)
+                            + PhongSpecularShading(L, spotLights[s].color, ray.direction, hit.normal, 5)
+                            );
+            }
+        }
+        
+    }
+    else
+    {
+        // Sample the skybox and write it
+        float theta = acos(ray.direction.y) / -PI;
+        float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
+        color = skybox.SampleLevel(skyboxSampler, float2(phi, theta), 0).xyz;
+        
+        hitDistance = 1000;   // TODO: Allow config to set the skybox distance for fog calculation
+    }
+    
+    return color;
+}
+
+#endif // Joe_Shade_Compute
