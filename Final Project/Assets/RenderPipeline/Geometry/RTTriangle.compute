@@ -124,7 +124,8 @@ void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri)
         return;     // Is on the R.H.S
     }
     
-    bestHit.barycentric = float3(areaABQ / tri.area, areaBCQ / tri.area, areaAQC / tri.area);
+    // bestHit.barycentric = float3(areaABQ / tri.area, areaBCQ / tri.area, areaAQC / tri.area);
+    bestHit.barycentric = float3(areaBCQ / tri.area, areaAQC / tri.area, areaABQ / tri.area);
     bestHit.position = hit;
     bestHit.distance = t;
     bestHit.geoType = 1;

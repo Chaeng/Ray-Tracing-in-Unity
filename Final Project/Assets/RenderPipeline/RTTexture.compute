@@ -101,9 +101,9 @@ float3 GetUvTexile_Triangle_Color(float u,
     // float f = abs(u - v);
     // return float3(f, f, f);  // line down middle, white side corners
 
-    int i = (int) (u * TextureImageSize);
+    int i = (uint) (u * TextureImageSize);
     // i = (2 * i) % TextureImageSize;  // stretch 2x for demo
-    int j = (int) (v * TextureImageSize);
+    int j = (uint) (v * TextureImageSize);
     // j = (2 * j) % TextureImageSize;  // stretch 2x for demo
     uint3 id = uint3(i, j, mTex1.imageIndex);
     // uint3 id = uint3(32, 32, mTex1.imageIndex);
@@ -177,7 +177,8 @@ float3 GetUvTexile_Sphere_Color(float u,
 {
     int i = (int) (u * TextureImageSize);
     int j = (int) (v * TextureImageSize);
-    uint3 id = uint3(i, j, mTex2.imageIndex);
+    //uint3 id = uint3(i, j, mTex2.imageIndex);
+    uint3 id = uint3(i, j, 0);
     float4 map = textureImages[id.xyz];
     return map.xyz;
 }
