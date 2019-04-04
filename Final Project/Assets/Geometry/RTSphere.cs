@@ -5,7 +5,7 @@ using UnityEngine;
 public class RTSphere : RTGeometry
 {
     [SerializeField] private float m_radius = 1;
-    [SerializeField] private string m_materialName;
+    [SerializeField] private string m_materialName = "";
 
     private int m_materialIndex = -1;
 
@@ -32,7 +32,8 @@ public class RTSphere : RTGeometry
         return new RTSphere_t 
         {
             center = _center,
-            radius = m_radius
+            radius = m_radius,
+            materialIndex = m_materialIndex
         };
     }
 }

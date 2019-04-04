@@ -30,7 +30,10 @@ float3 Transparent(
     float fogFactor,
     float3 fogColor,
     int numOfMaterials,
-    StructuredBuffer<RTMaterial> materials)
+    StructuredBuffer<RTMaterial> materials,
+    int numOfTextures,
+    StructuredBuffer<RTTexture> textures,
+    Texture2DArray<float4> textureImages)
 {
     if (hit.distance < 1.#INF)
     {                
@@ -309,7 +312,10 @@ float3 Transparent(
                                 fogFactor,
                                 fogColor,
                                 numOfMaterials,
-                                materials);
+                                materials,
+                                numOfTextures,
+                                textures,
+                                textureImages);
                      colorArr[k] += color; 
                  }   
         
@@ -411,7 +417,10 @@ float3 Transparent(
                                 fogFactor,
                                 fogColor,
                                 numOfMaterials,
-                                materials);
+                                materials,
+                                numOfTextures,
+                                textures,
+                                textureImages);
                      colorArr[k] += color; 
                  }  
              
@@ -735,7 +744,10 @@ float3 Transparent(
                                     fogFactor,
                                     fogColor,
                                     numOfMaterials,
-                                    materials);
+                                    materials,
+                                    numOfTextures,
+                                    textures,
+                                    textureImages);
                      colorArr[k] = color;    
                  } 
                  float3 c7 = colorArr[7]; // skybox 

@@ -10,12 +10,64 @@ struct RTTriangle
 {
     int id;
     float3 vertices[3];
+    float2 verticesUV[3];
     float3 normal;
     float planeD;
     float area;
     int isDoubleSide;
     int matIndex;
 };
+
+RTTriangle GetDefaultGeom_Triangle()
+{
+    RTTriangle tri;
+
+    tri.id = -1;
+
+    tri.vertices[0] = float3(0, 0, 0);
+    tri.vertices[1] = float3(0, 0, 0);
+    tri.vertices[2] = float3(0, 0, 0);
+
+    tri.verticesUV[0] = float2(0, 0);
+    tri.verticesUV[1] = float2(0, 0);
+    tri.verticesUV[2] = float2(0, 0);
+    
+    tri.normal = float3(0, 0, 0);
+
+    tri.planeD = 0;
+    tri.area = 0;
+    tri.isDoubleSide = 0;
+    tri.matIndex = -1;
+
+    return tri;
+}
+
+RTTriangle GetIndexedGeom_Triangle(StructuredBuffer<RTTriangle> triangles,
+    int numOfTriangles,
+    int index)
+{
+    RTTriangle tri;
+    int isMatched = 0;
+
+    // If index valid, then retrieve element
+    for (int i = 0; i < numOfTriangles; i++)
+    {
+        if (triangles[i].id == index)
+        {
+            tri = triangles[i];
+            isMatched = 1;
+            break;
+        }
+    }
+
+    // Otherwise, return default element
+    if (!isMatched)
+    {
+        tri = GetDefaultGeom_Triangle();
+    }
+
+    return tri;
+}
 
 void IntersectTriangle(Ray ray, inout RayHit bestHit, RTTriangle tri)
 {

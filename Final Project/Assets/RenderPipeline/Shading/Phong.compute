@@ -2,6 +2,7 @@
 #define PHONG_COMPUTE
 
 #include "../Shadow/Shadow.compute"
+#include "../RTMaterialUtils.compute"
 
 static const float PI = 3.14159265f;
 
@@ -48,7 +49,10 @@ float3 Shade(
     float fogFactor,
     float3 fogColor,
     int numOfMaterials,
-    StructuredBuffer<RTMaterial> materials)
+    StructuredBuffer<RTMaterial> materials,
+    int numOfTextures,
+    StructuredBuffer<RTTexture> textures,
+    Texture2DArray<float4> textureImages)
 {
     float3 color = float3(0, 0, 0);
     float hitDistance = hit.distance;
@@ -58,21 +62,54 @@ float3 Shade(
         numOfMaterials,
         hit.matIndex);
     float shininess = mat.n;
-
+    float3 ka = GetAmbient(
+        numOfSphere,
+        spheres,
+        numOfTriangle,
+        triangles,
+        numOfTextures,
+        textures,
+        textureImages,
+        mat,
+        hit);
+    float3 kd = GetDiffuse(
+        numOfSphere,
+        spheres,
+        numOfTriangle,
+        triangles,
+        numOfTextures,
+        textures,
+        textureImages,
+        mat,
+        hit);
+    float3 ks = GetSpecular(
+        numOfSphere,
+        spheres,
+        numOfTriangle,
+        triangles,
+        numOfTextures,
+        textures,
+        textureImages,
+        mat,
+        hit);
+    
+    // Note: float3 color each channel has values 0.0-1.0
+    
     if (hitDistance < 1.#INF)
     {
         float cosNormalToUp = dot(hit.normal, float3(0, 1, 0));
         float upperAmbientRatio = cosNormalToUp / 2 + 0.5f;
         
         color = (upperAmbientRatio) * ambientLightUpper + (1 - upperAmbientRatio) * ambientLightLower;
+        color = color * ka;
         float3 tempColor;
         float visibility;
         
         for(int d = 0; d < numOfDirLight; d++)
         {
 
-            tempColor  =   PhongDiffuseShading(dirLights[d].direction, dirLights[d].color, hit.normal) 
-                         + PhongSpecularShading(dirLights[d].direction, dirLights[d].color, ray.direction, hit.normal, shininess);
+            tempColor  =   kd * PhongDiffuseShading(dirLights[d].direction, dirLights[d].color, hit.normal) 
+                         + ks * PhongSpecularShading(dirLights[d].direction, dirLights[d].color, ray.direction, hit.normal, shininess);
             
             visibility = HardShadow(hit.position, 0, dirLights[d].direction, dirLights[d].direction, 
                                               hit.geoIndex, numOfSphere, spheres, numOfTriangle, triangles); 
@@ -82,8 +119,8 @@ float3 Shade(
         for(int p = 0; p < numOfPointLight; p++)
         {
             float3 L = normalize(pointLights[p].position - hit.position);
-            tempColor =   PhongDiffuseShading(L, pointLights[p].color, hit.normal) 
-                        + PhongSpecularShading(L, pointLights[p].color, ray.direction, hit.normal, shininess);
+            tempColor =   kd * PhongDiffuseShading(L, pointLights[p].color, hit.normal) 
+                        + ks * PhongSpecularShading(L, pointLights[p].color, ray.direction, hit.normal, shininess);
             
             visibility = HardShadow(hit.position, 1, pointLights[p].position, pointLights[p].position,
                                               hit.geoIndex, numOfSphere, spheres, numOfTriangle, triangles);
@@ -112,8 +149,8 @@ float3 Shade(
         
             if(intensity > 0)
             {
-                tempColor = intensity * (PhongDiffuseShading(L, spotLights[s].color, hit.normal)
-                            + PhongSpecularShading(L, spotLights[s].color, ray.direction, hit.normal, shininess)
+                tempColor = intensity * (kd * PhongDiffuseShading(L, spotLights[s].color, hit.normal)
+                            + ks * PhongSpecularShading(L, spotLights[s].color, ray.direction, hit.normal, shininess)
                             );
                 
                 // check is shadow map is trued on
