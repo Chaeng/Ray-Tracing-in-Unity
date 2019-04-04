@@ -379,7 +379,7 @@ float3 Transparent(
                  }
                 
                  float3 colorArr[5]; 
-                 for(int index = 0; index < 5; ++index){
+                 for(int index = 0; index < 4; ++index){
                      colorArr[index] = float3(0, 0, 0);
                  }
                  
