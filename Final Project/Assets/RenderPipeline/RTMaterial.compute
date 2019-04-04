@@ -21,7 +21,43 @@ struct RTMaterial
     // support for normal and positional map
     float3 normal;
     float3 position;
+
+    // support for textures
+    int texIndexKa;
+    int texIndexKd;
+    int texIndexKs;
 };
+
+RTMaterial GetDefaultMaterial()
+{
+    RTMaterial mat;
+
+    mat.id = -1;
+
+    // classic Ambient, Diffuse, Specular
+    mat.ka = float3(0, 0, 0);
+    mat.ks = float3(0, 0, 0);
+    mat.kd = float3(0, 0, 0);
+    mat.n = 1.0f;
+
+    // support for transparency and refractiveIndex
+    mat.transparency = 0.0f;
+    mat.refractiveIndex = 0.0f;
+
+    // support for reflection
+    mat.reflectivity = 0.0f;
+
+    // support for normal and positional map
+    mat.normal = float3(0, 0, 0);
+    mat.position = float3(0, 0, 0);
+
+    // support for textures
+    mat.texIndexKa = -1;
+    mat.texIndexKd = -1;
+    mat.texIndexKs = -1;
+
+    return mat;
+}
 
 RTMaterial GetIndexedMaterial(StructuredBuffer<RTMaterial> materials,
     int numOfMaterials,
@@ -35,41 +71,9 @@ RTMaterial GetIndexedMaterial(StructuredBuffer<RTMaterial> materials,
         mat = materials[index];
     }
     // Otherwise, return default material
-    // TODO: Specify custom values for default material
     else
     {
-        mat.id = -1;
-
-        // classic Ambient, Diffuse, Specular
-        mat.ka.x = 0.0f;
-        mat.ka.y = 0.0f;
-        mat.ka.z = 0.0f;
-
-        mat.ks.x = 0.0f;
-        mat.ks.y = 0.0f;
-        mat.ks.z = 0.0f;
-
-        mat.kd.x = 0.0f;
-        mat.kd.y = 0.0f;
-        mat.kd.z = 0.0f;
-
-        mat.n = 1.0f;
-
-        // support for transparency and refractiveIndex
-        mat.transparency = 0.0f;
-        mat.refractiveIndex = 0.0f;
-
-        // support for reflection
-        mat.reflectivity = 0.0f;
-
-        // support for normal and positional map
-        mat.normal.x = 0.0f;
-        mat.normal.y = 0.0f;
-        mat.normal.z = 0.0f;
-
-        mat.position.x = 0.0f;
-        mat.position.y = 0.0f;
-        mat.position.z = 0.0f;
+        mat = GetDefaultMaterial();
     }
 
     return mat;

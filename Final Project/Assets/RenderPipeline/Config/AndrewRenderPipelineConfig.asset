@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 621fbee77a3284945900a7b407d04dda, type: 3}
   m_Name: AndrewRenderPipelineConfig
   m_EditorClassIdentifier: 
-  skybox: {fileID: 0}
-  upperAmbitent: {r: 1, g: 1, b: 1, a: 1}
-  lowerAmbitent: {r: 1, g: 1, b: 1, a: 1}
-  globalRefractiveIndex: 1
-  secondaryRayGeneration: 1
+  skybox: {fileID: 2800000, guid: 3675d0c3c874f6b479bab57eb7e68c90, type: 3}
+  upperAmbitent: {r: 0, g: 0, b: 0, a: 1}
+  lowerAmbitent: {r: 0, g: 0, b: 0, a: 1}
+  globalRefractiveIndex: 2
+  maxRayGeneration: 1
   enableShadow: 0
-  fogColor: {r: 1, g: 1, b: 1, a: 1}
+  fogColor: {r: 0, g: 0, b: 0, a: 1}
   fogFactor: 0

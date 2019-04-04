@@ -1,0 +1,129 @@
+﻿#ifndef RTTEXTURE_COMPUTE
+#define RTTEXTURE_COMPUTE
+
+struct RTTexture
+{
+    int id;
+
+    // support for image
+    int isColor;
+    int imageIndex;
+
+    // support for checker pattern
+    int isChecker;
+    int uRepeat;
+    int vRepeat;
+    float3 color1;
+    float3 color2;
+};
+
+RTTexture GetDefaultTexture()
+{
+    RTTexture tex;
+
+    tex.id = -1;
+
+    // support for image
+    tex.isColor = 0;
+    tex.imageIndex = -1;
+
+    // support for checker pattern
+    tex.isChecker = 0;
+    tex.uRepeat = 0;
+    tex.vRepeat = 0;
+    tex.color1 = float3(0, 0, 0);
+    tex.color2 = float3(0, 0, 0);
+
+    return tex;
+}
+
+RTTexture GetIndexedTexture(StructuredBuffer<RTTexture> textures,
+    int numOfTextures,
+    int index)
+{
+    RTTexture tex;
+
+    // If index valid, then retrieve texture
+    if (index >= 0 && index < numOfTextures)
+    {
+        tex = textures[index];
+    }
+    // Otherwise, return default texture
+    else
+    {
+        tex = GetDefaultTexture();
+    }
+
+    return tex;
+}
+
+RTTriangle mTri;
+RTTexture mTex;
+
+void InitUv_Triangle(RTTriangle tri, RTTexture tex)
+{
+    mTri = tri;
+    mTex = tex;
+}
+
+void CalcUvCoords_Triangle(float3 pt,
+    float3 bc,
+    inout float u,
+    inout float v)
+{
+    u = bc.x * mTri.verticesUV[0].x + bc.y * mTri.verticesUV[1].x
+        + bc.z * mTri.verticesUV[2].x;
+    v = bc.x * mTri.verticesUV[0].y + bc.y * mTri.verticesUV[1].y
+        + bc.z * mTri.verticesUV[2].y;
+}
+
+float3 GetUvTexile_Triangle_Color(float u,
+    float v,
+    RayHit hit,
+    Texture2DArray<float4> textureImages)
+{
+    int i = (int) (u * 64);
+    int j = (int) (v * 64);
+    uint3 id = uint3(i, j, mTex.imageIndex);
+    float4 map = textureImages[id.xyz];
+    return map.xyz;
+}
+
+float3 GetUvTexile_Triangle_Checker(float u,
+    float v,
+    RayHit hit)
+{
+    if((uint)(u * mTex.uRepeat) % 2 == (uint)(v * mTex.vRepeat) % 2)
+    {
+        return mTex.color1;
+    }
+    else
+    {
+        return mTex.color2;
+    }
+}
+
+float3 GetTexturedAttr_Triangle(RTTexture tex,
+    RayHit hit,
+    RTTriangle tri,
+    Texture2DArray<float4> textureImages)
+{
+    float u, v;
+    InitUv_Triangle(tri, tex);
+    CalcUvCoords_Triangle(hit.position, hit.barycentric, u, v);
+    if (tex.isColor)
+    {
+        return GetUvTexile_Triangle_Color(u, v, hit, textureImages);
+    }
+    else if (tex.isChecker)
+    {
+        return GetUvTexile_Triangle_Checker(u, v, hit);
+    }
+    else
+    {
+        float3 defaultTexile = float3(1, 1, 1);
+        return defaultTexile;
+    }
+}
+
+#endif // RTTEXTURE_COMPUTE
