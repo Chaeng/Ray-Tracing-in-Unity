@@ -2,7 +2,7 @@
 {
     float denomenator = dot(norm, r.direction);
 
-    if (abs(denomenator) < 0.01)
+    if (abs(denomenator) < 0.001)
     {
         return false;
     }
@@ -165,7 +165,7 @@ bool SpotIntersection(RTSpotLight spot, Ray ray, inout float3 start, inout float
         float3 p3 = ray.origin + t3 * rayDir;
         float p3Check = dot(p3 - spot.position, v);
         
-        if (p3Check < 0 || p3Check >spot.range)
+        if (t3 <= 0 || p3Check < 0 || p3Check >spot.range)
         {
             return false;
         }
@@ -201,12 +201,39 @@ bool SpotIntersection(RTSpotLight spot, Ray ray, inout float3 start, inout float
     {
         if (p2Check > 0 && p2Check <= spot.range)
         {
+            if (t1 <= 0 )
+            {
+                if (t2 > 0)
+                {
+                    start = ray.origin;
+                    end = p2;
+                    return true;
+                }
+                return false;
+            }
+
             start = p1;
             end = p2;
             return true;
         }
         else if (p2Check > 0 && p2Check > spot.range)
         {
+            if (t1 <= 0)
+            {
+                if (t2 > 0)
+                {
+                    start = ray.origin;
+                    float dis = 0;
+                    bool hit = coneBaseIntersec(ray, spot.direction, spot.baseD, dis);
+                    if (hit)
+                    {
+                        end = ray.origin + dis * rayDir;
+                        return true;
+                    }
+                }
+                return false;
+            }         
+
             start = p1;
             float dis = 0;
             bool hit = coneBaseIntersec(ray, spot.direction, spot.baseD, dis);
@@ -218,15 +245,60 @@ bool SpotIntersection(RTSpotLight spot, Ray ray, inout float3 start, inout float
         }
         else
         {
-            start = ray.origin;
+            if (t1 <= 0)
+            {
+                return false;
+            }
+
+            float check = dot(ray.origin - spot.position, v);
+            if (check < spot.range)
+            {
+                start = ray.origin;
+                end = p1;
+                return true;
+            }
+            
             end = p1;
-            return true;
+            float dis = 0;
+            bool hit = coneBaseIntersec(ray, spot.direction, spot.baseD, dis);
+            if (hit)
+            {
+                start = ray.origin + dis * rayDir;
+                return true;
+            }
+            return false;
+
         }
     }
-    else if (p1Check > 0 && p1Check > spot.range)
+    else if (p1Check > 0 && p1Check > spot.range )
     {
         if (p2Check > 0 && p2Check <= spot.range)
         {
+            if (t1 <= 0)
+            {
+                if (t2 > 0)
+                {
+                    float check = dot(ray.origin - spot.position, v);
+                    if (check < spot.range)
+                    {
+                        start = ray.origin;
+                        end = p2;
+                        return true;
+                    }
+
+                    end = p2;
+                    float dis = 0;
+                    bool hit = coneBaseIntersec(ray, spot.direction, spot.baseD, dis);
+                    if (hit)
+                    {
+                        start = ray.origin + dis * rayDir;
+                        return true;
+                    }
+                    return false;
+                }
+                return false;
+            }
+
             end = p2;
             float dis = 0;
             bool hit = coneBaseIntersec(ray, spot.direction, spot.baseD, dis);
@@ -239,7 +311,7 @@ bool SpotIntersection(RTSpotLight spot, Ray ray, inout float3 start, inout float
     }
     else if (p1Check < 0)
     {
-        if (p2Check > 0 && p2Check <= spot.range)
+        if (p2Check > 0 && p2Check <= spot.range && t2 > 0)
         {
             start = p2;
             float dis = 0;

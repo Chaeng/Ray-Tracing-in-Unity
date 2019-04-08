@@ -28,9 +28,9 @@ public class RTLightInspector : Editor
                 _light.penumbraDecay = EditorGUILayout.FloatField("Penumbra Decay", _light.penumbraDecay);
                 _light.useShadowMap = EditorGUILayout.Toggle("Use shadow map", _light.useShadowMap);
                 _light.shadowFilter = EditorGUILayout.IntSlider("Shadow filter", _light.shadowFilter, 0, 20);
-                _light.useFog = EditorGUILayout.Toggle("Eable Fog", _light.useFog);
+                _light.useFog = EditorGUILayout.Toggle("Eable Volume", _light.useFog);
                 _light.SpotRange = EditorGUILayout.Slider("Range", _light.SpotRange, 1, 180);
-                _light.FogDensity = EditorGUILayout.Slider("Fog Density", _light.FogDensity, 0, 1);
+                _light.FogDensity = EditorGUILayout.Slider("Fog Density(β)", _light.FogDensity, 0, 1);
                 break;
         }
     }
