@@ -13,6 +13,12 @@ public class RTTriangle : RTGeometry
     [SerializeField] private bool m_isDoubleSide = true;
     [SerializeField] private string m_materialName;
 
+
+#if UNITY_EDITOR
+    [SerializeField] private bool m_drawGizmos = false;
+#endif
+
+
     private int m_materialIndex = -1;
 
 
@@ -79,5 +85,18 @@ public class RTTriangle : RTGeometry
     {
         return new Vector3(v.x * scale.x, v.y + scale.y / 2f, v.z * scale.z);
     }
-    
+
+
+#if UNITY_EDITOR
+    public void OnDrawGizmos()
+    {
+        if(m_drawGizmos)
+        {
+            Gizmos.DrawLine(m_worldVert0, m_worldVert1);
+            Gizmos.DrawLine(m_worldVert1, m_worldVert2);
+            Gizmos.DrawLine(m_worldVert2, m_worldVert0);
+        }
+    }
+#endif
+
 }

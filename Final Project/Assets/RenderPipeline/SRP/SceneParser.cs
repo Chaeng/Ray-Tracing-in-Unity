@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,6 +6,8 @@ namespace RayTracingRenderer
 {
     public class SceneParser
     {
+        private static SceneParser _sharedInstance = new SceneParser();
+
         private List<RTSphere_t> m_sphereGeom;
         private List<RTTriangle_t> m_triangleGeom;
         private List<RTMaterial_t> m_materials;
@@ -16,7 +17,12 @@ namespace RayTracingRenderer
 
         private AccelGridGroup _accelGrids;
 
-        public SceneParser()
+        public static SceneParser Instance
+        {
+            get { return _sharedInstance; }
+        }
+
+        private SceneParser()
         {
             m_sphereGeom = new List<RTSphere_t>();
             m_triangleGeom = new List<RTTriangle_t>();
@@ -24,6 +30,8 @@ namespace RayTracingRenderer
             m_directionalLights = new List<RTLightStructureDirectional_t>();
             m_pointLights = new List<RTLightStructurePoint_t>();
             m_spotLights = new List<RTLightStructureSpot_t>();
+
+            _accelGrids = new AccelGridGroup();
         }
 
 
@@ -56,12 +64,12 @@ namespace RayTracingRenderer
         {
             return _accelGrids.GetGridBoxDimension();
         }
-        
+
         public List<RTMaterial_t> GetMaterials()
         {
             return m_materials;
         }
-        
+
         public List<RTLightStructureDirectional_t> GetDirectionalLights()
         {
             return m_directionalLights;
@@ -89,7 +97,7 @@ namespace RayTracingRenderer
             ParseSphere(roots, ref count);
             ParseTriangle(roots, ref count);
             ParseMesh(roots, ref count);
-            
+
             ConstructAccelerateStructure();
         }
 
@@ -107,7 +115,7 @@ namespace RayTracingRenderer
 
             foreach (var root in roots)
             {
-                RTMaterialDatabase[] materialDatabases 
+                RTMaterialDatabase[] materialDatabases
                     = root.GetComponentsInChildren<RTMaterialDatabase>();
 
                 foreach (var database in materialDatabases)
@@ -118,7 +126,7 @@ namespace RayTracingRenderer
                         {
                             continue;
                         }
-                        
+
                         foreach (var mat in database.GetMaterials())
                         {
                             string name = mat.GetName();
@@ -139,7 +147,7 @@ namespace RayTracingRenderer
         {
             foreach (var root in roots)
             {
-                RTSphereRenderer[] sphereRenderers 
+                RTSphereRenderer[] sphereRenderers
                     = root.GetComponentsInChildren<RTSphereRenderer>();
 
                 foreach (var renderer in sphereRenderers)
@@ -165,7 +173,7 @@ namespace RayTracingRenderer
         {
             foreach (var root in roots)
             {
-                RTTriangleRenderer[] triangleRenderers 
+                RTTriangleRenderer[] triangleRenderers
                     = root.GetComponentsInChildren<RTTriangleRenderer>();
 
                 foreach (var renderer in triangleRenderers)
@@ -176,7 +184,7 @@ namespace RayTracingRenderer
                             = renderer.GetTriangle().GetMaterialName();
                         if (triangleMaterialName != null)
                         {
-                            if(triangleMaterialName == name)
+                            if (triangleMaterialName == name)
                             {
                                 renderer.GetTriangle().SetMaterialIndex(index);
                             }
@@ -187,7 +195,7 @@ namespace RayTracingRenderer
         }
 
         private void ParseSphere(GameObject[] roots, ref int counter)
-        {   
+        {
             // Force initialization of dependencies
             if (m_materials == null)
             {
@@ -238,7 +246,7 @@ namespace RayTracingRenderer
                     if (renderer.gameObject.activeSelf)
                     {
                         RTTriangle_t triangleGeomT = renderer.GetGeometry();
-                        
+
                         triangleGeomT.id = counter++;
                         m_triangleGeom.Add(triangleGeomT);
                     }
@@ -265,12 +273,12 @@ namespace RayTracingRenderer
                     {
                         List<RTTriangle_t> allTrianglesInMesh = renderer.GetGeometry();
 
-                        if(allTrianglesInMesh == null)
+                        if (allTrianglesInMesh == null)
                         {
                             continue;
                         }
 
-                        for(int t = 0; t < allTrianglesInMesh.Count; t++)
+                        for (int t = 0; t < allTrianglesInMesh.Count; t++)
                         {
                             allTrianglesInMesh[t].SetId(counter);
                             counter++;
@@ -296,24 +304,20 @@ namespace RayTracingRenderer
                     localMin = m_triangleGeom[i].vert0;
                     localMax = m_triangleGeom[i].vert0;
                 }
-                        
+
                 localMin.x = Mathf.Min(localMin.x, m_triangleGeom[i].vert0.x, m_triangleGeom[i].vert1.x, m_triangleGeom[i].vert2.x);
                 localMin.y = Mathf.Min(localMin.y, m_triangleGeom[i].vert0.y, m_triangleGeom[i].vert1.y, m_triangleGeom[i].vert2.y);
                 localMin.z = Mathf.Min(localMin.z, m_triangleGeom[i].vert0.z, m_triangleGeom[i].vert1.z, m_triangleGeom[i].vert2.z);
-                            
+
                 localMax.x = Mathf.Max(localMax.x, m_triangleGeom[i].vert0.x, m_triangleGeom[i].vert1.x, m_triangleGeom[i].vert2.x);
                 localMax.y = Mathf.Max(localMax.y, m_triangleGeom[i].vert0.y, m_triangleGeom[i].vert1.y, m_triangleGeom[i].vert2.y);
                 localMax.z = Mathf.Max(localMax.z, m_triangleGeom[i].vert0.z, m_triangleGeom[i].vert1.z, m_triangleGeom[i].vert2.z);
             }
 
-            
-            if (_accelGrids == null)
-            {
-                _accelGrids = new AccelGridGroup();
-            }
+           
             _accelGrids.UpdateAccelGridGroup(localMin, localMax);
 
-            
+
             for (int i = 0; i < m_triangleGeom.Count; i++)
             {
                 _accelGrids.AddTriangle(m_triangleGeom[i]);

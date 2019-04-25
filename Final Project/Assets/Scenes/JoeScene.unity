@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731725, g: 0.13414752, b: 0.121078566, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731703, g: 0.13414727, b: 0.12107852, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -216,7 +216,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 291046821}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.16, y: 0, z: -3.42}
+  m_LocalPosition: {x: 2.11, y: 0, z: -3.42}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -233,6 +233,7 @@ GameObject:
   - component: {fileID: 530823756}
   - component: {fileID: 530823755}
   - component: {fileID: 530823754}
+  - component: {fileID: 530823757}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -304,6 +305,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &530823757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 530823753}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96633f737f81ef247a19d2bb044f19dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &581235207
 GameObject:
   m_ObjectHideFlags: 0
@@ -462,6 +475,7 @@ MonoBehaviour:
   m_vertices2: {x: 0, y: 3, z: 0}
   m_isDoubleSide: 1
   m_materialName: 
+  m_drawGizmos: 1
 --- !u!4 &979759857
 Transform:
   m_ObjectHideFlags: 0
@@ -493,7 +507,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1034976657
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -523,6 +537,7 @@ MonoBehaviour:
   m_vertices2: {x: 0, y: 3, z: 0}
   m_isDoubleSide: 1
   m_materialName: 
+  m_drawGizmos: 1
 --- !u!4 &1034976659
 Transform:
   m_ObjectHideFlags: 0
@@ -530,13 +545,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1034976656}
-  m_LocalRotation: {x: 0, y: 0.09515083, z: 0, w: 0.99546295}
+  m_LocalRotation: {x: 0.4674355, y: 0.15104136, z: -0.081412405, w: 0.8672155}
   m_LocalPosition: {x: 4.92, y: 0, z: 3.15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 7
-  m_LocalEulerAnglesHint: {x: 0, y: 10.92, z: 0}
+  m_LocalEulerAnglesHint: {x: 56.65, y: 19.76, z: 0}
 --- !u!1 &1094084969
 GameObject:
   m_ObjectHideFlags: 0

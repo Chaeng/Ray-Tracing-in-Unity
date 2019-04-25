@@ -9,7 +9,7 @@ namespace RayTracingRenderer
     {
         private void InitSceneParsing()
         {
-            m_sceneParser = new SceneParser();
+            m_sceneParser = SceneParser.Instance;
         }
 
         private void RunParseScene()
